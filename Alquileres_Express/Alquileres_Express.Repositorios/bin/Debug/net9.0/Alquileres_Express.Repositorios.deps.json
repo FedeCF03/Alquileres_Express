@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "Alquileres_Express.Repositorios/1.0.0": {
+        "dependencies": {
+          "Alquileres_Express.Aplicacion": "1.0.0"
+        },
+        "runtime": {
+          "Alquileres_Express.Repositorios.dll": {}
+        }
+      },
+      "Alquileres_Express.Aplicacion/1.0.0": {
+        "runtime": {
+          "Alquileres_Express.Aplicacion.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Alquileres_Express.Repositorios/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Alquileres_Express.Aplicacion/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

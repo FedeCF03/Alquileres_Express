@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net9.0": {}
+    "net9.0": {
+      "Alquileres_Express.Aplicacion/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/Alquileres_Express.Aplicacion.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Alquileres_Express.Aplicacion.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "Alquileres_Express.Aplicacion/1.0.0": {
+      "type": "project",
+      "path": "../Alquileres_Express.Aplicacion/Alquileres_Express.Aplicacion.csproj",
+      "msbuildProject": "../Alquileres_Express.Aplicacion/Alquileres_Express.Aplicacion.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net9.0": []
+    "net9.0": [
+      "Alquileres_Express.Aplicacion >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\fedec\\.nuget\\packages\\": {}
@@ -31,7 +50,11 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj": {
+              "projectPath": "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
