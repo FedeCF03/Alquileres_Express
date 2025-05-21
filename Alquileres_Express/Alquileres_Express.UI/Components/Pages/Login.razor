@@ -25,6 +25,8 @@
 
     private async Task IniciarSesion()
     {
+        // buscar usuario
+
         var claims = new List<Claim> {
 new Claim(ClaimTypes.Name, credenciales.Usuario),
 new Claim(ClaimTypes.Role, "Admin")

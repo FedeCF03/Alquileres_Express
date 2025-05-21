@@ -1,3 +1,4 @@
+using Alquileres_Express.Aplicacion.CasosDeUso;
 using Alquileres_Express.UI.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -17,6 +18,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 });
 builder.Services.AddAuthorization();
+builder.Services.AddTransient<CasoDeUsoAltaInmueble>();
+builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
+builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
+builder.Services.AddTransient<CasoDeUsoBajaInmueble>();
+builder.Services.AddTransient<ObtenerClienteUseCase>();
+builder.Services.AddScoped<IRepositorioCliente, RepositorioClienteMock>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCascadingAuthenticationState();

@@ -1,0 +1,35 @@
+@page "/listadoUsuario"
+@rendermode InteractiveServer
+@inject ListarUsuarioUseCase ListarUsuarioUseCase
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>NOMBRE</th>
+            <th>APELLIDO</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cli in _lista)
+        {
+            <tr>
+                <td>@cli.ID</td>
+                <td>@cli.nombre</td>
+                <td>@cli.apellido</td>
+                <td>@cli.correo</td>
+                <td>@cli.fechaNacimiento</td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    List<Usuario> _lista = new List<Usuario>();
+    protected override void OnInitialized()
+    {
+        _lista = ListarUsuarioUseCase.Ejecutar();
+    }
+}

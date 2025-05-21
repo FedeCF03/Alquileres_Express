@@ -1,0 +1,22 @@
+@page "/usuario"
+@rendermode InteractiveServer
+@inject NavigationManager Navegador;
+@inject CasoDeUsoRegistrarUsuario RegistrarUsuarioUseCase
+
+<input placeholder="Nombre" @bind="_usuario.nombre" class="form-control">
+<input placeholder="Apellido" @bind="_usuario.apellido" class="form-control">
+<input placeholder="Correo" @bind="_usuario.correo" class="form-control">
+<input placeholder="Contraseña" @bind="_usuario.contraseña" class="form-control">
+<input placeholder="direccion" @bind="_usuario.direccion" class="form-control">
+<button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+
+@code {
+    Usuario _usuario = new Usuario();
+    void Aceptar()
+    {
+        RegistrarUsuarioUseCase.Ejecutar(_usuario);
+        _usuario = new Usuario();
+        Navegador.NavigateTo("listadoUsuario");
+
+    }
+}
