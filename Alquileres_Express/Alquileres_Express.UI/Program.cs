@@ -1,6 +1,8 @@
 using Alquileres_Express.Aplicacion.CasosDeUso;
 using Alquileres_Express.UI.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Alquileres_Express.Aplicacion.Interfaces;
+using Alquileres_Express.Repositorios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,13 +19,28 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.LoginPath = "/login";
 
 });
-builder.Services.AddAuthorization();
+
+builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
+builder.Services.AddTransient<CasoDeUsoListarUsuario>();
+builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuarioMock>();
 builder.Services.AddTransient<CasoDeUsoAltaInmueble>();
 builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
 builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
 builder.Services.AddTransient<CasoDeUsoBajaInmueble>();
-builder.Services.AddTransient<ObtenerClienteUseCase>();
-builder.Services.AddScoped<IRepositorioCliente, RepositorioClienteMock>();
+builder.Services.AddTransient<CasoDeUsoBajaUsuario>();
+
+// builder.Services.AddTransient<CasoDeUsoCancelarAlquiler>();
+// builder.Services.AddTransient<CasoDeUsoEditarPerfil>();
+// builder.Services.AddTransient<CasoDeUsoEliminarInmueble>();
+// builder.Services.AddTransient<CasoDeUsoListarUsuario>();
+builder.Services.AddTransient<CasoDeUsoModificarInmueble>();
+
+builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
+// builder.Services.AddTransient<CasoDeUsoVerPerfil>();
+// builder.Services.AddTransient<CasoDeUsoEliminarInmueble>();
+// builder.Services.AddTransient<CasoDeUsoListarUsuario>();
+builder.Services.AddTransient<CasoDeUsoModificarInmueble>();
+
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCascadingAuthenticationState();

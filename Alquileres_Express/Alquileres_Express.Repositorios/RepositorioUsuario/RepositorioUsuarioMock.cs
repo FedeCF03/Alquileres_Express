@@ -33,9 +33,18 @@ public class RepositorioUsuarioMock : IRepositorioUsuario
     }
     public void RegistrarUsuario(Usuario u)
     {
-        u.ID = _proximoId++;
-        //cargar los datos del cliente desde blazor
-        _listaUsuarios.Add(Clonar(u));//Crea un nuevo usuario y lo agrega a la lista
+        var existe = _listaUsuarios.Any(aux => aux.correo == u.correo);
+
+        if (!existe)
+        {
+            u.ID = _proximoId++;
+            _listaUsuarios.Add(Clonar(u)); // Agrega solo si el correo está libre
+        }
+        else
+        {
+            // Opcional: lanzar una excepción o manejar el error
+            throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
+        }
     }
 
     public List<Usuario> GetUsuarios()//Devuelve una copia de la lista de usuarios

@@ -479,7 +479,8 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
-          "Alquileres_Express.Aplicacion": "1.0.0"
+          "Alquileres_Express.Aplicacion": "1.0.0",
+          "Microsoft.EntityFrameworkCore.Sqlite": "9.0.5"
         },
         "compile": {
           "bin/placeholder/Alquileres_Express.Repositorios.dll": {}
