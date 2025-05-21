@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Alquileres_Express.Repositorios")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b893b4a2eeec23dc0396bfe7d1581f84f44229ee")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f83b2f3d2a59a805bc25a5c202a10a8d057e7a41")]
 [assembly: System.Reflection.AssemblyProductAttribute("Alquileres_Express.Repositorios")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Alquileres_Express.Repositorios")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
