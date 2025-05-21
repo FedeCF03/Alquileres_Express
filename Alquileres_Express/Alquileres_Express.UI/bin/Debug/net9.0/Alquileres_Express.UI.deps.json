@@ -357,7 +357,8 @@
       },
       "Alquileres_Express.Repositorios/1.0.0": {
         "dependencies": {
-          "Alquileres_Express.Aplicacion": "1.0.0"
+          "Alquileres_Express.Aplicacion": "1.0.0",
+          "Microsoft.EntityFrameworkCore.Sqlite": "9.0.5"
         },
         "runtime": {
           "Alquileres_Express.Repositorios.dll": {

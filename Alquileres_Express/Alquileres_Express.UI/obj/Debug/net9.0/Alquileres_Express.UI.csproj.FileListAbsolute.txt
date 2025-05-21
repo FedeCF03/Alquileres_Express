@@ -67,8 +67,6 @@ C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Expres
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\obj\Debug\net9.0\compressed\d8mb0fzaog-h1s4sie4z3.gz
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\obj\Debug\net9.0\compressed\bfcu21msy1-63fj8s7r0e.gz
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\obj\Debug\net9.0\compressed\67sd75rbyx-0j3bgjxly4.gz
-C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\obj\Debug\net9.0\compressed\3d9f1ey8jc-up2ohym98h.gz
-C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\obj\Debug\net9.0\compressed\7gkdokorzo-up2ohym98h.gz
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\obj\Debug\net9.0\staticwebassets.development.json
@@ -118,3 +116,5 @@ C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Expres
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\bin\Debug\net9.0\runtimes\win-arm64\native\e_sqlite3.dll
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\bin\Debug\net9.0\runtimes\win-x64\native\e_sqlite3.dll
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\bin\Debug\net9.0\runtimes\win-x86\native\e_sqlite3.dll
+C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\obj\Debug\net9.0\compressed\3d9f1ey8jc-so1xs75dal.gz
+C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express\Alquileres_Express.UI\obj\Debug\net9.0\compressed\7gkdokorzo-so1xs75dal.gz

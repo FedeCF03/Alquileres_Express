@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Alquileres_Express.UI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f83b2f3d2a59a805bc25a5c202a10a8d057e7a41")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+144d8a11c25b3b58e00ead2937b0379a50b1a084")]
 [assembly: System.Reflection.AssemblyProductAttribute("Alquileres_Express.UI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Alquileres_Express.UI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
