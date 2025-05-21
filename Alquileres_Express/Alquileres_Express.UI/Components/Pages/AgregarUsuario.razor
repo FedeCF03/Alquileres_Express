@@ -1,7 +1,7 @@
 @page "/usuario"
 @rendermode InteractiveServer
 @inject NavigationManager Navegador;
-@inject CasoDeUsoRegistrarUsuario RegistrarUsuarioUseCase
+@inject CasoDeUsoRegistarUsuario casoDeUsoRegistrarUsuario
 
 <input placeholder="Nombre" @bind="_usuario.nombre" class="form-control">
 <input placeholder="Apellido" @bind="_usuario.apellido" class="form-control">
@@ -14,7 +14,7 @@
     Usuario _usuario = new Usuario();
     void Aceptar()
     {
-        RegistrarUsuarioUseCase.Ejecutar(_usuario);
+        Ca.Ejecutar(_usuario);
         _usuario = new Usuario();
         Navegador.NavigateTo("listadoUsuario");
 
