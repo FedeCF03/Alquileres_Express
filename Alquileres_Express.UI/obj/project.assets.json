@@ -1407,19 +1407,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Usuario\\.nuget\\packages\\": {}
+    "C:\\Users\\Mar\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Usuario\\Desktop\\Alquileres_Express\\Alquileres_Express.UI\\Alquileres_Express.UI.csproj",
+      "projectUniqueName": "C:\\Users\\Mar\\Desktop\\Alquileres_Express\\Alquileres_Express.UI\\Alquileres_Express.UI.csproj",
       "projectName": "Alquileres_Express.UI",
-      "projectPath": "C:\\Users\\Usuario\\Desktop\\Alquileres_Express\\Alquileres_Express.UI\\Alquileres_Express.UI.csproj",
-      "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Usuario\\Desktop\\Alquileres_Express\\Alquileres_Express.UI\\obj\\",
+      "projectPath": "C:\\Users\\Mar\\Desktop\\Alquileres_Express\\Alquileres_Express.UI\\Alquileres_Express.UI.csproj",
+      "packagesPath": "C:\\Users\\Mar\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Mar\\Desktop\\Alquileres_Express\\Alquileres_Express.UI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Usuario\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Mar\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -1431,11 +1431,11 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\Usuario\\Desktop\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj": {
-              "projectPath": "C:\\Users\\Usuario\\Desktop\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj"
+            "C:\\Users\\Mar\\Desktop\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj": {
+              "projectPath": "C:\\Users\\Mar\\Desktop\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj"
             },
-            "C:\\Users\\Usuario\\Desktop\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj": {
-              "projectPath": "C:\\Users\\Usuario\\Desktop\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj"
+            "C:\\Users\\Mar\\Desktop\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj": {
+              "projectPath": "C:\\Users\\Mar\\Desktop\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj"
             }
           }
         }
