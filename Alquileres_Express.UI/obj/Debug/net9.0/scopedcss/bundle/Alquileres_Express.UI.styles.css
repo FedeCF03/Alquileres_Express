@@ -1,0 +1,146 @@
+@import '_content/BlazorDateRangePicker/BlazorDateRangePicker.iitr8bszy4.bundle.scp.css';
+
+/* _content/Alquileres_Express.UI/Components/Layout/MainLayout.razor.rz.scp.css */
+/* Fondo principal */
+.main-content[b-spow7be3na] {
+    background-color: #495d54;
+    min-height: 100vh; /* que ocupe todo el alto de la ventana */
+    color: white; /* texto blanco */
+    padding-top: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Barra superior toda blanca */
+.top-bar[b-spow7be3na] {
+    background-color: white;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Ajustes para texto y logo dentro de la barra blanca */
+.top-bar .text-white[b-spow7be3na] {
+    color: black !important; /* Cambiamos a negro porque el fondo es blanco */
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.top-bar img[b-spow7be3na] {
+    height: 30px;
+    margin-right: 0.5rem;
+}
+
+/* Botones en la barra */
+.top-bar button[b-spow7be3na] {
+    /* Usamos estilo bootstrap outline-dark para que se vean sobre fondo blanco */
+    color: black;
+    border: 1px solid black;
+    background: transparent;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.Contactanos[b-spow7be3na]{
+    color: rgb(255, 255, 255) !important;
+    border: 1px solid black;
+    background: #495d54 !important;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.top-bar button:hover[b-spow7be3na] {
+    background-color: #e0e0e0;
+}
+/* _content/Alquileres_Express.UI/Components/Pages/Login.razor.rz.scp.css */
+
+
+/* Basic styling for the login page */
+.login-container[b-w2b9kdx41t] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 60px);
+    /* Adjust based on your header/footer height */
+    background-color: #495d54;
+    /* Light grey background */
+    padding: 20px;
+}
+
+.login-card[b-w2b9kdx41t] {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-title[b-w2b9kdx41t] {
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.form-group[b-w2b9kdx41t] {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label[b-w2b9kdx41t] {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+}
+
+.form-control[b-w2b9kdx41t] {
+    width: calc(100% - 20px);
+    /* Adjust for padding */
+    padding: 12px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+    /* Include padding in width */
+}
+
+.form-control:focus[b-w2b9kdx41t] {
+    border-color: #007bff;
+    /* Highlight on focus */
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-primary[b-w2b9kdx41t] {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.btn-primary:hover[b-w2b9kdx41t] {
+    background-color: #0056b3;
+}
+
+.validation-message[b-w2b9kdx41t] {
+    color: #dc3545;
+    /* Red color for error messages */
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+}
+
+/* _content/Alquileres_Express.UI/Components/Pages/Principal.razor.rz.scp.css */
