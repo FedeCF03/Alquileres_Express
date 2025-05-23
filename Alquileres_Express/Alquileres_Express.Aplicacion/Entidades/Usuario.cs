@@ -14,6 +14,10 @@ public abstract class Usuario
 
     public RolUsuario Rol { get; set; }
 
+    public Usuario()
+    {
+
+    }
     // Constructor de la clase base
     public Usuario(int id, string correo, string contraseña, string nombre, string apellido, string direccion, DateTime fechaNacimiento)
     {
@@ -24,9 +28,5 @@ public abstract class Usuario
         Apellido = apellido;
         Direccion = direccion;
         FechaNacimiento = fechaNacimiento;
-    }
-    public Usuario()
-    {
-
     }
 }
