@@ -24,7 +24,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
 builder.Services.AddTransient<CasoDeUsoListarUsuario>();
-//builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuarioMock>();
+builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
+builder.Services.AddScoped<IRepositorioCliente, RepositorioCliente>();
+builder.Services.AddTransient<IRepositorioInmueble, RepositorioInmueble>();
+
 builder.Services.AddTransient<CasoDeUsoAltaInmueble>();
 builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
 builder.Services.AddTransient<CasoDeUsoAltaUsuario>();

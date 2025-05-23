@@ -6,8 +6,8 @@ using Alquileres_Express.Aplicacion.Entidades;
 
 public class CasoDeUsoRegistrarUsuario(IRepositorioCliente repositorio) : CasoDeUsoCliente(repositorio)
 {
-    public void Ejecutar(Cliente cliente)
+    public void Ejecutar(Cliente cli)
     {
-        Repositorio.RegistrarCliente(cliente);
+        Repositorio.RegistrarCliente(cli);
     }
 }

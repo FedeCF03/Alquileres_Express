@@ -12,4 +12,8 @@ public class Cliente : Usuario
         Alquileres = new List<Alquiler>();
         this.Rol = RolUsuario.Cliente;
     }
+    public Cliente()
+    {
+
+    }
 }
