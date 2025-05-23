@@ -4,10 +4,10 @@ using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Aplicacion.Entidades;
 
 
-public class CasoDeUsoRegistrarUsuario(IRepositorioUsuario repositorio) : CasoDeUsoUsuario(repositorio)
+public class CasoDeUsoRegistrarUsuario(IRepositorioCliente repositorio) : CasoDeUsoCliente(repositorio)
 {
-    public void Ejecutar(Usuario usuario)
+    public void Ejecutar(Cliente cliente)
     {
-        Repositorio.RegistrarUsuario(usuario);
+        Repositorio.RegistrarCliente(cliente);
     }
 }
