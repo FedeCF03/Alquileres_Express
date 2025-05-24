@@ -1,5 +1,3 @@
-using System;
-
 namespace Alquileres_Express.Aplicacion.Entidades;
 
 public abstract class Usuario

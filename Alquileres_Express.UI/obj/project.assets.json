@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net9.0": {
+      "BCrypt.Net-Next/4.0.3": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/BCrypt.Net-Next.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/BCrypt.Net-Next.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "BlazorDateRangePicker/6.1.0": {
         "type": "package",
         "dependencies": {
@@ -601,6 +614,7 @@
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
           "Alquileres_Express.Aplicacion": "1.0.0",
+          "BCrypt.Net-Next": "4.0.3",
           "Microsoft.EntityFrameworkCore.Sqlite": "9.0.5"
         },
         "compile": {
@@ -613,6 +627,37 @@
     }
   },
   "libraries": {
+    "BCrypt.Net-Next/4.0.3": {
+      "sha512": "W+U9WvmZQgi5cX6FS5GDtDoPzUCV4LkBLkywq/kRZhuDwcbavOzcDAr3LXJFqHUi952Yj3LEYoWW0jbEUQChsA==",
+      "type": "package",
+      "path": "bcrypt.net-next/4.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "bcrypt.net-next.4.0.3.nupkg.sha512",
+        "bcrypt.net-next.nuspec",
+        "ico.png",
+        "lib/net20/BCrypt.Net-Next.dll",
+        "lib/net20/BCrypt.Net-Next.xml",
+        "lib/net35/BCrypt.Net-Next.dll",
+        "lib/net35/BCrypt.Net-Next.xml",
+        "lib/net462/BCrypt.Net-Next.dll",
+        "lib/net462/BCrypt.Net-Next.xml",
+        "lib/net472/BCrypt.Net-Next.dll",
+        "lib/net472/BCrypt.Net-Next.xml",
+        "lib/net48/BCrypt.Net-Next.dll",
+        "lib/net48/BCrypt.Net-Next.xml",
+        "lib/net5.0/BCrypt.Net-Next.dll",
+        "lib/net5.0/BCrypt.Net-Next.xml",
+        "lib/net6.0/BCrypt.Net-Next.dll",
+        "lib/net6.0/BCrypt.Net-Next.xml",
+        "lib/netstandard2.0/BCrypt.Net-Next.dll",
+        "lib/netstandard2.0/BCrypt.Net-Next.xml",
+        "lib/netstandard2.1/BCrypt.Net-Next.dll",
+        "lib/netstandard2.1/BCrypt.Net-Next.xml",
+        "readme.md"
+      ]
+    },
     "BlazorDateRangePicker/6.1.0": {
       "sha512": "AfmD5ZWF/IQfos8CBSoX/l9IlTq6b2+5C53ltP/2hLdHKJsIacoEAETkRYkBnpAdOcns0Sc3ixYzZJicbuVVRQ==",
       "type": "package",
@@ -1407,19 +1452,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\fedec\\.nuget\\packages\\": {}
+    "C:\\Users\\Gonzalo\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.UI\\Alquileres_Express.UI.csproj",
+      "projectUniqueName": "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.UI\\Alquileres_Express.UI.csproj",
       "projectName": "Alquileres_Express.UI",
-      "projectPath": "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.UI\\Alquileres_Express.UI.csproj",
-      "packagesPath": "C:\\Users\\fedec\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.UI\\obj\\",
+      "projectPath": "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.UI\\Alquileres_Express.UI.csproj",
+      "packagesPath": "C:\\Users\\Gonzalo\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.UI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\fedec\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Gonzalo\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -1431,11 +1476,11 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj": {
-              "projectPath": "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj"
+            "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj": {
+              "projectPath": "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj"
             },
-            "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj": {
-              "projectPath": "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj"
+            "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj": {
+              "projectPath": "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj"
             }
           }
         }

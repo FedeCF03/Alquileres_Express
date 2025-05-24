@@ -46,3 +46,35 @@ C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express.Repositorios\obj\
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\refint\Alquileres_Express.Repositorios.dll
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.pdb
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\ref\Alquileres_Express.Repositorios.dll
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\bin\Debug\net9.0\Alquileres_Express.Repositorios.deps.json
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\bin\Debug\net9.0\Alquileres_Express.Repositorios.dll
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\bin\Debug\net9.0\Alquileres_Express.Repositorios.pdb
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\bin\Debug\net9.0\Alquileres_Express.Aplicacion.dll
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\bin\Debug\net9.0\Alquileres_Express.Aplicacion.pdb
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.csproj.AssemblyReference.cache
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.AssemblyInfoInputs.cache
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.AssemblyInfo.cs
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.csproj.CoreCompileInputs.cache
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.sourcelink.json
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquiler.545826F8.Up2Date
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.dll
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\refint\Alquileres_Express.Repositorios.dll
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.pdb
+C:\Users\Gonzalo\Informatica\Pagina inge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\ref\Alquileres_Express.Repositorios.dll
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\bin\Debug\net9.0\Alquileres_Express.Repositorios.deps.json
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\bin\Debug\net9.0\Alquileres_Express.Repositorios.dll
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\bin\Debug\net9.0\Alquileres_Express.Repositorios.pdb
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\bin\Debug\net9.0\Alquileres_Express.Aplicacion.dll
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\bin\Debug\net9.0\Alquileres_Express.Aplicacion.pdb
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.csproj.AssemblyReference.cache
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.AssemblyInfoInputs.cache
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.AssemblyInfo.cs
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.csproj.CoreCompileInputs.cache
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.sourcelink.json
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquiler.545826F8.Up2Date
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.dll
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\refint\Alquileres_Express.Repositorios.dll
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\Alquileres_Express.Repositorios.pdb
+C:\Users\Gonzalo\Informatica\PaginaInge\Alquileres_Express\Alquileres_Express.Repositorios\obj\Debug\net9.0\ref\Alquileres_Express.Repositorios.dll

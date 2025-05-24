@@ -2,9 +2,7 @@ using Alquileres_Express.Aplicacion.CasosDeUso;
 using Alquileres_Express.UI.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Alquileres_Express.Aplicacion.Interfaces;
-using Alquileres_Express.Aplicacion.Servicios;
 using Alquileres_Express.Repositorios.Context;
-using Alquileres_Express.Repositorios;
 using Alquileres_Express.Repositorios.RepositoriosSQLite;
 
 var builder = WebApplication.CreateBuilder(args);

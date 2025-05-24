@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net9.0": {
+      "BCrypt.Net-Next/4.0.3": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/BCrypt.Net-Next.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/BCrypt.Net-Next.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.Data.Sqlite.Core/9.0.5": {
         "type": "package",
         "dependencies": {
@@ -478,6 +491,37 @@
     }
   },
   "libraries": {
+    "BCrypt.Net-Next/4.0.3": {
+      "sha512": "W+U9WvmZQgi5cX6FS5GDtDoPzUCV4LkBLkywq/kRZhuDwcbavOzcDAr3LXJFqHUi952Yj3LEYoWW0jbEUQChsA==",
+      "type": "package",
+      "path": "bcrypt.net-next/4.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "bcrypt.net-next.4.0.3.nupkg.sha512",
+        "bcrypt.net-next.nuspec",
+        "ico.png",
+        "lib/net20/BCrypt.Net-Next.dll",
+        "lib/net20/BCrypt.Net-Next.xml",
+        "lib/net35/BCrypt.Net-Next.dll",
+        "lib/net35/BCrypt.Net-Next.xml",
+        "lib/net462/BCrypt.Net-Next.dll",
+        "lib/net462/BCrypt.Net-Next.xml",
+        "lib/net472/BCrypt.Net-Next.dll",
+        "lib/net472/BCrypt.Net-Next.xml",
+        "lib/net48/BCrypt.Net-Next.dll",
+        "lib/net48/BCrypt.Net-Next.xml",
+        "lib/net5.0/BCrypt.Net-Next.dll",
+        "lib/net5.0/BCrypt.Net-Next.xml",
+        "lib/net6.0/BCrypt.Net-Next.dll",
+        "lib/net6.0/BCrypt.Net-Next.xml",
+        "lib/netstandard2.0/BCrypt.Net-Next.dll",
+        "lib/netstandard2.0/BCrypt.Net-Next.xml",
+        "lib/netstandard2.1/BCrypt.Net-Next.dll",
+        "lib/netstandard2.1/BCrypt.Net-Next.xml",
+        "readme.md"
+      ]
+    },
     "Microsoft.Data.Sqlite.Core/9.0.5": {
       "sha512": "cP5eBSqra4Ae80X72g0h2N+jdrA4BgoMQmz9JaQmKAEXUHw9N21DPIBqIyMjOo2fK9ISiGytlAOxBAJf1hEvqg==",
       "type": "package",
@@ -1125,23 +1169,24 @@
   "projectFileDependencyGroups": {
     "net9.0": [
       "Alquileres_Express.Aplicacion >= 1.0.0",
+      "BCrypt.Net-Next >= 4.0.3",
       "Microsoft.EntityFrameworkCore.Sqlite >= 9.0.5"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\fedec\\.nuget\\packages\\": {}
+    "C:\\Users\\Gonzalo\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj",
+      "projectUniqueName": "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj",
       "projectName": "Alquileres_Express.Repositorios",
-      "projectPath": "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj",
-      "packagesPath": "C:\\Users\\fedec\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.Repositorios\\obj\\",
+      "projectPath": "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.Repositorios\\Alquileres_Express.Repositorios.csproj",
+      "packagesPath": "C:\\Users\\Gonzalo\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.Repositorios\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\fedec\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Gonzalo\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -1153,8 +1198,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj": {
-              "projectPath": "C:\\Users\\fedec\\Downloads\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj"
+            "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj": {
+              "projectPath": "C:\\Users\\Gonzalo\\Informatica\\PaginaInge\\Alquileres_Express\\Alquileres_Express.Aplicacion\\Alquileres_Express.Aplicacion.csproj"
             }
           }
         }
@@ -1175,6 +1220,10 @@
       "net9.0": {
         "targetAlias": "net9.0",
         "dependencies": {
+          "BCrypt.Net-Next": {
+            "target": "Package",
+            "version": "[4.0.3, )"
+          },
           "Microsoft.EntityFrameworkCore.Sqlite": {
             "target": "Package",
             "version": "[9.0.5, )"

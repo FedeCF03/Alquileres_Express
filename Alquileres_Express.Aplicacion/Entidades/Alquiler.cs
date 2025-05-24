@@ -1,8 +1,5 @@
 namespace Alquileres_Express.Aplicacion.Entidades;
 
-using Alquileres_Express.Aplicacion.Enumerativo;
-
-
 public class Alquiler
 {
     public int Id { get; set; }
