@@ -4,10 +4,11 @@ using Alquileres_Express.Aplicacion.Interfaces;
 
 namespace Alquileres_Express.Aplicacion.CasosDeUso;
 
-public class CasoDeUsoListarUsuario(IRepositorioUsuario repositorio) : CasoDeUsoUsuario(repositorio)
+public class CasoDeUsoListarUsuario(IRepositorioPersonal repositorio)// : CasoDeUsoUsuario(repositorio)
 {
     public List<Usuario> Ejecutar()
     {
-        return Repositorio.GetUsuarios();
+        //return repositorio.GetUsuarios();
+        return null;
     }
 }

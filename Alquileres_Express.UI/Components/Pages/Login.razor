@@ -3,6 +3,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 @using System.Security.Claims
 @using Alquileres_Express.Aplicacion
+@using Alquileres_Express.Aplicacion.Entidades
 @using Alquileres_Express.Aplicacion.Interfaces
 @using Alquileres_Express.Aplicacion.Servicios
 @using Alquileres_Express.Repositorios
@@ -13,28 +14,30 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Net.Mail
 @inject NavigationManager NavigationManager
+@inject IRepositorioCliente RepositorioCliente
+@inject IRepositorioPersonal RepositorioPersonal
 
 <div class="login-container">
     <div class="login-card">
-        <h3 class="login-title">Iniciar Sesión</h3>
+        <h3 class="login-title">Iniciar sesión</h3>
 
-        <EditForm Model="@cliente" OnValidSubmit="IniciarSesion" FormName="loginForm">
+        <EditForm Model="@usuario" OnValidSubmit="IniciarSesion" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
                 <label for="username">Email</label>
-                <InputText id="username" @bind-Value="cliente.Nombre" class="form-control"
+                <InputText id="username" @bind-Value="usuario.Nombre" class="form-control"
                     placeholder="Ingrese su usuario" />
             </div>
 
             <div class="form-group">
                 <label for="password">Contraseña</label>
-                <InputText id="password" @bind-Value="cliente.Contraseña" type="password" class="form-control"
+                <InputText id="password" @bind-Value="usuario.Contraseña" type="password" class="form-control"
                     placeholder="Ingrese su contraseña" />
             </div>
             <div class="login-links">
                 <a href="/forgot-password" class="link-secondary">¿Olvidaste tu contraseña?</a>
-                <a href="/register" class="link-secondary">Regístrarse</a>
+                <a href="/register" class="link-secondary">Registrarse</a>
             </div>
 
             <button type="submit" class="btn-primary">Ingresar</button>
@@ -44,29 +47,26 @@
 @code {
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
-    IRepositorioUsuario _repositorioUsuario { get; set; } = new RepositorioUsuario();
     [SupplyParameterFromForm]
-    private LoginModel cliente { get; set; } = new();
+    private Usuario usuario { get; set; }
+
 
     private async Task IniciarSesion()
     {
-        Console.WriteLine("llega");
-
-        cliente.Rol = RolUsuario.Gerente;
-        Console.WriteLine("llega");
-        cliente.Correo = "fedecalta03@gmail.com";
-        Console.WriteLine("llega");
-
-        if (cliente.Rol == RolUsuario.Gerente)
+        usuario = RepositorioCliente.ObtenerClientePorMail(usuario.Correo) ??
+        RepositorioPersonal.ObtenerPersonalPorMail(usuario.Correo) ?? null;
+        if (usuario == null)
         {
-            ServicioEnviarEmail.EnviarEmailDobleAutenticacion(cliente.Correo);
-
-
+            // Mostrar mensaje de error
+            return;
         }
-
+        if (usuario.Rol == RolUsuario.Gerente)
+        {
+            //ServicioEnviarEmail.EnviarEmailDobleAutenticacion(usuario.Correo);
+        }
         var claims = new List<Claim> {
-new Claim(ClaimTypes.Name, cliente.Correo),
-new Claim(ClaimTypes.Role, cliente.Rol.ToString())
+new Claim(ClaimTypes.Name, usuario.Correo),
+new Claim(ClaimTypes.Role, usuario.Rol.ToString())
 };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);

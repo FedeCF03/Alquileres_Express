@@ -4,7 +4,7 @@ namespace Alquileres_Express.Aplicacion.Entidades
     public class Inmueble
     {
         public int Id { get; set; }
-        public string nombre { get; set; }
+        public string Nombre { get; set; }
         public string Direccion { get; set; }
         public string CoordLong { get; set; }
         public string CoordLat { get; set; }

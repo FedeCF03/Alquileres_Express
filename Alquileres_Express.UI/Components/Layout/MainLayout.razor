@@ -1,7 +1,9 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager Nav
+@using Microsoft.AspNetCore.Authentication
 @using Alquileres_Express.UI.Components.Pages;
-
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @{
     var currentRoute = Nav.ToBaseRelativePath(Nav.Uri);
 }
@@ -17,20 +19,36 @@
 
     <!-- Botones a la derecha -->
     <div class="d-flex align-items-center gap-2">
-         @if (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase)){
+        <AuthorizeView>
+            <Authorized>
+                @if (!string.Equals(currentRoute, "Perfil", StringComparison.OrdinalIgnoreCase))
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/Perfil">
+                            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Perfil
+                        </NavLink>
+                    </div>
+                }
+            </Authorized>
+        </AuthorizeView>
+        @if (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase))
+        {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/Login">
                     <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Iniciar Sesion
                 </NavLink>
             </div>
 
-            @if (!string.Equals(currentRoute, "Inmuebles", StringComparison.OrdinalIgnoreCase)){
+            @if (!string.Equals(currentRoute, "Inmuebles", StringComparison.OrdinalIgnoreCase))
+            {
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/Inmuebles">
                         <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Inmuebles
                     </NavLink>
                 </div>
-            } else { 
+            }
+            else
+            {
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/Principal">
                         <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Home

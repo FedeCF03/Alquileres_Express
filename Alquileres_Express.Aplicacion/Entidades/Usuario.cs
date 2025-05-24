@@ -4,7 +4,7 @@ namespace Alquileres_Express.Aplicacion.Entidades;
 
 public abstract class Usuario
 {
-    public int ID { get; set; }
+    public int Id { get; set; }
     public string Correo { get; set; }
     public string Contraseña { get; set; }
     public string Nombre { get; set; }
@@ -19,14 +19,14 @@ public abstract class Usuario
 
     }
     // Constructor de la clase base
-    public Usuario(int id, string correo, string contraseña, string nombre, string apellido, string direccion, DateTime fechaNacimiento)
-    {
-        ID = id;
-        Correo = correo;
-        Contraseña = contraseña;
-        Nombre = nombre;
-        Apellido = apellido;
-        Direccion = direccion;
-        FechaNacimiento = fechaNacimiento;
-    }
+    // public Usuario(int id, string correo, string contraseña, string nombre, string apellido, string direccion, DateTime fechaNacimiento)
+    // {
+    //     Id = id;
+    //     Correo = correo;
+    //     Contraseña = contraseña;
+    //     Nombre = nombre;
+    //     Apellido = apellido;
+    //     Direccion = direccion;
+    //     FechaNacimiento = fechaNacimiento;
+    //}
 }

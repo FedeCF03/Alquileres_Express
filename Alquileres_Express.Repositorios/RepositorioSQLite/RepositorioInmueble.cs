@@ -1,4 +1,4 @@
-namespace Alquileres_Express.Repositorios;
+namespace Alquileres_Express.Repositorios.RepositoriosSQLite;
 
 using Microsoft.EntityFrameworkCore;
 using Alquileres_Express.Aplicacion.Entidades;

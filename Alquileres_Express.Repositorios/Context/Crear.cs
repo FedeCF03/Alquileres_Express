@@ -6,17 +6,24 @@ public class Crear
 {
     public static void Inicializar()
     {
-        using var context = new Alquileres_ExpressContext();
-        if (context.Database.EnsureCreated())
+        try
         {
-
-            var connection = context.Database.GetDbConnection();
-            connection.Open();
-            using (var command = connection.CreateCommand())
+            using var context = new Alquileres_ExpressContext();
+            if (context.Database.EnsureCreated())
             {
-                command.CommandText = "PRAGMA journal_mode=DELETE;";
-                command.ExecuteNonQuery();
+
+                var connection = context.Database.GetDbConnection();
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "PRAGMA journal_mode=DELETE;";
+                    command.ExecuteNonQuery();
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al inicializar la base de datos: {ex.Message}");
         }
     }
 }
