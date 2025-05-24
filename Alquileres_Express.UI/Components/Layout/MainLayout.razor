@@ -1,0 +1,48 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager Nav
+@using Alquileres_Express.UI.Components.Pages;
+
+@{
+    var currentRoute = Nav.ToBaseRelativePath(Nav.Uri);
+}
+<!-- Barra superior con borde blanco -->
+<div class="top-bar d-flex justify-content-between align-items-center border-bottom border-white px-3"
+    style="height: 50px;">
+
+    <!-- Logo a la izquierda -->
+    <div class="d-flex align-items-center">
+        <img src="images/logo.png" alt="logo" style="height: 30px;" class="me-2" />
+        <span class="text-white fw-bold fs-5">Alquiler Express</span>
+    </div>
+
+    <!-- Botones a la derecha -->
+    <div class="d-flex align-items-center gap-2">
+         @if (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase)){
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/Login">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Iniciar Sesion
+                </NavLink>
+            </div>
+
+            @if (!string.Equals(currentRoute, "Inmuebles", StringComparison.OrdinalIgnoreCase)){
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/Inmuebles">
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Inmuebles
+                    </NavLink>
+                </div>
+            } else { 
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/Principal">
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Home
+                    </NavLink>
+                </div>
+            }
+        }
+        <button class="btn btn-sm Contactanos">Contactanos</button>
+    </div>
+</div>
+<!-- Contenido principal con fondo personalizado -->
+
+<main class="main-content text-white py-4 px-3">
+    @Body
+</main>
