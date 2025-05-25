@@ -1,15 +1,14 @@
 namespace Alquileres_Express.Aplicacion.Entidades;
 
-using Alquileres_Express.Aplicacion.Enumerativo;
-
-
 public class Alquiler
 {
-    public int ClienteId { get; set; }
+    public int Id { get; set; }
+    public Cliente Cliente { get; set; }
     public RangoDeFechas RangoDeFechas { get; set; }
     public double precio;
     public bool Cancelado { get; set; }
-    public int InmuebleId { get; set; }
+    public Inmueble Inmueble { get; set; }
+
 
     public EstadoDeAlquiler GetEstadoDeAlquiler()
     {

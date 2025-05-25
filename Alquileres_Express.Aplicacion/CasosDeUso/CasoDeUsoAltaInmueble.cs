@@ -7,8 +7,10 @@ public class CasoDeUsoAltaInmueble(IRepositorioInmueble repoInmueble)
 {
     public IRepositorioInmueble RepoInmueble { get; set; } = repoInmueble;
 
-    public bool Ejecutar(Inmueble inmueble)
+    public bool Ejecutar(Inmueble inmueble, RolUsuario rolUsuario)
     {
+        if (rolUsuario != RolUsuario.Gerente)
+            return false;
         return RepoInmueble.AgregarInmueble(inmueble);
     }
 }

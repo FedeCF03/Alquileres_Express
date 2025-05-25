@@ -2,9 +2,8 @@ using Alquileres_Express.Aplicacion.CasosDeUso;
 using Alquileres_Express.UI.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Alquileres_Express.Aplicacion.Interfaces;
-using Alquileres_Express.Repositorios;
-using Alquileres_Express.Aplicacion.Servicios;
 using Alquileres_Express.Repositorios.Context;
+using Alquileres_Express.Repositorios.RepositoriosSQLite;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +23,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
 builder.Services.AddTransient<CasoDeUsoListarUsuario>();
-builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
+builder.Services.AddScoped<IRepositorioPersonal, RepositorioPersonal>();
 builder.Services.AddScoped<IRepositorioCliente, RepositorioCliente>();
 builder.Services.AddTransient<IRepositorioInmueble, RepositorioInmueble>();
 
@@ -36,13 +35,12 @@ builder.Services.AddTransient<CasoDeUsoBajaUsuario>();
 // builder.Services.AddTransient<CasoDeUsoCancelarAlquiler>();
 // builder.Services.AddTransient<CasoDeUsoEditarPerfil>();
 // builder.Services.AddTransient<CasoDeUsoEliminarInmueble>();
-// builder.Services.AddTransient<CasoDeUsoListarUsuario>();
+//builder.Services.AddTransient<CasoDeUsoListarUsuario>();
 builder.Services.AddTransient<CasoDeUsoModificarInmueble>();
 
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
 // builder.Services.AddTransient<CasoDeUsoVerPerfil>();
 // builder.Services.AddTransient<CasoDeUsoEliminarInmueble>();
-// builder.Services.AddTransient<CasoDeUsoListarUsuario>();
 builder.Services.AddTransient<CasoDeUsoModificarInmueble>();
 
 
@@ -69,6 +67,5 @@ app.UseAuthorization();
 builder.Services.AddAuthorization();
 app.Run();
 
-Crear c = new Crear();
 Crear.Inicializar();
 app.Run();

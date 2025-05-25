@@ -3,6 +3,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 @using System.Security.Claims
 @using Alquileres_Express.Aplicacion
+@using Alquileres_Express.Aplicacion.Entidades
 @using Alquileres_Express.Aplicacion.Interfaces
 @using Alquileres_Express.Aplicacion.Servicios
 @using Alquileres_Express.Repositorios
@@ -44,26 +45,18 @@
 @code {
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
-    IRepositorioUsuario _repositorioUsuario { get; set; } = new RepositorioUsuario();
     [SupplyParameterFromForm]
     private LoginModel cliente { get; set; } = new();
 
+
     private async Task IniciarSesion()
     {
-        Console.WriteLine("llega");
 
         cliente.Rol = RolUsuario.Gerente;
-        Console.WriteLine("llega");
-        cliente.Correo = "fedecalta03@gmail.com";
-        Console.WriteLine("llega");
-
         if (cliente.Rol == RolUsuario.Gerente)
         {
             ServicioEnviarEmail.EnviarEmailDobleAutenticacion(cliente.Correo);
-
-
         }
-
         var claims = new List<Claim> {
 new Claim(ClaimTypes.Name, cliente.Correo),
 new Claim(ClaimTypes.Role, cliente.Rol.ToString())
