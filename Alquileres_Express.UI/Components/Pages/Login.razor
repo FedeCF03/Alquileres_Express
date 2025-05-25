@@ -1,16 +1,10 @@
 @page "/login"
-@inject NavigationManager Nav
 @inject IHttpContextAccessor HttpContextAccessor
 @using System.Security.Claims
-@using Alquileres_Express.Aplicacion
-@using Alquileres_Express.Aplicacion.Entidades
-@using Alquileres_Express.Aplicacion.Interfaces
-@using Alquileres_Express.Aplicacion.Servicios
-@using Alquileres_Express.Repositorios
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authorization;
 @using Microsoft.AspNetCore.Authentication.Cookies
-@inject AuthenticationStateProvider AuthenticationStateProvider
+
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Net.Mail
 @inject NavigationManager NavigationManager
@@ -24,7 +18,7 @@
 
             <div class="form-group">
                 <label for="username">Email</label>
-                <InputText id="username" @bind-Value="cliente.Nombre" class="form-control"
+                <InputText id="username" @bind-Value="cliente.Correo" class="form-control"
                     placeholder="Ingrese su usuario" />
             </div>
 

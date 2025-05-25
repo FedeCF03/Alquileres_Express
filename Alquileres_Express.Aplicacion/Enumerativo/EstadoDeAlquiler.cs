@@ -1,4 +1,4 @@
-namespace Alquileres_Express.Aplicacion;
+namespace Alquileres_Express.Aplicacion.Enumerativo;
 
 public enum EstadoDeAlquiler
 {

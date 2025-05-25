@@ -9,10 +9,9 @@ namespace Alquileres_Express.Aplicacion.Entidades
         public string CoordLong { get; set; }
         public string CoordLat { get; set; }
         public string Ciudad { get; set; }
-        public string Estado { get; set; }
         public string CodigoPostal { get; set; }
         public double Precio { get; set; }
-        public int Habitaciones { get; set; }
+        public int CantidadDeCamas { get; set; }
         public int Banios { get; set; }
         public TipoDeInmueble TipoInmueble { get; set; }
         public List<Alquiler>? alquileres;

@@ -4,7 +4,7 @@ using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Aplicacion.Validadores;
 using Alquileres_Express.Repositorios.Context;
 using System.Collections.Generic;
-using BCrypt;
+
 
 
 
@@ -15,16 +15,16 @@ public class RepositorioUsuarioGenerico : IRepositorioGenerico
 
     public List<Usuario> Listar()
     {
-        return _context.Set<Usuario>().ToList();
+        return [.. _context.Set<Usuario>()];
     }
 
 
     public void Registrar<T>(T u) where T : Usuario
     {
-        ValidadorUsuario validador = new ValidadorUsuario();
+        ValidadorUsuario validador = new ();
         validador.Ejecutar(u);
         //validar mail
-        if (!_context.Set<Usuario>().Any(user => user.Correo == u.Correo))
+        if (!_context.Set<Usuario>().Any(user => user.Correo.Equals(u.Correo)))
         {
             u.Contraseña = BCrypt.Net.BCrypt.HashPassword(u.Contraseña.Trim());//.trim() elimina espacios en blanco
             _context.Set<T>().Add(u);
