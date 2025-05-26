@@ -4,35 +4,30 @@ namespace Alquileres_Express.Aplicacion.Validadores;
 
 public class ValidadorUsuario
 {
-    public void Ejecutar(Usuario usuario)
+    public bool Ejecutar(Usuario usuario)
     {
         //Validar campos
-        validarCampos(usuario);
+        if (!ValidarCampos(usuario))
+            return false;
         //Validar contraseña
         if (usuario.Contraseña.Length < 6)
-            throw new InvalidOperationException("La contraseña debe tener 6 o más dígitos.");
+            return false;
 
         //Validar edad
-        var today = DateTime.Today;
-        int edad = today.Year - usuario.FechaNacimiento.Year;
-        if (usuario.FechaNacimiento > today.AddYears(-edad))
-            edad--;
-        if (edad < 18)
-            throw new InvalidOperationException("El usuario debe ser mayor de edad.");
-
+        TimeSpan distanciaEntreFechas = DateTime.Now - usuario.FechaNacimiento;
+        if (distanciaEntreFechas.TotalDays < 6570) // 6570 días son aproximadamente 18 años
+            return false;
+        return true;
     }
 
-    private void validarCampos(Usuario u)
+    private bool ValidarCampos(Usuario u)
     {
-        if (string.IsNullOrWhiteSpace(u.Nombre))
-            throw new InvalidOperationException("El nombre es obligatorio.");
-        if (string.IsNullOrWhiteSpace(u.Apellido))
-            throw new InvalidOperationException("El apellido es obligatorio.");
-        if (string.IsNullOrWhiteSpace(u.Correo))
-            throw new InvalidOperationException("El correo es obligatorio.");
-        if (string.IsNullOrWhiteSpace(u.Contraseña))
-            throw new InvalidOperationException("La contraseña es obligatoria.");
-        if (string.IsNullOrWhiteSpace(u.Direccion))
-            throw new InvalidOperationException("La dirección es obligatoria.");
+        if (string.IsNullOrWhiteSpace(u.Nombre) || string.IsNullOrWhiteSpace(u.Apellido) ||
+            string.IsNullOrWhiteSpace(u.Correo) || string.IsNullOrWhiteSpace(u.Contraseña) ||
+            string.IsNullOrWhiteSpace(u.Direccion))
+        {
+            return false;
+        }
+        return true;
     }
 }
