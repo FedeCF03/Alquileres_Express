@@ -1,6 +1,12 @@
 @page "/login"
 @inject IHttpContextAccessor HttpContextAccessor
 @using System.Security.Claims
+@using Alquileres_Express.Aplicacion
+@using Alquileres_Express.Aplicacion.Entidades
+@using Alquileres_Express.Aplicacion.Interfaces
+@using Alquileres_Express.Aplicacion.Servicios
+@using Alquileres_Express.Repositorios
+@using Alquileres_Express.Repositorios.RepositoriosSQLite
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authorization;
 @using Microsoft.AspNetCore.Authentication.Cookies
@@ -13,18 +19,19 @@
     <div class="login-card">
         <h3 class="login-title">Iniciar Sesión</h3>
 
-        <EditForm Model="@cliente" OnValidSubmit="IniciarSesion" FormName="loginForm">
+        <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
                 <label for="username">Email</label>
-                <InputText id="username" @bind-Value="cliente.Correo" class="form-control"
+                <InputText
+                    id="username" @bind-Value="user.Correo" class="form-control"
                     placeholder="Ingrese su usuario" />
             </div>
 
             <div class="form-group">
                 <label for="password">Contraseña</label>
-                <InputText id="password" @bind-Value="cliente.Contraseña" type="password" class="form-control"
+                <InputText id="password" @bind-Value="user.Contraseña" type="password" class="form-control"
                     placeholder="Ingrese su contraseña" />
             </div>
             <div class="login-links">
@@ -34,26 +41,52 @@
 
             <button type="submit" class="btn-primary">Ingresar</button>
         </EditForm>
+        @if (ErrorMessage)
+        {
+            <div class="alert alert-danger mt-3">
+                <strong>Error:</strong> Credenciales incorrectas.
+            </div>
+        }
     </div>
 </div>
 @code {
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
     [SupplyParameterFromForm]
-    private LoginModel cliente { get; set; } = new();
+    private LoginModel user { get; set; } = new();
 
+    private IRepositorioCliente repositorioCliente = new RepositorioCliente();
+    private IRepositorioPersonal repositorioPersonal = new RepositorioPersonal();
 
+    private bool ErrorMessage { get; set; } = false;
     private async Task IniciarSesion()
     {
-
-        cliente.Rol = RolUsuario.Gerente;
-        if (cliente.Rol == RolUsuario.Gerente)
+        user.Rol = RolUsuario.Gerente;
+        /*Personal personal = repositorioPersonal.ObtenerPersonalPorMailYContraseña(user.Correo, user.Contraseña);
+        Cliente cliente = repositorioCliente.ObtenerClientePorMailYContraseña(user.Correo, user.Contraseña);
+        if (personal != null)
         {
-            ServicioEnviarEmail.EnviarEmailDobleAutenticacion(cliente.Correo);
+            user.Rol = personal.Rol;
+            if (personal.Rol == RolUsuario.Gerente)
+            {
+                String codigo = ServicioEnviarEmail.EnviarEmailDobleAutenticacion(personal.Correo);
+                repositorioPersonal.ActualizarEstadoDobleAutenticacion(personal.Id, codigo);
+                NavigationManager.NavigateTo("/verificacion-doble-autenticacion");
+            }
         }
+        else if (cliente != null)
+        {
+            user.Rol = cliente.Rol;
+        }
+        else
+        {
+            ErrorMessage = true;
+            throw new Exception("Credenciales incorrectas");
+        }
+        */
         var claims = new List<Claim> {
-new Claim(ClaimTypes.Name, cliente.Correo),
-new Claim(ClaimTypes.Role, cliente.Rol.ToString())
+new Claim(ClaimTypes.Name, user.Correo),
+new Claim(ClaimTypes.Role, user.Rol.ToString())
 };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
@@ -64,7 +97,6 @@ new Claim(ClaimTypes.Role, cliente.Rol.ToString())
 
     public class LoginModel
     {
-        public string Nombre { get; set; }
         public string Contraseña { get; set; }
         public RolUsuario Rol { get; set; }
         public string Correo { get; set; }

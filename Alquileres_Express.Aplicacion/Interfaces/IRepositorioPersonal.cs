@@ -1,4 +1,5 @@
 using Alquileres_Express.Aplicacion.Entidades;
+using Alquileres_Express.Aplicacion.Enumerativo;
 namespace Alquileres_Express.Aplicacion.Interfaces;
 
 public interface IRepositorioPersonal
@@ -14,6 +15,10 @@ public interface IRepositorioPersonal
     public List<Personal> ObtenerTodosElPersonal();
     public List<Personal> ObtenerPersonalPorNombre(string nombre);
 
+    public Personal ObtenerPersonalPorMailYContraseña(string mail, string contraseña);
 
+    public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad);
+
+    public bool ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad, out RolUsuario rol);
 
 }

@@ -11,5 +11,5 @@ public interface IRepositorioCliente
     public Cliente ObtenerClientePorMail(string mail);
     public List<Cliente> ObtenerClientes();
     public void RegistrarCliente(Cliente c);
-
+    public Cliente ObtenerClientePorMailYContraseña(string mail, string contraseña);
 }
