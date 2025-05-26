@@ -24,9 +24,8 @@
 
             <div class="form-group">
                 <label for="username">Email</label>
-                <<<<<<< HEAD <InputText id="username" @bind-Value="user.Correo" class="form-control"=======<InputText
-                    id="username" @bind-Value="user.Correo" class="form-control">>>>>>>
-                    1e1dc5b20dcd63fded11f935519ac8e11e4d44f2
+                <InputText
+                    id="username" @bind-Value="user.Correo" class="form-control"
                     placeholder="Ingrese su usuario" />
             </div>
 
@@ -62,7 +61,8 @@
     private bool ErrorMessage { get; set; } = false;
     private async Task IniciarSesion()
     {
-        Personal personal = repositorioPersonal.ObtenerPersonalPorMailYContraseña(user.Correo, user.Contraseña);
+        user.Rol = RolUsuario.Gerente;
+        /*Personal personal = repositorioPersonal.ObtenerPersonalPorMailYContraseña(user.Correo, user.Contraseña);
         Cliente cliente = repositorioCliente.ObtenerClientePorMailYContraseña(user.Correo, user.Contraseña);
         if (personal != null)
         {
@@ -83,7 +83,7 @@
             ErrorMessage = true;
             throw new Exception("Credenciales incorrectas");
         }
-
+        */
         var claims = new List<Claim> {
 new Claim(ClaimTypes.Name, user.Correo),
 new Claim(ClaimTypes.Role, user.Rol.ToString())

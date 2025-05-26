@@ -8,11 +8,6 @@
 
 
 
-<<<<<<< HEAD
-
-
-}
-=======
 // public class RepositorioUsuarioGenerico<T> : IRepositorioGenerico
 // {
 //     readonly Alquileres_ExpressContext _context;
@@ -42,4 +37,3 @@
 //     }
 
 // }
->>>>>>> 1e1dc5b20dcd63fded11f935519ac8e11e4d44f2

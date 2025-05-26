@@ -1,5 +1,6 @@
 using Alquileres_Express.Aplicacion;
 using Alquileres_Express.Aplicacion.Entidades;
+using Alquileres_Express.Aplicacion.Enumerativo;
 using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Repositorios.Context;
 
@@ -85,4 +86,6 @@ public class RepositorioPersonal : IRepositorioPersonal
         return false;
 
     }
+
+   
 }
