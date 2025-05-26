@@ -14,6 +14,10 @@ public interface IRepositorioPersonal
     public List<Personal> ObtenerTodosElPersonal();
     public List<Personal> ObtenerPersonalPorNombre(string nombre);
 
+    public Personal ObtenerPersonalPorMailYContraseña(string mail, string contraseña);
 
+    public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad);
+
+    public bool ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad, out RolUsuario rol);
 
 }

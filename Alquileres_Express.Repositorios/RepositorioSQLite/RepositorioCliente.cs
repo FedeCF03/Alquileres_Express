@@ -47,4 +47,10 @@ public class RepositorioCliente : IRepositorioCliente
     {
         throw new NotImplementedException();
     }
+
+    public Cliente ObtenerClientePorMailYContraseña(string mail, string contraseña)
+    {
+        throw new NotImplementedException();
+    }
+
 }
