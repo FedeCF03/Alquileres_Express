@@ -1,7 +1,3 @@
-using System;
-
-using Alquileres_Express.Aplicacion.Interfaces;
-using Alquileres_Express.Aplicacion.Entidades;
 namespace Alquileres_Express.Repositorios;
 
 public class RepositorioUsuarioMock //: IRepositorioUsuario

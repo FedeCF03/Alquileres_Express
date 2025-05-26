@@ -1,6 +1,5 @@
 namespace Alquileres_Express.Repositorios.RepositoriosSQLite;
 
-using Microsoft.EntityFrameworkCore;
 using Alquileres_Express.Aplicacion.Entidades;
 using Alquileres_Express.Aplicacion.Interfaces;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ public class RepositorioCliente : IRepositorioCliente
     public void EliminarCliente(Cliente c)
     {
         throw new NotImplementedException();
+        
     }
 
     public void ModificarCliente(Cliente c)

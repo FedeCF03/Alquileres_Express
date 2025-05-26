@@ -3,7 +3,6 @@
 @using Microsoft.AspNetCore.Authentication
 @using Alquileres_Express.UI.Components.Pages;
 @using Microsoft.AspNetCore.Components.Authorization
-@inject AuthenticationStateProvider AuthenticationStateProvider
 @{
     var currentRoute = Nav.ToBaseRelativePath(Nav.Uri);
 }
@@ -30,6 +29,7 @@
                     </div>
                 }
             </Authorized>
+
         </AuthorizeView>
         @if (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase))
         {

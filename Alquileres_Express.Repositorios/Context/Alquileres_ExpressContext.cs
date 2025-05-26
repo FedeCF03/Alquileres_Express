@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Alquileres_Express.Aplicacion.Entidades;
-using Alquileres_Express.Aplicacion;
 namespace Alquileres_Express.Repositorios.Context;
+
 
 public class Alquileres_ExpressContext : DbContext
 {
