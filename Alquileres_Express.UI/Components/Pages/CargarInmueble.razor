@@ -1,0 +1,111 @@
+@page "/cargar-inmueble"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
+@inject IHttpContextAccessor HttpContextAccessor
+@using System.Security.Claims
+@inject IRepositorioInmueble RepositorioInmueble
+@inject CasoDeUsoAltaInmueble CasoDeUsoAltaInmueble
+@using Microsoft.AspNetCore.Authorization
+@using Alquileres_Express.Aplicacion.Enumerativo
+@attribute [Authorize]
+@inject IJSRuntime JS
+
+
+<AuthorizeView Roles="Gerente, Admin">
+    <h3>Bienvenido Administrador</h3>
+<label class="form-label">Cargar Inmueble</label>
+<label class="form-label">Por favor, complete los siguientes campos:</label>
+<label class="form-label">Nombre del Inmueble</label>
+<input required=true type="text" @bind="inmueble.Nombre" placeholder="Nombre del Inmueble" class="form-control mb-2" />
+<label class="form-label">Ciudad del Inmueble</label>
+<input required=true type=" text" @bind="inmueble.Ciudad" placeholder="Ciudad del Inmueble" class="form-control mb-2" />
+<label class="form-label">Dirección del Inmueble</label>
+<input required=true type="text" @bind="inmueble.Direccion" placeholder="Dirección del Inmueble" class="form-control mb-2" />
+<label class="form-label">Precio del Inmueble</label>
+<input required=true type="number" @bind="inmueble.Precio" placeholder="Precio del Inmueble" class="form-control mb-2" />
+<label class="form-label">Cantidad de camas del Inmueble</label>
+<input required=true type="number" @bind="inmueble.CantidadDeCamas" placeholder="Cantidad de camas" class="form-control mb-2" />
+<label class="form-label">Cantidad de baños del Inmueble</label>
+<input required=true type="number" @bind="inmueble.Banios" placeholder="Cantidad de baños" class="form-control mb-2" />
+<label for="type">Elija un tipo de inmueble:</label>
+<select @bind=inmueble.TipoInmueble required=true name="cars" id="cars">
+<option value=@TipoDeInmueble.Vivienda >Vivienda</option>
+<option value="@TipoDeInmueble.Negocio">Negocio</option>
+<option value="@TipoDeInmueble.Garaje">Garaje</option>
+</select>
+<button class="btn btn-primary" @onclick="() => Cargar()">Cargar Inmueble</button>
+
+
+<p> Por favor, elija una ubicación en el mapa para el Inmueble con el marcador</p> 
+<div id="map" style="height: 400px; width: 80%;">
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initMap" async
+    defer></script>
+<script>
+    function initializeMap(dotNetHelper) {
+        const initialPosition = { lat: -34.6037, lng: -58.3816 }; // Coordenadas de Buenos Aires
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: initialPosition,
+            zoom: 12,
+        });
+
+        const marker = new google.maps.Marker({
+            position: initialPosition,
+            map: map,
+            draggable: true,
+        });
+
+        // Actualizar coordenadas al mover el marcador
+        marker.addListener("dragend", () => {
+            const position = marker.getPosition();
+            dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', position.lat(), position.lng());
+        });
+
+        // Permitir al usuario colocar un nuevo marcador al hacer clic en el mapa
+        map.addListener("click", (event) => {
+            marker.setPosition(event.latLng);
+            dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', event.latLng.lat(), event.latLng.lng());
+        });
+    }
+</script>
+</div>
+
+</AuthorizeView>
+<NotAuthorized>
+    <h3>Acceso Denegado</h3>
+    <p>Solo los usuarios con el rol de Gerente o Administrador pueden acceder a esta página.</p>
+</NotAuthorized>
+
+
+@code {
+    Inmueble inmueble = new();
+
+    private double Latitud { get; set; }
+    private double Longitud { get; set; }
+    private async Task Cargar()
+    {
+        CasoDeUsoAltaInmueble.Ejecutar(inmueble, RolUsuario.Gerente);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Crear una referencia al objeto .NET para pasar a JavaScript
+            var dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initializeMap", dotNetRef);
+        }
+
+    }
+
+    [JSInvokable]
+    public void ActualizarCoordenadas(double lat, double lng)
+    {
+        Latitud = lat;
+        Longitud = lng;
+        StateHasChanged(); 
+        // Actualizar la interfaz de usuario
+        
+    }
+
+}
