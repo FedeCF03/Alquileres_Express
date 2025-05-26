@@ -60,8 +60,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xMb2dvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/fedec/Downloads/Alquileres_Express/Alquileres_Express.UI/Components/Pages/MercadoPago.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNZXJjYWRvUGFnby5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/fedec/Downloads/Alquileres_Express/Alquileres_Express.UI/Components/Pages/Perfil.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQZXJmaWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/fedec/Downloads/Alquileres_Express/Alquileres_Express.UI/Components/Pages/VerificacionDobleAutenticacion.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xWZXJpZmljYWNpb25Eb2JsZUF1dGVudGljYWNpb24ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/fedec/Downloads/Alquileres_Express/Alquileres_Express.UI/Components/Pages/Weather.razor]

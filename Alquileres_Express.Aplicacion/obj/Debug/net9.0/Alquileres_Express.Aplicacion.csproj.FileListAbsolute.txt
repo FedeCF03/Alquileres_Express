@@ -34,3 +34,4 @@ C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express.Aplicacion\obj\De
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express.Aplicacion\obj\Debug\net9.0\refint\Alquileres_Express.Aplicacion.dll
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express.Aplicacion\obj\Debug\net9.0\Alquileres_Express.Aplicacion.pdb
 C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express.Aplicacion\obj\Debug\net9.0\ref\Alquileres_Express.Aplicacion.dll
+C:\Users\fedec\Downloads\Alquileres_Express\Alquileres_Express.Aplicacion\obj\Debug\net9.0\Alquileres_Express.Aplicacion.csproj.AssemblyReference.cache

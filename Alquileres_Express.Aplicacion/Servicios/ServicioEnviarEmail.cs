@@ -6,9 +6,10 @@ public static class ServicioEnviarEmail
 {
 
 
-    public static void EnviarEmailDobleAutenticacion(string email)
+    public static string EnviarEmailDobleAutenticacion(string email)
     {
         MailMessage? mensaje = new();
+        String cod = ServicioGenerarCodigo.GenerarCodigoAleatorio();
 
         try
         {
@@ -17,7 +18,7 @@ public static class ServicioEnviarEmail
                 mensaje.From = new MailAddress("alquileresexpresssender@gmail.com");
                 mensaje.To.Add(email);
                 mensaje.Subject = "Codigo de verificación";
-                mensaje.Body = "Su código de verificación es: " + ServicioGenerarCodigo.GenerarCodigoAleatorio(); ;
+                mensaje.Body = "Su código de verificación es: " + cod;
                 mensaje.IsBodyHtml = true;
 
                 using (var smtp = new SmtpClient("smtp.gmail.com", 587))
@@ -32,7 +33,7 @@ public static class ServicioEnviarEmail
         {
             Console.WriteLine(ex.Message);
         }
-
+        return cod;
     }
 
 }

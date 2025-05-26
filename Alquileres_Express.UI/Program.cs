@@ -39,6 +39,7 @@ builder.Services.AddTransient<CasoDeUsoBajaUsuario>();
 // builder.Services.AddTransient<CasoDeUsoEliminarInmueble>();
 //builder.Services.AddTransient<CasoDeUsoListarUsuario>();
 builder.Services.AddTransient<CasoDeUsoModificarInmueble>();
+builder.Services.AddSingleton<MercadoPagoService>();
 
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
 // builder.Services.AddTransient<CasoDeUsoVerPerfil>();
