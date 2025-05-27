@@ -5,6 +5,7 @@ using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Repositorios.Context;
 using Alquileres_Express.Repositorios.RepositoriosSQLite;
 using Alquileres_Express.Aplicacion.Validadores;
+using Alquileres_Express.Aplicacion.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +44,8 @@ builder.Services.AddSingleton<MercadoPagoService>();
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
 // builder.Services.AddTransient<CasoDeUsoVerPerfil>();
 // builder.Services.AddTransient<CasoDeUsoEliminarInmueble>();
-builder.Services.AddTransient<CasoDeUsoModificarInmueble>();
+builder.Services.AddTransient<CasoDeUsoModificarInmueble>()
+.AddTransient<FiltroDeInmueblesService>();
 
 
 builder.Services.AddHttpContextAccessor();

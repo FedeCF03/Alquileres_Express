@@ -15,5 +15,18 @@ namespace Alquileres_Express.Aplicacion.Entidades
         public int? Banios { get; set; }
         public TipoDeInmueble TipoInmueble { get; set; }
         public List<Alquiler>? alquileres;
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is null)
+            {
+                return false;
+            }
+            if (obj is Inmueble inmueble)
+            {
+                return Id == inmueble.Id;
+            }
+            return false;
+        }
     }
 }
