@@ -23,10 +23,29 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 });
 
-builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
-builder.Services.AddTransient<CasoDeUsoListarUsuario>();
-builder.Services.AddScoped<IRepositorioPersonal, RepositorioPersonal>();
-builder.Services.AddScoped<IRepositorioCliente, RepositorioCliente>();
+builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
+    AddTransient<CasoDeUsoListarUsuario>()
+    .AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>()
+    .AddTransient<CasoDeUsoAltaCliente>()
+    .AddTransient<CasoDeUsoBuscarCliente>()
+    .AddTransient<CasoDeUsoAltaInmueble>()
+    .AddTransient<CasoDeUsoListarInmuebles>()
+    .AddTransient<CasoDeUsoModificarInmueble>()
+    .AddTransient<CasoDeUsoEliminarInmueble>()
+    .AddTransient<CasoDeUsoBuscarInmueble>()
+    
+    .AddTransient<CasoDeUsoAltaPersonal>()
+    .AddTransient<CasoDeUsoBuscarPersonal>()
+    
+
+    .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
+    .AddScoped<IRepositorioCliente,RepositorioCliente >()
+    .AddScoped<IRepositorioInmueble,RepositorioInmueble >()
+    .AddTransient<CasoDeUsoBajaInmueble>()
+    .AddTransient<CasoDeUsoRegistrarAlquiler>()
+    .AddTransient<CasoDeUsoListarAlquileres>()
+    .AddTransient<CasoDeUsoBuscarAlquiler>()
+    .AddTransient<CasoDeUsoCancelarAlquiler>();
 builder.Services.AddTransient<IRepositorioInmueble, RepositorioInmueble>();
 
 //builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
