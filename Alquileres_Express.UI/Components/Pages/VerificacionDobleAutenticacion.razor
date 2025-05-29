@@ -1,0 +1,86 @@
+@page "/verificacion-doble-autenticacion"
+@inject NavigationManager Nav
+@inject IHttpContextAccessor HttpContextAccessor
+@using System.Security.Claims
+@using Alquileres_Express.Aplicacion
+@using Alquileres_Express.Aplicacion.Entidades
+@using Alquileres_Express.Aplicacion.Interfaces
+@using Alquileres_Express.Aplicacion.Servicios
+@using Alquileres_Express.Repositorios
+@using Alquileres_Express.Repositorios.RepositoriosSQLite
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject NavigationManager NavigationManager
+@using System.ComponentModel.DataAnnotations
+<h3>Verificación</h3>
+
+<EditForm Model="@modelo" OnValidSubmit="ProcesarVerificacion" FormName="CodigoVerificacion">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Email:</label>
+        <InputText @bind-Value="modelo.Correo" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Código de verificación:</label>
+        <InputText @bind-Value="modelo.Codigo" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Verificar</button>
+
+    @if (mensaje != null)
+    {
+        <div class="alert alert-info mt-3">@mensaje</div>
+    }
+</EditForm>
+
+
+@code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+    private VerificacionModel modelo = new();
+    private string? mensaje;
+    RepositorioPersonal repositorioPersonal = new RepositorioPersonal();
+    CasoDeUsoValidarCodigoDeSeguridad casoDeUsoValidarCodigoDeSeguridad = new CasoDeUsoValidarCodigoDeSeguridad(new
+    RepositorioPersonal());
+    private async Task ProcesarVerificacion()
+    {
+        Personal usuario = casoDeUsoValidarCodigoDeSeguridad.Ejecutar(modelo.Correo, modelo.Codigo);
+        if (usuario != null)
+        {
+            mensaje = "¡Verificación exitosa!";
+            await guardarEnCookie(modelo.Correo, usuario.Rol);
+        }
+        else
+        {
+            mensaje = "Email o código incorrecto.";
+        }
+    }
+
+    public class VerificacionModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Correo { get; set; } = "";
+
+        [Required]
+        [StringLength(4, MinimumLength = 4, ErrorMessage = "Debe tener 4 caracteres.")]
+        public string Codigo { get; set; } = "";
+    }
+
+    private async Task guardarEnCookie(String correo, RolUsuario rol)
+    {
+
+        var claims = new List<Claim> {
+new Claim(ClaimTypes.Name, correo),
+new Claim(ClaimTypes.Role, rol.ToString())
+};
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        await HttpContext.SignInAsync(principal);
+        NavigationManager.NavigateTo("/");
+    }
+}

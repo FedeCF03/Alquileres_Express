@@ -1,0 +1,15 @@
+@page "/mercado-pago"
+@inject MercadoPagoService MPService
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+<h3>Comprar Producto</h3>
+<button class="btn btn-primary" @onclick="IniciarCompra">Comprar con MercadoPago</button>
+
+@code {
+    private async Task IniciarCompra()
+    {
+        var url = await MPService.CrearPreferenciaAsync();
+        NavManager.NavigateTo(url, forceLoad: true); // redirige al checkout de MP
+    }
+}
