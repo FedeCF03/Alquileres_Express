@@ -1,0 +1,24 @@
+@page "/Inmuebles"
+@inject FiltroDeInmueblesService FiltroDeInmueblesService
+@rendermode InteractiveServer
+
+<PageTitle>Inmuebles</PageTitle>
+<h1 style="font-weight: bold;">Inmuebles</h1>
+
+<div class="main-content">
+    <div class="property-list">
+        <div class="property-card">
+            <img src="https://th.bing.com/th/id/OIP.B8X6m8si0KeCLs9nrADwCgAAAA?rs=1&pid=ImgDetMain" alt="Propiedad 1" />
+        </div>
+        <div class="property-card">
+            <img src="https://th.bing.com/th/id/OIP.B8X6m8si0KeCLs9nrADwCgAAAA?rs=1&pid=ImgDetMain" alt="Propiedad 2" />
+        </div>
+    </div>
+</div>
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await FiltroDeInmueblesService.CargarInmueblesAsync();
+    }
+}

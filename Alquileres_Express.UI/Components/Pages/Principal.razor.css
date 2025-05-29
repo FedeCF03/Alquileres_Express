@@ -1,0 +1,59 @@
+.seccion-propiedades {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background-color: #5f7261;
+    padding: 2rem;
+    border-radius: 10px;
+    flex-wrap: wrap;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.texto-lateral {
+    max-width: 400px;
+}
+
+.texto-lateral h2 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.texto-lateral p {
+    color: #dfe6dd;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.btn-mas {
+    background-color: #4e6e58;
+    color: white;
+    font-weight: bold;
+    padding: 0.6rem 2rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.galeria-propiedades {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.miniatura {
+    width: 120px;
+    height: auto;
+    border-radius: 8px;
+    border: 5px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: border 0.3s;
+    cursor: pointer;
+}
+
+.miniatura.activa {
+    border: 5px solid #dd4ef3;
+}

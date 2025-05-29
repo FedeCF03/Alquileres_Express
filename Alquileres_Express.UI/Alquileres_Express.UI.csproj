@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Alquileres_Express.Aplicacion\Alquileres_Express.Aplicacion.csproj" />
+    <ProjectReference Include="..\Alquileres_Express.Repositorios\Alquileres_Express.Repositorios.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BlazorDateRangePicker" Version="6.1.0" />
+    <PackageReference Include="mercadopago-sdk" Version="2.5.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>
