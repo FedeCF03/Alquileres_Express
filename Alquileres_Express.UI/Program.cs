@@ -51,6 +51,10 @@ builder.Services.AddTransient<CasoDeUsoModificarInmueble>()
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCascadingAuthenticationState();
 var app = builder.Build();
+//Agrego gonza
+builder.Services.AddScoped<IRepositorioCliente, RepositorioCliente>();
+builder.Services.AddScoped<ValidadorUsuario>();
+builder.Services.AddScoped<CasoDeUsoAltaUCliente>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
