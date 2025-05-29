@@ -58,16 +58,17 @@ public class RepositorioCliente : IRepositorioCliente
         throw new NotImplementedException();
     }
 
-    public Cliente ObtenerClientePorMailYContraseña(string mail, string contraseña)
+    public Cliente? ObtenerClientePorMailYContraseña(string mail, string contraseña)
     {
-        contraseña = BCrypt.Net.BCrypt.HashPassword(contraseña);
+        //bool esValida = BCrypt.Net.BCrypt.Verify(contraseñaIngresada, usuario.Contraseña);
 
-        var cli = _context.Cliente.FirstOrDefault(p => p.Correo == mail && p.Contraseña == contraseña);
-        if (cli == null)
+        var cli = _context.Clientes.FirstOrDefault(p => p.Correo == mail);
+        if (cli != null && BCrypt.Net.BCrypt.Verify(contraseña, cli.Contraseña))
         {
-            return null;
+            return cli;
         }
-        return cli;
+        return null;
+
     }
 
 }

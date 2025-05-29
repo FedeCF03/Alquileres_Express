@@ -12,5 +12,6 @@ public interface IRepositorioInmueble
     public List<Inmueble> ObtenerTodosLosInmuebles();
     public List<Inmueble> ObtenerInmueblesPorTipo(string tipo);
     public List<Inmueble> ObtenerInmueblesPorUbicacion(string ubicacion);
+    public List<Inmueble> ObtenerInmueblesDisponibles();
 
 }
