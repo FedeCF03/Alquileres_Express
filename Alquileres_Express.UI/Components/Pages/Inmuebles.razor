@@ -1,24 +1,64 @@
 @page "/Inmuebles"
 @inject FiltroDeInmueblesService FiltroDeInmueblesService
+@inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
 @rendermode InteractiveServer
 
 <PageTitle>Inmuebles</PageTitle>
-<h1 style="font-weight: bold;">Inmuebles</h1>
 
-<div class="main-content">
-    <div class="property-list">
-        <div class="property-card">
-            <img src="https://th.bing.com/th/id/OIP.B8X6m8si0KeCLs9nrADwCgAAAA?rs=1&pid=ImgDetMain" alt="Propiedad 1" />
-        </div>
-        <div class="property-card">
-            <img src="https://th.bing.com/th/id/OIP.B8X6m8si0KeCLs9nrADwCgAAAA?rs=1&pid=ImgDetMain" alt="Propiedad 2" />
+<div class="inmuebles-container">
+    <div class="inmuebles-listado">
+        <h2>Propiedades</h2>
+        <div class="imagenes">
+            @if (inmuebles == null || !inmuebles.Any())
+            {
+                <p>No hay inmuebles disponibles.</p>
+            }
+            else
+            {
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var inmueble in inmuebles)
+                        {
+                            <tr>
+                                <td>@inmueble.Nombre</td>
+                                <td>$@inmueble.Precio?.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
         </div>
     </div>
+
+    <div class="filtros">
+        <h2>Ordenar</h2>
+        <p>FILTROS</p>
+        <select>
+            <option>Localidad</option>
+        </select>
+        <select>
+            <option>Precio</option>
+        </select>
+        <select>
+            <option>Cantidad de personas</option>
+        </select>
+        <select>
+            <option>Mejor valoradas</option>
+        </select>
+    </div>
 </div>
+
 @code
 {
-    protected override async Task OnInitializedAsync()
+    private List<Inmueble> inmuebles;
+    protected override void OnInitialized()
     {
-        await FiltroDeInmueblesService.CargarInmueblesAsync();
+        inmuebles = casoDeUsoListarInmuebles.Ejecutar();
     }
 }

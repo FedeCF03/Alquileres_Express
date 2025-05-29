@@ -5,6 +5,7 @@ using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Repositorios.Context;
 using Alquileres_Express.Repositorios.RepositoriosSQLite;
 using Alquileres_Express.Aplicacion.Validadores;
+using Alquileres_Express.Aplicacion.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,10 +29,10 @@ builder.Services.AddScoped<IRepositorioPersonal, RepositorioPersonal>();
 builder.Services.AddScoped<IRepositorioCliente, RepositorioCliente>();
 builder.Services.AddTransient<IRepositorioInmueble, RepositorioInmueble>();
 
-builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
-builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
+//builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
+//builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
 builder.Services.AddTransient<CasoDeUsoBajaInmueble>();
-builder.Services.AddTransient<CasoDeUsoBajaUsuario>();
+//builder.Services.AddTransient<CasoDeUsoBajaUsuario>();
 builder.Services.AddTransient<CasoDeUsoBuscarCliente>();
 builder.Services.AddTransient<CasoDeUsoBuscarPersonal>();
 builder.Services.AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>();
@@ -50,8 +51,8 @@ builder.Services.AddTransient<CasoDeUsoModificarInmueble>();
 builder.Services.AddScoped<IRepositorioCliente, RepositorioCliente>();
 builder.Services.AddTransient<ValidadorUsuario>();
 builder.Services.AddTransient<CasoDeUsoAltaCliente>();
-builder.Services.AddTransient < FiltroDeInmueblesService();
-
+builder.Services.AddTransient<FiltroDeInmueblesService>();
+builder.Services.AddTransient<CasoDeUsoListarInmuebles>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCascadingAuthenticationState();
 var app = builder.Build();

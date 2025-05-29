@@ -7,6 +7,7 @@
 @using Alquileres_Express.Aplicacion.Servicios
 @using Alquileres_Express.Repositorios
 @using Alquileres_Express.Aplicacion.CasosDeUso
+@using Alquileres_Express.Repositorios.RepositoriosSQLite
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authorization;
 @using Microsoft.AspNetCore.Authentication.Cookies
@@ -53,12 +54,10 @@
     public HttpContext? HttpContext { get; set; }
     [SupplyParameterFromForm]
     private LoginModel user { get; set; } = new();
-    private CasoDeUsoBuscarCliente casoDeUsoBuscarCliente = new CasoDeUsoBuscarCliente();
-    private CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal = new CasoDeUsoBuscarPersonal();
+    private CasoDeUsoBuscarCliente casoDeUsoBuscarCliente = new CasoDeUsoBuscarCliente(new RepositorioCliente());
+    private CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal = new CasoDeUsoBuscarPersonal(new RepositorioPersonal());
     private CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion = new
-    CasoDeUsoActualizarEstadoDobleAutenticacion();
-    private CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion = new
-    CasoDeUsoActualizarEstadoDobleAutenticacion();
+    CasoDeUsoActualizarEstadoDobleAutenticacion(new RepositorioPersonal());
     private bool ErrorMessage { get; set; } = false;
     private async Task IniciarSesion()
     {
@@ -69,7 +68,7 @@
             if (personal.Rol == RolUsuario.Gerente)
             {
                 String codigo = ServicioEnviarEmail.EnviarEmailDobleAutenticacion(personal.Correo);
-                casoDeUsoActualizarEstadoDobleAutenticacion.Ejecutar(personal.Correo, codigo);
+                casoDeUsoActualizarEstadoDobleAutenticacion.Ejecutar(personal.Id, codigo);
                 NavigationManager.NavigateTo("/verificacion-doble-autenticacion");
             }
         }
