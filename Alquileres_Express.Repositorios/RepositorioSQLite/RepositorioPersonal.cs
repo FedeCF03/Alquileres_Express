@@ -70,7 +70,7 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     }
 
-    public bool ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad, out RolUsuario rol)
+    public Personal ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad)
     {
         var personal = _context.Personal.FirstOrDefault(p => p.Correo == correo && p.CodigoDeSeguridad == int.Parse(codigoDeSeguridad));
         if (personal != null)
@@ -78,11 +78,8 @@ public class RepositorioPersonal : IRepositorioPersonal
             personal.CodigoDeSeguridad = 0;
             _context.SaveChanges();
             // Resetear el código de seguridad después de la validación
-            rol = personal.Rol;
-            return true;
         }
-        rol = personal.Rol;
-        return false;
+        return personal ?? null;
 
     }
 }

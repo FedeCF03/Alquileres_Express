@@ -18,6 +18,6 @@ public interface IRepositorioPersonal
 
     public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad);
 
-    public bool ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad, out RolUsuario rol);
+    public Personal ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad);
 
 }

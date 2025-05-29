@@ -11,8 +11,6 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authorization;
 @using Microsoft.AspNetCore.Authentication.Cookies
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager NavigationManager
 
 @page "/verificar"
@@ -37,12 +35,13 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Verificar</button>
+
+    @if (mensaje != null)
+    {
+        <div class="alert alert-info mt-3">@mensaje</div>
+    }
 </EditForm>
 
-@if (mensaje != null)
-{
-    <div class="alert alert-info mt-3">@mensaje</div>
-}
 
 @code {
     [CascadingParameter]
@@ -52,18 +51,11 @@
     RepositorioPersonal repositorioPersonal = new RepositorioPersonal();
     private async Task ProcesarVerificacion()
     {
-
-        if (repositorioPersonal.ValidarCodigoDeSeguridad(modelo.Correo, modelo.Codigo, out RolUsuario rol))
+        Personal usuario = repositorioPersonal.ValidarCodigoDeSeguridad(modelo.Correo, modelo.Codigo);
+        if (usuario != null)
         {
             mensaje = "¡Verificación exitosa!";
-            var claims = new List<Claim> {
-new Claim(ClaimTypes.Name, modelo.Correo),
-new Claim(ClaimTypes.Role, rol.ToString())
-};
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-            await HttpContext.SignInAsync(principal);
-            NavigationManager.NavigateTo("/");
+            await guardarEnCookie(modelo.Correo, usuario.Rol);
         }
         else
         {
@@ -80,5 +72,18 @@ new Claim(ClaimTypes.Role, rol.ToString())
         [Required]
         [StringLength(4, MinimumLength = 4, ErrorMessage = "Debe tener 4 caracteres.")]
         public string Codigo { get; set; } = "";
+    }
+
+    private async Task guardarEnCookie(String correo, RolUsuario rol)
+    {
+
+        var claims = new List<Claim> {
+new Claim(ClaimTypes.Name, correo),
+new Claim(ClaimTypes.Role, rol.ToString())
+};
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        await HttpContext.SignInAsync(principal);
+        NavigationManager.NavigateTo("/");
     }
 }

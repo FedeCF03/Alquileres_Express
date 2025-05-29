@@ -28,7 +28,6 @@ builder.Services.AddScoped<IRepositorioPersonal, RepositorioPersonal>();
 builder.Services.AddScoped<IRepositorioCliente, RepositorioCliente>();
 builder.Services.AddTransient<IRepositorioInmueble, RepositorioInmueble>();
 
-builder.Services.AddTransient<CasoDeUsoAltaInmueble>().AddTransient<ValidadorInmueble>();
 builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
 builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
 builder.Services.AddTransient<CasoDeUsoBajaInmueble>();
@@ -39,7 +38,6 @@ builder.Services.AddTransient<CasoDeUsoBajaUsuario>();
 //builder.Services.AddTransient<CasoDeUsoListarUsuario>();
 builder.Services.AddTransient<CasoDeUsoModificarInmueble>();
 builder.Services.AddSingleton<MercadoPagoService>();
-
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
 // builder.Services.AddTransient<CasoDeUsoVerPerfil>();
 // builder.Services.AddTransient<CasoDeUsoEliminarInmueble>();
