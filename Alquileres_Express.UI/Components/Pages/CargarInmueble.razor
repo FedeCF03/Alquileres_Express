@@ -7,10 +7,11 @@
 @inject CasoDeUsoAltaInmueble CasoDeUsoAltaInmueble
 @using Microsoft.AspNetCore.Authorization
 @using Alquileres_Express.Aplicacion.Enumerativo
+@inject IConfiguration config
 @attribute [Authorize]
 @inject IJSRuntime JS
 
-
+<PageTitle>Cargar inmueble</PageTitle>
 <AuthorizeView Roles="Gerente, Admin">
     <h3>Bienvenido Administrador</h3>
 <label class="form-label">Cargar Inmueble</label>
@@ -28,6 +29,7 @@
 <label class="form-label">Cantidad de baños del Inmueble</label>
 <input required=true type="number" @bind="inmueble.Banios" placeholder="Cantidad de baños" class="form-control mb-2" />
 <label for="type">Elija un tipo de inmueble:</label>
+
 <select @bind=inmueble.TipoInmueble required=true name="cars" id="cars">
 <option value=@TipoDeInmueble.Vivienda >Vivienda</option>
 <option value="@TipoDeInmueble.Negocio">Negocio</option>
@@ -37,7 +39,7 @@
 
 
 <p> Por favor, elija una ubicación en el mapa para el Inmueble con el marcador</p> 
-<div id="map" style="height: 400px; width: 80%;">
+ <div id="map" style="height: 400px; width: 80%;">
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initMap" async
     defer></script>
@@ -68,8 +70,23 @@
             dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', event.latLng.lat(), event.latLng.lng());
         });
     }
+
 </script>
-</div>
+</div> 
+
+
+<InputFile OnChange="CaptureFiles" multiple />
+<button @onclick="GuardarFotos" class="btn btn-primary">Cargar Archivos</button>
+
+@if (errores.Count > 0)
+    {
+        <div class="alert alert-danger">
+            @foreach (var error in errores)
+            {
+                <p>@error</p>
+            }
+        </div>
+    }
 
 </AuthorizeView>
 <NotAuthorized>
@@ -89,12 +106,13 @@
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+         if (firstRender)
         {
             // Crear una referencia al objeto .NET para pasar a JavaScript
             var dotNetRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("initializeMap", dotNetRef);
         }
+
 
     }
 
@@ -108,4 +126,69 @@
         
     }
 
+    private long maxFileSize = 1024 * 1024 * 5; // 5 MB
+    private int maxAllowedFiles = 30;
+    private List<String> errores = new();
+
+    private InputFileChangeEventArgs browser;
+
+    
+    private async Task GuardarFotos()
+    {
+        if (browser == null)
+        {
+            errores.Add("No se ha seleccionado ningún archivo.");
+            return;
+        }
+
+        if (browser.FileCount > maxAllowedFiles)
+        {
+            errores.Add($"No se pueden cargar más de {maxAllowedFiles} archivos.");
+            return;
+        }
+        errores.Clear();
+        foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))
+        {
+            try{
+                if (file.Size > maxFileSize)
+                {
+                    errores.Add($"El archivo {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
+                }
+                else{
+                crearArchivo(file);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                errores.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
+            }
+    } }
+    private async Task CaptureFiles(InputFileChangeEventArgs e)
+    {
+        browser = e;
+        
+    }
+
+    private async void crearArchivo(IBrowserFile file)
+    {
+        string newFileName = Path.ChangeExtension(
+                    Path.GetRandomFileName(), 
+                    Path.GetExtension(file.Name));
+                    
+                var pathFotosInmuebles = Path.GetFullPath(
+                    Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "..", 
+                        "Alquileres_Express.Repositorios", 
+                        "FotosInmuebles"));
+
+                Directory.CreateDirectory(pathFotosInmuebles);
+
+                var path = Path.Combine(pathFotosInmuebles, newFileName);
+        
+                await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+    }
+}
 }

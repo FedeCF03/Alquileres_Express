@@ -12,6 +12,7 @@ public class Alquileres_ExpressContext : DbContext
     public DbSet<Alquiler> Alquileres { get; set; }
     public DbSet<RegistroDeLlave> Llaves { get; set; }
     public DbSet<RangoDeFechas> RangoDeFechas { get; set; }
+    public DbSet<Foto> Fotos { get; set; }
 #nullable restore
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
