@@ -9,6 +9,7 @@
 @using Alquileres_Express.Aplicacion.Enumerativo
 @inject IConfiguration config
 @inject IHttpContextAccessor HttpContextAccessor
+@inject IRepositorioFoto RepositorioFoto
 @attribute [Authorize]
 @inject IJSRuntime JS
 
@@ -25,9 +26,10 @@
 <input required=true type="text" @bind="inmueble.Nombre" placeholder="Nombre del Inmueble" class="form-control mb-2" />
 <label class="form-label">Ciudad del Inmueble</label>
 <input required=true type=" text" @bind="inmueble.Ciudad" placeholder="Ciudad del Inmueble" class="form-control mb-2" />
+
 <label class="form-label">Dirección del Inmueble</label>
 <input required=true type="text" @bind="inmueble.Direccion" placeholder="Dirección del Inmueble" class="form-control mb-2" />
-<label class="form-label">Precio del Inmueble</label>
+<label class="form-label">Precio por día del Inmueble</label>
 <input required=true type="number" @bind="inmueble.Precio" placeholder="Precio del Inmueble" class="form-control mb-2" />
 <label class="form-label">Cantidad de camas del Inmueble</label>
 <input required=true type="number" @bind="inmueble.CantidadDeCamas" placeholder="Cantidad de camas" class="form-control mb-2" />
@@ -46,7 +48,7 @@
 <p> Por favor, elija una ubicación en el mapa para el Inmueble con el marcador</p> 
  <div id="map" style="height: 400px; width: 80%;">
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initMap" async
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initializeMap" async
     defer></script>
 <script>
     function initializeMap(dotNetHelper) {
@@ -79,7 +81,7 @@
 </script>
 </div> 
 
-<button class="btn btn-primary" @onclick="() => Cargar()">Cargar Inmueble</button>
+<button type="submit" class="btn btn-primary" @onclick="() => Cargar()">Cargar Inmueble</button>
 </EditForm>
 
 <InputFile OnChange="CaptureFiles" multiple />
@@ -108,17 +110,19 @@
 
     private double Latitud { get; set; }
     private double Longitud { get; set; }
-    private async Task Cargar()
+    private void Cargar()
     {
-        RolUsuario rol = (RolUsuario)Enum.Parse(typeof(RolUsuario), HttpContext.Request.Cookies["Rol"]); 
-        CasoDeUsoAltaInmueble.Ejecutar(inmueble,rol);
+        inmueble.CoordLat = Latitud;
+        inmueble.CoordLong = Longitud;
+        CasoDeUsoAltaInmueble.Ejecutar(inmueble,RolUsuario.Gerente);
+      persistirFotos(fotos, inmueble);
+        
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
          if (firstRender)
         {
-            // Crear una referencia al objeto .NET para pasar a JavaScript
             var dotNetRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("initializeMap", dotNetRef);
         }
@@ -139,6 +143,7 @@
     private long maxFileSize = 1024 * 1024 * 5; // 5 MB
     private int maxAllowedFiles = 30;
     private List<String> errores = new();
+    private List<Foto> fotos = new();
 
     private InputFileChangeEventArgs browser;
 
@@ -163,7 +168,10 @@
                 if (file.Size > maxFileSize)
                 {
                     errores.Add($"El archivo {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
+                    return;
+
                 }
+
                 else{
                 crearArchivo(file);
                 }
@@ -173,6 +181,7 @@
             {
                 errores.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
             }
+        
     } }
     private async Task CaptureFiles(InputFileChangeEventArgs e)
     {
@@ -189,9 +198,7 @@
                 var pathFotosInmuebles = Path.GetFullPath(
                     Path.Combine(
                         Directory.GetCurrentDirectory(),
-                        "..", 
-                        "Alquileres_Express.Repositorios", 
-                        "FotosInmuebles"));
+                       "wwwroot", "images","fotosInmuebles"));
 
                 Directory.CreateDirectory(pathFotosInmuebles);
 
@@ -199,5 +206,16 @@
         
                 await using FileStream fs = new(path, FileMode.Create);
                 await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+                fotos.Add(new Foto
+                {
+                    Url = $"/images/fotosInmuebles/{newFileName}",
+                });
+    }
+
+    public void persistirFotos(List<Foto> fotos, Inmueble inmueble)
+    {
+        fotos.ForEach(foto => foto.InmuebleId = inmueble.Id);
+        RepositorioFoto.AgregarFotos(fotos);
+    
     }
 }

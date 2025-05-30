@@ -7,29 +7,60 @@ using Alquileres_Express.Repositorios.Context;
 
 public class RepositorioFoto : IRepositorioFoto
 {
-    private Alquileres_ExpressContext AlquileresExpressContext = new();
-    public void AgregarFoto(Foto foto)
+    public int AgregarFoto(Foto foto)
     {
+        using Alquileres_ExpressContext AlquileresExpressContext = new();
+        AlquileresExpressContext.Fotos.Add(foto);
+        AlquileresExpressContext.SaveChanges();
+        return foto.Id;
+    }
 
+    public void AgregarFotos(List<Foto> fotos)
+    {
+        using Alquileres_ExpressContext AlquileresExpressContext = new();
+
+        AlquileresExpressContext.Fotos.AddRange(fotos);
+        AlquileresExpressContext.SaveChanges();
     }
 
     public void EliminarFoto(int id)
     {
-        throw new NotImplementedException();
-    }
-
-    public Foto ObtenerFotoPorId(int id)
-    {
-        throw new NotImplementedException();
+        using Alquileres_ExpressContext AlquileresExpressContext = new();
+        Foto? foto = AlquileresExpressContext.Fotos.Find(id);
+        if (foto != null)
+        {
+            AlquileresExpressContext.Fotos.Remove(foto);
+            AlquileresExpressContext.SaveChanges();
+        }
+        else
+        {
+            throw new KeyNotFoundException($"Foto with id {id} not found.");
+        }
     }
 
     public List<Foto> ObtenerFotosPorInmueble(int idInmueble)
     {
-        throw new NotImplementedException();
+        using Alquileres_ExpressContext AlquileresExpressContext = new();
+        return AlquileresExpressContext.Fotos.Where(f => f.InmuebleId == idInmueble).ToList();
+
     }
+
 
     public List<Foto> ObtenerTodasLasFotos()
     {
-        throw new NotImplementedException();
+        using Alquileres_ExpressContext AlquileresExpressContext = new();
+        return AlquileresExpressContext.Fotos.ToList();
     }
+
+    public Foto ObtenerFotoPorId(int id)
+    {
+        using Alquileres_ExpressContext AlquileresExpressContext = new();
+        Foto? foto = AlquileresExpressContext.Fotos.Find(id);
+        if (foto == null)
+        {
+            throw new KeyNotFoundException($"Foto with id {id} not found.");
+        }
+        return foto;
+    }
+
 }
