@@ -9,12 +9,9 @@
 @using Alquileres_Express.Aplicacion.Enumerativo
 @inject IConfiguration config
 @inject IHttpContextAccessor HttpContextAccessor
-@attribute [Authorize]
 @inject IJSRuntime JS
 
 <PageTitle>Cargar inmueble</PageTitle>
-<AuthorizeView Roles="Gerente, Admin">
-    <h3>Bienvenido Administrador</h3>
 
 <EditForm FormName="a" Model="inmueble" OnValidSubmit="Cargar">
         <DataAnnotationsValidator />
@@ -94,13 +91,6 @@
             }
         </div>
     }
-
-</AuthorizeView>
-
-<AuthorizeView Roles="Cliente">
-    <h3>Bienvenido Cliente</h3>
-    <p>Solo los administradores pueden cargar inmuebles.</p>
-</AuthorizeView>
 
 @code {
     Inmueble inmueble = new();

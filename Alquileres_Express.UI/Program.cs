@@ -29,7 +29,7 @@ builder.Services.AddScoped<IRepositorioPersonal, RepositorioPersonal>();
 builder.Services.AddScoped<IRepositorioCliente, RepositorioCliente>();
 builder.Services.AddTransient<IRepositorioInmueble, RepositorioInmueble>();
 
-//builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
+builder.Services.AddTransient<CasoDeUsoAltaPersonal>();
 //builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
 builder.Services.AddTransient<CasoDeUsoBajaInmueble>();
 //builder.Services.AddTransient<CasoDeUsoBajaUsuario>();
