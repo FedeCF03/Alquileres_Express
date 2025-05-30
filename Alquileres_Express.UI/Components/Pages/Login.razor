@@ -9,7 +9,7 @@
     <div class="login-card">
         <h3 class="login-title">Iniciar Sesión</h3>
 
-        <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
+        <EditForm Model="@user" OnValidSubmit="iniciarSesionComoGerenteFake" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -48,6 +48,14 @@
     private CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion = new
     CasoDeUsoActualizarEstadoDobleAutenticacion(new RepositorioPersonal());
     private bool ErrorMessage { get; set; } = false;
+
+    private async Task iniciarSesionComoGerenteFake()
+    {
+        user.Correo = "maria@gmail.com";
+        user.Rol = RolUsuario.Gerente;
+        await guardarEnCookie();
+
+    }
     private async Task IniciarSesion()
     {
         Personal personal = casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);

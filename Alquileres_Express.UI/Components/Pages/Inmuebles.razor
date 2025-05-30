@@ -27,7 +27,7 @@
                         {
                             <tr>
                                 <td>@inmueble.Nombre</td>
-                                <td>$@inmueble.Precio?.ToString("N2")</td>
+                                <td>$@inmueble.Precio</td>
                             </tr>
                         }
                     </tbody>
@@ -56,7 +56,7 @@
 
 @code
 {
-    private List<Inmueble> inmuebles;
+    private List<Inmueble> inmuebles = new List<Inmueble>();
     protected override void OnInitialized()
     {
         inmuebles = casoDeUsoListarInmuebles.Ejecutar();

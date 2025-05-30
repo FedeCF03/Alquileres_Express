@@ -1,7 +1,14 @@
-namespace Alquileres_Express.Aplicacion.CasosDeUso
+namespace Alquileres_Express.Aplicacion.CasosDeUso;
+
+using Alquileres_Express.Aplicacion.Entidades;
+using Alquileres_Express.Aplicacion.Interfaces;
+
+public class CasoDeUsoModificarInmueble(IRepositorioInmueble repositorio)
 {
-    public class CasoDeUsoModificarInmueble
+    public bool Ejecutar(Inmueble inmueble)
     {
 
+        throw new NotImplementedException("Este caso de uso no está implementado.");
     }
+
 }

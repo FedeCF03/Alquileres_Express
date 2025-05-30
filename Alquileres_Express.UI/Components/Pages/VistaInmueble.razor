@@ -1,5 +1,8 @@
 @page "/inmueble/{id:int}"
+@rendermode InteractiveServer
 @inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
+@inject IRepositorioFoto repositorioFotos
+@inject IJSRuntime JS
 
 @inject NavigationManager NavigationManager
 
@@ -18,12 +21,20 @@
             </div>
         </section>
 
+        
+        @if (imagenes.Length == 0)
+        {
+            <p>No hay fotos disponibles para esta propiedad.</p>
+        }
+        else
+        {
+            
         <section class="galeria">
             <button @onclick="FotoAnterior" class="btn-flecha">◀</button>
             <img src="@imagenes[fotoActual]" alt="Foto propiedad" class="foto" />
             <button @onclick="FotoSiguiente" class="btn-flecha">▶</button>
         </section>
-
+        }
         <section class="detalles">
             <h4>Detalles</h4>
             <ul>
@@ -35,12 +46,15 @@
             </ul>
         </section>
     </main>
+   
 </div>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initMap" async
+ <img src="/images/fotosInmuebles/oxouzdoi.png" alt="Foto propiedad" class="foto" />
+<div id="map" style="height: 400px; width: 80%;">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initializeMap" async
     defer></script>
 <script>
-    function initializeMap(dotNetHelper) {
-        const initialPosition = { lat: @inmueble.CoordLat, lng: @inmueble.CoordLong }; // Coordenadas de Buenos Aires
+    function initializeMap(dotNetHelper, lat, lng) {
+        const initialPosition = { lat: lat, lng: lng}; // Coordenadas de Buenos Aires
 
         const map = new google.maps.Map(document.getElementById("map"), {
             center: initialPosition,
@@ -50,45 +64,41 @@
         const marker = new google.maps.Marker({
             position: initialPosition,
             map: map,
-            draggable: false,
+            draggable: true,
         });
 
     }
 
 </script>
+</div>
 
 @code {
     private int fotoActual = 0;
-    private string[] imagenes = new[]
-    {
-"img/departamento1.jpg",
-"img/departamento2.jpg",
-"img/departamento3.jpg"
-};
+    private string[] imagenes = new string[0];
 
     void FotoSiguiente()
     {
         fotoActual = (fotoActual + 1) % imagenes.Length;
+        StateHasChanged(); // Actualiza la vista para mostrar la nueva foto
     }
 
     void FotoAnterior()
     {
         fotoActual = (fotoActual - 1 + imagenes.Length) % imagenes.Length;
+        StateHasChanged();
     }
-}
 
-
-@code {
     [Parameter]
     public int Id { get; set; }
 
-    private Inmueble? inmueble;
+    private Inmueble inmueble = new Inmueble();
 
     protected override void OnParametersSet()
     {
         try
         {
-            // inmueble = await casoDeUsoObtenerInmueble.Ejecutar(Id);
+            inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            imagenes = repositorioFotos.ObtenerFotosPorInmueble(Id).Select(f => f.Url).ToArray();
 
         }
         catch (Exception ex)
@@ -97,5 +107,12 @@
             NavigationManager.NavigateTo("/error");
         }
     }
-
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+         if (firstRender)
+        {
+            var dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initializeMap", dotNetRef, @inmueble.CoordLat, @inmueble.CoordLong);
+        }
+    }
 }

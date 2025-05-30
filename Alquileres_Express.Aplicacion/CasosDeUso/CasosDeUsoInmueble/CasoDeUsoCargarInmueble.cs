@@ -6,10 +6,10 @@ using Alquileres_Express.Aplicacion.Entidades;
 
 public class CasoDeUsoCargarInmueble(IRepositorioInmueble repo, ValidadorInmueble validador) : CasoDeUsoInmueble(repo)
 {
-    public bool Ejecutar(Inmueble inmueble)
+    public int Ejecutar(Inmueble inmueble)
     {
         if (!validador.Ejecutar(inmueble))
-            return false;
+            return -1;
         return repo.AgregarInmueble(inmueble);
 
     }

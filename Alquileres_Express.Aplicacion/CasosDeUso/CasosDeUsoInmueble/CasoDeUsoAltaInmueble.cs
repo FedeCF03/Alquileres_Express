@@ -9,21 +9,21 @@ public class CasoDeUsoAltaInmueble(ValidadorInmueble validador, IRepositorioInmu
 {
     public ValidadorInmueble Validador { get; set; } = validador;
     public IRepositorioInmueble RepoInmueble { get; set; } = repoInmueble;
-    public bool Ejecutar(Inmueble inmueble, RolUsuario rolUsuario)
+    public int Ejecutar(Inmueble inmueble, RolUsuario rolUsuario)
     {
         try
         {
             if (!Validador.Ejecutar(inmueble))
             {
-                return false; // Si la validación falla, retornamos false
+                return -1;
             }
             if (rolUsuario != RolUsuario.Gerente)
-                return false;
+                return -1;
             return RepoInmueble.AgregarInmueble(inmueble);
         }
         catch (Exception ex)
         {
-            return false;
+            return -1;
         }
     }
 }
