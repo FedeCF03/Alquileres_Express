@@ -1,15 +1,21 @@
 @page "/login"
 @inject IHttpContextAccessor HttpContextAccessor
 
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Net.Mail
+@using System.Security.Claims
+@inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
+@inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
+@inject CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion
 @inject NavigationManager NavigationManager
 
 <div class="login-container">
     <div class="login-card">
         <h3 class="login-title">Iniciar Sesión</h3>
 
-        <EditForm Model="@user" OnValidSubmit="iniciarSesionComoGerenteFake" FormName="loginForm">
+        <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -43,10 +49,6 @@
     public HttpContext? HttpContext { get; set; }
     [SupplyParameterFromForm]
     private LoginModel user { get; set; } = new();
-    private CasoDeUsoBuscarCliente casoDeUsoBuscarCliente = new CasoDeUsoBuscarCliente(new RepositorioCliente());
-    private CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal = new CasoDeUsoBuscarPersonal(new RepositorioPersonal());
-    private CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion = new
-    CasoDeUsoActualizarEstadoDobleAutenticacion(new RepositorioPersonal());
     private bool ErrorMessage { get; set; } = false;
 
     private async Task iniciarSesionComoGerenteFake()
@@ -103,6 +105,7 @@ new Claim(ClaimTypes.Role, user.Rol.ToString())
         var principal = new ClaimsPrincipal(identity);
         await HttpContext.SignInAsync(principal);
         NavigationManager.NavigateTo("/");
+    
     }
     public class LoginModel
     {

@@ -62,16 +62,6 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddCascadingAuthenticationState();
 
 
-<<<<<<< HEAD
-=======
-builder.Services.AddTransient<CasoDeUsoAltaPersonal>();
-//builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
-builder.Services.AddTransient<CasoDeUsoBajaInmueble>();
-//builder.Services.AddTransient<CasoDeUsoBajaUsuario>();
-builder.Services.AddTransient<CasoDeUsoBuscarCliente>();
-builder.Services.AddTransient<CasoDeUsoBuscarPersonal>();
-builder.Services.AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>();
->>>>>>> federamatodoanda
 
 var app = builder.Build();
 
