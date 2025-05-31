@@ -53,15 +53,12 @@ public class RepositorioPersonal : IRepositorioPersonal
     public Personal? ObtenerPersonalPorMailYContraseña(string mail, string contraseña)
     {
 
-        contraseña = BCrypt.Net.BCrypt.HashPassword(contraseña);
-
-        var per = _context.Personal.FirstOrDefault(p => p.Correo == mail && p.Contraseña == contraseña);
-        if (per == null)
+        var per = _context.Personal.FirstOrDefault(p => p.Correo == mail);
+        if (per != null && BCrypt.Net.BCrypt.Verify(contraseña, per.Contraseña))
         {
-            return null;
+            return per;
         }
-        return per;
-
+        return null;
     }
 
     public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad)

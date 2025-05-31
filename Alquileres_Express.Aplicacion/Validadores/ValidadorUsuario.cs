@@ -5,6 +5,7 @@ namespace Alquileres_Express.Aplicacion.Validadores;
 
 public class ValidadorUsuario
 {
+
     public void Ejecutar(Usuario usuario)
     {
         ValidarCampos(usuario);

@@ -1,4 +1,123 @@
-@page "/personal"
+@page "/agregar-personal"
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize(Roles = "Administrador,Gerente")]
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Mvc
+@inject CasoDeUsoAltaPersonal casoDeUsoAltaPersonal
 @rendermode InteractiveServer
 
-@inject NavigationManager Navegadsor
+
+<div class="login-container">
+    <div class="login-card">
+        <h3 class="login-title">Agregar Personal</h3>
+
+        <EditForm Model="@nuevoPersonal" OnValidSubmit="GuardarPersonal" FormName="agregarPersonalForm">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label>Correo</label>
+                <InputText class="form-control" @bind-Value="nuevoPersonal.Correo" />
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña</label>
+                <InputText type="password" class="form-control" @bind-Value="nuevoPersonal.Contraseña" />
+            </div>
+
+            <div class="form-group">
+                <label>Nombre</label>
+                <InputText class="form-control" @bind-Value="nuevoPersonal.Nombre" />
+            </div>
+
+            <div class="form-group">
+                <label>Apellido</label>
+                <InputText class="form-control" @bind-Value="nuevoPersonal.Apellido" />
+            </div>
+
+            <div class="form-group">
+                <label>Dirección</label>
+                <InputText class="form-control" @bind-Value="nuevoPersonal.Direccion" />
+            </div>
+            <label>Fecha de Nacimiento</label>
+            <select class="form-select me-1" @bind="selectedDay">
+                <option value="">Día</option>
+                @foreach (var d in Enumerable.Range(1, 31))
+                {
+                    <option value="@d">@d</option>
+                }
+            </select>
+            <select class="form-select me-1" @bind="selectedMonth">
+                <option value="">Mes</option>
+                @foreach (var m in Enumerable.Range(1, 12))
+                {
+                    <option value="@m">@m</option>
+                }
+            </select>
+            <select class="form-select" @bind="selectedYear">
+                <option value="">Año</option>
+                @foreach (var y in Enumerable.Range(DateTime.Now.Year - 100, 101).Reverse())
+                {
+                    <option value="@y">@y</option>
+                }
+            </select>
+            <div class="form-group">
+                <label>Rol</label>
+                <InputSelect class="form-control" @bind-Value="nuevoPersonal.Rol">
+                    <option value=@RolUsuario.Gerente>Gerente</option>
+                    <option value="@RolUsuario.Empleado">Empleado</option>
+                </InputSelect>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </EditForm>
+    </div>
+</div>
+<div class="alert alert-danger mt-3" role="alert"
+    style="display: @(string.IsNullOrEmpty(mensajeError) ? "none" : "block")">
+    @mensajeError
+
+</div>
+
+<div class="alert alert-success mt-3" role="alert"
+    style="display: @(string.IsNullOrEmpty(mensajeExito) ? "none" : "block")">
+    @mensajeExito
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Personal nuevoPersonal { get; set; } = new();
+    private string mensajeError = string.Empty;
+    private string mensajeExito = string.Empty;
+
+    private int? selectedDay;
+    private int? selectedMonth;
+    private int? selectedYear;
+    private void GuardarPersonal()
+    {
+        if (selectedDay == null || selectedMonth == null || selectedYear == null)
+        {
+            mensajeError = "Por favor, seleccioná día, mes y año de nacimiento.";
+            return;
+        }
+
+        try
+        {
+            nuevoPersonal.FechaNacimiento = new DateTime(
+            selectedYear.Value,
+            selectedMonth.Value,
+            selectedDay.Value
+            );
+            casoDeUsoAltaPersonal.Ejecutar(nuevoPersonal);
+            mensajeExito = "Personal agregado correctamente.";
+        }
+        catch (Exception ex)
+        {
+            mensajeError = ex.Message;
+        }
+
+    }
+}
