@@ -10,8 +10,9 @@
 @inject IConfiguration config
 @inject IHttpContextAccessor HttpContextAccessor
 @inject IRepositorioFoto RepositorioFoto
-@attribute [Authorize]
+@attribute [Authorize (Roles = "Administrador, Gerente")]
 @inject IJSRuntime JS
+
 
 <PageTitle>Cargar inmueble</PageTitle>
 
