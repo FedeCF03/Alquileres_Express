@@ -5,8 +5,8 @@ namespace Alquileres_Express.Aplicacion.Interfaces;
 public interface IRepositorioInmueble
 {
     public int AgregarInmueble(Inmueble inmueble);
-    public bool ModificarInmueble(Inmueble inmueble);
-    public bool EliminarInmueble(int id);
+    public void ModificarInmueble(Inmueble inmueble);
+    public void EliminarInmueble(int id);
     public Inmueble ObtenerInmueblePorId(int id);
 
     public Inmueble ObtenerInmueblePorNombre(string nombre);

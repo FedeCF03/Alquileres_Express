@@ -21,7 +21,7 @@
 
 /* Ajustes para texto y logo dentro de la barra blanca */
 .top-bar .text-white {
-    color: black !important; /* Cambiamos a negro porque el fondo es blanco */
+    color: black !important; 
     font-weight: 700;
     font-size: 1.25rem;
 }
@@ -33,7 +33,6 @@
 
 /* Botones en la barra */
 .top-bar button {
-    /* Usamos estilo bootstrap outline-dark para que se vean sobre fondo blanco */
     color: black;
     border: 1px solid black;
     background: transparent;

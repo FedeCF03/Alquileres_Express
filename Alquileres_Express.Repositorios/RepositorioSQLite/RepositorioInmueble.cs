@@ -5,6 +5,7 @@ using Alquileres_Express.Aplicacion.Entidades;
 using Alquileres_Express.Aplicacion.Enumerativo;
 using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Repositorios.Context;
+using Microsoft.EntityFrameworkCore;
 
 public class RepositorioInmueble : IRepositorioInmueble
 {
@@ -17,16 +18,15 @@ public class RepositorioInmueble : IRepositorioInmueble
         return inmueble.Id;
     }   
 
-    public bool EliminarInmueble(int id)
+    public void EliminarInmueble(int id)
     {
         using var _context = new Alquileres_ExpressContext();
         Inmueble inmueble = _context.Inmuebles.Find(id) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {id}");
         _context.Inmuebles.Remove(inmueble);
         _context.SaveChanges();
-        return true;
     }
 
-    public bool ModificarInmueble(Inmueble inmueble)
+    public void ModificarInmueble(Inmueble inmueble)
     {
         using var _context = new Alquileres_ExpressContext();
         Inmueble inmuebleExistente = _context.Inmuebles.Find(inmueble.Id) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {inmueble.Id}");
@@ -41,13 +41,12 @@ public class RepositorioInmueble : IRepositorioInmueble
         inmuebleExistente.CantidadDeCamas = inmueble.CantidadDeCamas;
         inmuebleExistente.TipoInmueble = inmueble.TipoInmueble;
         _context.SaveChanges();
-        return true;
     }
 
     public Inmueble ObtenerInmueblePorId(int id)
     {
         using var _context = new Alquileres_ExpressContext();
-        var inmueble = _context.Inmuebles.Find(id) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {id}");
+        var inmueble = _context.Inmuebles.Include(i => i.Fotos).FirstOrDefault(i => i.Id == id) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {id}");
         return inmueble;
     }
 

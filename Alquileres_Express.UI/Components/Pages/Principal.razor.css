@@ -1,59 +1,51 @@
-.seccion-propiedades {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    background-color: #5f7261;
-    padding: 2rem;
-    border-radius: 10px;
-    flex-wrap: wrap;
-    color: white;
-    font-family: 'Segoe UI', sans-serif;
+bloque-principal {
+  max-width: 90vw;      /* mismo ancho que la imagen principal */
+  margin: 0 auto;
 }
 
-.texto-lateral {
-    max-width: 400px;
+.imagen-grande {
+  width: 100%;
+  height: 50vh;
+  object-fit: cover;
+  display: block;
+  border: 4px solid white;
 }
 
-.texto-lateral h2 {
-    font-weight: 700;
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    color: white;
+.contenido-inferior {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-height: 60vh; /* Ajustable según diseño */
+  padding: 2rem 0;
 }
 
-.texto-lateral p {
-    color: #dfe6dd;
-    margin-bottom: 1rem;
-    line-height: 1.4;
+.texto {
+  text-align: left;
+  width: 100%;
+  max-width: 800px;
+  color: white;
 }
 
-.btn-mas {
-    background-color: #4e6e58;
-    color: white;
-    font-weight: bold;
-    padding: 0.6rem 2rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+.texto h2 {
+  margin-bottom: 0.5rem;
 }
 
-.galeria-propiedades {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
+.texto p {
+  margin-bottom: 1rem;
 }
 
-.miniatura {
-    width: 120px;
-    height: auto;
-    border-radius: 8px;
-    border: 5px solid white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    transition: border 0.3s;
-    cursor: pointer;
+.galeria-miniaturas {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
 }
 
-.miniatura.activa {
-    border: 5px solid #dd4ef3;
+.galeria-miniaturas img {
+  flex: 1;
+  max-height: 40vh;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 4px solid white;
 }
