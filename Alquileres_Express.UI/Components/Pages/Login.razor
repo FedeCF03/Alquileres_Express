@@ -10,7 +10,8 @@
 @inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
 @inject CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion
 @inject NavigationManager NavigationManager
-
+@inject ServicioGenerarCodigo servicioGenerarCodigo
+@inject ServicioEnviarEmail servicioEnviarEmail
 <div class="login-container">
     <div class="login-card">
         <h3 class="login-title">Iniciar Sesión</h3>
@@ -66,7 +67,8 @@
             user.Rol = personal.Rol;
             if (personal.Rol == RolUsuario.Gerente || personal.Rol == RolUsuario.Administrador)
             {
-                String codigo = ServicioEnviarEmail.EnviarEmailDobleAutenticacion(personal.Correo);
+                String codigo = servicioGenerarCodigo.GenerarCodigoAleatorio();
+                servicioEnviarEmail.EnviarEmail(personal.Correo,"Codigo de autenticacion" ,"Su codigo de autenticacion es : " ,codigo);
                 casoDeUsoActualizarEstadoDobleAutenticacion.Ejecutar(personal.Id, codigo);
                 NavigationManager.NavigateTo("/verificacion-doble-autenticacion");
             }

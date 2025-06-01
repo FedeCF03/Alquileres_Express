@@ -2,7 +2,7 @@
 .main-content {
     background-color: #495d54;
     min-height: 100vh; /* que ocupe todo el alto de la ventana */
-    color: white; /* texto blanco */
+    color: rgb(255, 255, 255); /* texto blanco */
     padding-top: 1rem;
     padding-left: 1rem;
     padding-right: 1rem;

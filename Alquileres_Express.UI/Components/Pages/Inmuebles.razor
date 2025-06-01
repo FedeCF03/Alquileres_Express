@@ -1,6 +1,7 @@
 @page "/Inmuebles"
 @inject FiltroDeInmueblesService FiltroDeInmueblesService
 @inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
+@using Alquileres_Express.Aplicacion.Servicios;
 @rendermode InteractiveServer
 
 <PageTitle>Inmuebles</PageTitle>
@@ -56,7 +57,11 @@
 
 @code
 {
-    private List<Inmueble> inmuebles = new List<Inmueble>();
+    private List<Inmueble> inmuebles;
+    private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
+
+
+    
     protected override void OnInitialized()
     {
         inmuebles = casoDeUsoListarInmuebles.Ejecutar();

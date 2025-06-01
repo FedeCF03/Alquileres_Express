@@ -36,11 +36,10 @@
         }
         else
         {
-        
         <section class="galeria">
             @foreach (var imagen in imagenes)
             {
-            <img src="@imagenes[fotoActual]" alt="Foto propiedad" class="foto" />
+            <img src="@inmueble.Fotos!.ElementAt(fotoActual)" alt="Foto propiedad" class="foto" />
             @* <button class="btn btn-secondary" @onclick="EliminarFoto">Eliminar</button> *@
             }
             <button class="btn btn-secondary" @onclick="()=>AgregandoFotos=true">Agregar fotos</button>

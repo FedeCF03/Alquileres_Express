@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Authorization
-@attribute [Authorize]
+@using BlazorDateRangePicker;
+@rendermode InteractiveServer
 
 <h3>Panel privado</h3>
 <PageTitle>Home</PageTitle>
@@ -11,3 +12,17 @@ Welcome to your new app.
 <AuthorizeView Roles="Administrador">
     <h3>Bienvenido Administrador</h3>
 </AuthorizeView>
+<DateRangePicker @bind-StartDate="StartDate" @bind-EndDate="EndDate" placeholder="Por favor,elija las fechas"/>
+
+@code {
+    DateTimeOffset? date;
+    DateTimeOffset? StartDate { get; set; }
+    DateTimeOffset? EndDate { get; set; }
+   
+}
+
+<style>
+    .prueba {
+        color: red;
+    }
+</style>

@@ -42,20 +42,18 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>()
     .AddTransient<CasoDeUsoBuscarPersonal>()
     .AddTransient<CasoDeUsoValidarCodigoDeSeguridad>()
-
-
+    .AddTransient<CasoDeUsoRegistrarCliente>()
+  
     .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
     .AddScoped<IRepositorioCliente, RepositorioCliente>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
     .AddScoped<IRepositorioFoto, RepositorioFoto>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
 
-
-
+    .AddTransient<ServicioEnviarEmail>()
     .AddTransient<FiltroDeInmueblesService>()
     .AddTransient<MercadoPagoService>()
-    //.AddTransient<ServicioLoggear>()
-
+    .AddTransient<ServicioGenerarCodigo>()
     .AddTransient<ValidadorInmueble>()
     .AddTransient<ValidadorUsuario>()
     .AddHttpContextAccessor()

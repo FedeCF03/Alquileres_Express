@@ -1,8 +1,8 @@
 namespace Alquileres_Express.Aplicacion.Servicios;
 
-public static class ServicioGenerarCodigo
+public  class ServicioGenerarCodigo
 {
-    public static string GenerarCodigoAleatorio()
+    public string GenerarCodigoAleatorio()
     {
         Random random = new();
         String codigo = "";

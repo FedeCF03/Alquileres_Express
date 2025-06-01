@@ -17,6 +17,8 @@ public class ValidadorUsuario
     {
         if (string.IsNullOrWhiteSpace(u.Nombre))
             throw new InvalidOperationException("El nombre no puede estar vacío.");
+            if (string.IsNullOrWhiteSpace(u.Dni))
+            throw new InvalidOperationException("El DNI no puede estar vacío.");
         if (string.IsNullOrWhiteSpace(u.Apellido))
             throw new InvalidOperationException("El apellido no puede estar vacío.");
         if (string.IsNullOrWhiteSpace(u.Correo))

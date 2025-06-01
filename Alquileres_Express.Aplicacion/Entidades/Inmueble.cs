@@ -14,8 +14,8 @@ namespace Alquileres_Express.Aplicacion.Entidades
         public int CantidadDeCamas { get; set; }//Cantidad habitaciones
         public int Banios { get; set; }
         public TipoDeInmueble TipoInmueble { get; set; }
-        public List<Alquiler>? alquileres;
-        public bool disponible { get; set; }
+        public List<Alquiler>? Alquileres;
+        public bool Disponible { get; set; }
         public List<Foto>? Fotos { get; set; }
 
 
