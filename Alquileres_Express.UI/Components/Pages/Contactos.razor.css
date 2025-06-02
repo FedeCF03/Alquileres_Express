@@ -1,0 +1,42 @@
+.redes-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* <- Esto alinea el contenido al tope */
+    min-height: 100vh;
+    padding: 2rem;
+    padding-top: 3rem; /* Opcional: ajustá la separación desde arriba */
+}
+
+.titulo {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.redes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    text-align: center;
+}
+
+.red img {
+    width: 96px;
+    height: 96px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+}
+
+.red a, .red p {
+    font-size: 1.1rem;
+    color: #1f2937;
+    text-decoration: underline;
+}
+
+.links {
+    color: #1da3d8;
+    text-decoration: underline;
+    font-weight: 600;
+}

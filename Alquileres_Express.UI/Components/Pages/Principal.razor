@@ -1,19 +1,70 @@
 @page "/Principal"
 
-<div class="bloque-principal">
-  <img src="images/Inicial.png" class="imagen-grande" alt="Imagen principal" />
+@inject FiltroDeInmueblesService FiltroDeInmueblesService
+@inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
+@using Alquileres_Express.Aplicacion.Servicios;
+@rendermode InteractiveServer
 
-  <div class="contenido-inferior">
-    <div class="texto">
-      <h2>Encontra tu propiedad ideal</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...</p>
-      <button>Más</button>
+<PageTitle>Inmuebles</PageTitle>
+
+<div class="inmuebles-container">
+    <div class="inmuebles-listado">
+        <h2>Propiedades</h2>
+        <div class="imagenes">
+            @if (inmuebles == null || !inmuebles.Any())
+            {
+                <p>No hay inmuebles disponibles.</p>
+            }
+            else
+            {
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var inmueble in inmuebles)
+                        {
+                            <tr>
+                                <td>@inmueble.Nombre</td>
+                                <td>$@inmueble.Precio</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
     </div>
 
-    <div class="galeria-miniaturas">
-      <img src="images/Inicial1.png" alt="Propiedad 1" />
-      <img src="images/Inicial2.png" alt="Propiedad 2" />
-      <img src="images/Inicial3.png" alt="Propiedad 3" />
+    <div class="filtros">
+        <h2>Ordenar</h2>
+        <p>FILTROS</p>
+        <select>
+            <option>Localidad</option>
+        </select>
+        <select>
+            <option>Precio</option>
+        </select>
+        <select>
+            <option>Cantidad de personas</option>
+        </select>
+        <select>
+            <option>Mejor valoradas</option>
+        </select>
     </div>
-  </div>
 </div>
+
+@code
+{
+    private List<Inmueble> inmuebles;
+    private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
+
+
+    
+    protected override void OnInitialized()
+    {
+        inmuebles = casoDeUsoListarInmuebles.Ejecutar();
+    }
+}
