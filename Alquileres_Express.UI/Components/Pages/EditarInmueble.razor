@@ -24,13 +24,6 @@
             </div>
         </section>
 
-        
-        @if (fotos.Count == 0)
-        {
-            <p>No hay fotos disponibles para esta propiedad.</p>
-        }
-        else
-        {
         <section class="galeria">
             <InputFile @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
             <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
@@ -39,13 +32,12 @@
                 {
                     <div class="image-card">
                         <img src="@foto.Url" />
-                        <button @onclick="()=>EliminarFoto(foto.Nombre)">Eliminar</button>
+                        <button @onclick="()=>EliminarFoto(foto)">Eliminar</button>
                     </div>
                 }
             </div>
 
         </section>
-        }
         <section class="detalles">
             <h4>Detalles</h4>
             <ul>
@@ -96,6 +88,7 @@
 </main>
 </div>
 <button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
+<button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
 @if (errores.Count > 0)
     {
         <div class="alert alert-danger">
@@ -133,7 +126,8 @@
     private int maxAllowedFiles = 30;
     private List<String> errores = new();
     private string errorPorFaltaDeFotos = string.Empty;
-    private List<Foto> fotos = new();
+    private List<Foto> fotos = [];
+    private List<Foto> fotosEliminadas = [];
     private Guid inputFileId = Guid.NewGuid();
     private InputFileChangeEventArgs? browser;
 
@@ -216,20 +210,16 @@
         }   
         if (errores.Count == 0 & casoDeUsoEditarInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out mensajeError)){
             ServicioFotos.EliminarFotosPorInmueble(inmueble.Id);
+            ServicioFotos.EliminarFotosDelDirectorio(fotosEliminadas);
             ServicioFotos.PersistirFotos(fotos, inmueble.Id);
             Nav.NavigateTo("/inmuebles");
         }
     }
 
-    private void EliminarFoto(string nombre)
+    private void EliminarFoto(Foto foto)
     {
-        var foto = fotos.FirstOrDefault(f => f.Nombre == nombre);
-        if (foto != null)
-        {
-            fotos.Remove(foto);
-            File.Delete(Path.Combine(ServicioFotos.DevolverPathDelDirectorio(), nombre));
-            StateHasChanged();
-        }
+        fotos.Remove(foto);
+        fotosEliminadas.Add(foto);
     }
     
     private async Task GuardarFotos()
@@ -256,9 +246,7 @@
                     {
                         errores.Add($"El archivo {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
                         return;
-
                     }
-
                     else
                     {
                         crearArchivo(file);
