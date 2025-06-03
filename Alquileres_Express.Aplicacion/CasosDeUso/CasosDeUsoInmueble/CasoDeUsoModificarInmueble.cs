@@ -8,25 +8,22 @@ public class CasoDeUsoModificarInmueble(IRepositorioInmueble repositorio, Valida
     public bool Ejecutar(Inmueble inmueble, out string mensajeError)
     {
         mensajeError = string.Empty;
-
-        if (!validadorInmueble.Ejecutar(inmueble))
+        try
         {
-            mensajeError = "Alguno de los campos del inmueble está vacío. Por favor, llene todos los campos.";
-            return false;
-        }
+        validadorInmueble.Ejecutar(inmueble);
+        
         if (SeRepiteNombre(inmueble))
         {
             mensajeError = "Ya existe un inmueble con el mismo nombre.";
             return false;
         }
-        try
-        {
+        
             repositorio.ModificarInmueble(inmueble);
             return true;
         }
         catch (Exception ex)
         {
-            mensajeError = $"Ocurrió un error al modificar el inmueble: {ex.Message}";
+            mensajeError = ex.Message;
             return false;
         }
     

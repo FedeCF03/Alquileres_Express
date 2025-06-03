@@ -9,16 +9,13 @@
 @using Alquileres_Express.Aplicacion.Enumerativo
 @inject IConfiguration config
 @inject IHttpContextAccessor HttpContextAccessor
-@inject IRepositorioFoto RepositorioFoto
+@inject ServicioFotos ServicioFotos
 @attribute [Authorize (Roles = "Administrador, Gerente")]
 @inject IJSRuntime JS
 
 
 <PageTitle>Cargar inmueble</PageTitle>
 
-<EditForm FormName="a" Model="inmueble" OnValidSubmit="Cargar">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
 <label class="form-label">Cargar Inmueble</label>
 <label class="form-label">Por favor, complete los siguientes campos:</label>
 <label class="form-label">Nombre del Inmueble</label>
@@ -51,7 +48,8 @@
     defer></script>
 <script>
     function initializeMap(dotNetHelper) {
-        const initialPosition = { lat: -34.6037, lng: -58.3816 }; // Coordenadas de Buenos Aires
+        const initialPosition = { lat: -34.6037, lng: -58.3816 };// Coordenadas de Buenos Aires
+        const initialMarkerPosition = {lat: 0, lng: 0};
 
         const map = new google.maps.Map(document.getElementById("map"), {
             center: initialPosition,
@@ -59,7 +57,7 @@
         });
 
         const marker = new google.maps.Marker({
-            position: initialPosition,
+            position: initialMarkerPosition,
             map: map,
             draggable: true,
         });
@@ -79,12 +77,21 @@
 
 </script>
 </div> 
+<InputFile @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
+<button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
 
-<button type="submit" class="btn btn-primary" @onclick="() => Cargar()">Cargar Inmueble</button>
-</EditForm>
+<button class="btn btn-primary" @onclick="() => Cargar()">Cargar Inmueble</button>
 
-<InputFile OnChange="CaptureFiles" multiple />
-<button @onclick="GuardarFotos" class="btn btn-primary">Cargar Archivos</button>
+
+<div class="image-list">
+    @foreach (var foto in fotos)
+    {
+        <div class="image-card">
+            <img src="@foto.Url" />
+            <button @onclick="()=>EliminarFoto(foto.Nombre)">Eliminar</button>
+        </div>
+    }
+</div>
 
 @if (errores.Count > 0)
     {
@@ -95,6 +102,12 @@
             }
         </div>
     }
+@if (mensajeError != string.Empty)
+    {
+        <div class="alert alert-danger">
+            <p>@mensajeError</p>
+        </div>
+    }
 
 @code {
     Inmueble inmueble = new();
@@ -102,13 +115,27 @@
 
     private double Latitud { get; set; }
     private double Longitud { get; set; }
+    private string mensajeError = string.Empty;
+    private long maxFileSize = 1024 * 1024 * 5; // 5 MB
+    private int maxAllowedFiles = 30;
+    private List<String> errores = new();
+    private List<Foto> fotos = new();
+    private Guid inputFileId = Guid.NewGuid();
+    private InputFileChangeEventArgs? browser;
     private void Cargar()
     {
         inmueble.CoordLat = Latitud;
         inmueble.CoordLong = Longitud;
-        CasoDeUsoAltaInmueble.Ejecutar(inmueble,RolUsuario.Gerente);
-      persistirFotos(fotos, inmueble);
-        
+        if (fotos.Count == 0)
+        {
+            errores.Add("Debe cargar al menos una foto del inmueble.");
+            StateHasChanged();
+            return;
+        }   
+        if (errores.Count == 0 & CasoDeUsoAltaInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out mensajeError) != -1){
+            ServicioFotos.PersistirFotos(fotos, inmueble.Id);
+            Nav.NavigateTo("/inmuebles");
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -132,53 +159,65 @@
         
     }
 
-    private long maxFileSize = 1024 * 1024 * 5; // 5 MB
-    private int maxAllowedFiles = 30;
-    private List<String> errores = new();
-    private List<Foto> fotos = new();
 
-    private InputFileChangeEventArgs browser;
-
+    private void EliminarFoto(string nombre)
+    {
+        var foto = fotos.FirstOrDefault(f => f.Nombre == nombre);
+        if (foto != null)
+        {
+            fotos.Remove(foto);
+            File.Delete(Path.Combine(ServicioFotos.DevolverPathDelDirectorio(), nombre));
+            StateHasChanged();
+        }
+    }
     
     private async Task GuardarFotos()
     {
-        if (browser == null)
+        try
         {
-            errores.Add("No se ha seleccionado ningún archivo.");
-            return;
-        }
-
-        if (browser.FileCount > maxAllowedFiles)
-        {
-            errores.Add($"No se pueden cargar más de {maxAllowedFiles} archivos.");
-            return;
-        }
-        errores.Clear();
-        foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))
-        {
-            try{
-                if (file.Size > maxFileSize)
-                {
-                    errores.Add($"El archivo {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
-                    return;
-
-                }
-
-                else{
-                crearArchivo(file);
-                }
-
-            }
-            catch (Exception ex)
+            errores.Clear();
+            if (browser == null || browser.FileCount == 0)
             {
-                errores.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
+                errores.Add("No se ha seleccionado ningún archivo.");
+                return;
             }
-        
-    } }
+
+            if (browser.FileCount > maxAllowedFiles)
+            {
+                errores.Add($"No se pueden cargar más de {maxAllowedFiles} archivos.");
+                return;
+            }   
+            foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))
+            {
+                try{
+                    if (file.Size > maxFileSize)
+                    {
+                        errores.Add($"El archivo {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
+                        return;
+
+                    }
+
+                    else
+                    {
+                        crearArchivo(file);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    errores.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
+                }
+            }
+        }
+        finally 
+        {
+            inputFileId = Guid.NewGuid();
+            StateHasChanged();
+        }
+    }
     private async Task CaptureFiles(InputFileChangeEventArgs e)
     {
         browser = e;
-        
     }
 
     private async void crearArchivo(IBrowserFile file)
@@ -201,13 +240,24 @@
                 fotos.Add(new Foto
                 {
                     Url = $"/images/fotosInmuebles/{newFileName}",
+                    Nombre = newFileName,
                 });
+                StateHasChanged();
     }
 
-    public void persistirFotos(List<Foto> fotos, Inmueble inmueble)
-    {
-        fotos.ForEach(foto => foto.InmuebleId = inmueble.Id);
-        RepositorioFoto.AgregarFotos(fotos);
-    
-    }
 }
+
+<style>
+    .image-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.image-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+</style>

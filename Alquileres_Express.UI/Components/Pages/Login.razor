@@ -16,7 +16,7 @@
     <div class="login-card">
         <h3 class="login-title">Iniciar Sesión</h3>
 
-        <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
+        <EditForm Model="@user" OnValidSubmit="IniciarSesionComoGerenteFake" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -52,7 +52,7 @@
     private LoginModel user { get; set; } = new();
     private bool ErrorMessage { get; set; } = false;
 
-    private async Task iniciarSesionComoGerenteFake()
+    private async Task IniciarSesionComoGerenteFake()
     {
         user.Correo = "maria@gmail.com";
         user.Rol = RolUsuario.Gerente;

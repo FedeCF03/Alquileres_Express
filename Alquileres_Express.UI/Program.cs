@@ -7,6 +7,7 @@ using Alquileres_Express.Repositorios.RepositoriosSQLite;
 using Alquileres_Express.Aplicacion.Validadores;
 using Alquileres_Express.Aplicacion.Servicios;
 using Alquileres_Express.Repositorio;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +44,7 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<CasoDeUsoBuscarPersonal>()
     .AddTransient<CasoDeUsoValidarCodigoDeSeguridad>()
     .AddTransient<CasoDeUsoRegistrarCliente>()
-  
+
     .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
     .AddScoped<IRepositorioCliente, RepositorioCliente>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
@@ -57,10 +58,9 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<ValidadorInmueble>()
     .AddTransient<ValidadorUsuario>()
     .AddHttpContextAccessor()
-    .AddCascadingAuthenticationState();
-
-
-
+    .AddCascadingAuthenticationState()
+    .AddTransient<ServicioFotos>();
+builder.WebHost.UseStaticWebAssets();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -69,6 +69,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
+
+app.UseStaticFiles();
 
 app.UseAntiforgery();
 
@@ -82,4 +84,5 @@ app.UseAuthorization();
 builder.Services.AddAuthorization();
 
 Crear.Inicializar();
+
 app.Run();
