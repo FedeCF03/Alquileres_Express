@@ -7,6 +7,7 @@ public interface IRepositorioFoto
     public int AgregarFoto(Foto foto);
     public void AgregarFotos(List<Foto> fotos);
     public void EliminarFoto(int id);
+    public void EliminarFotosPorInmueble(int idInmueble);
     public List<Foto> ObtenerTodasLasFotos();
     public List<Foto> ObtenerFotosPorInmueble(int idInmueble);
 

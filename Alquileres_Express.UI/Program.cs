@@ -34,7 +34,7 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<CasoDeUsoAltaInmueble>()
     .AddTransient<CasoDeUsoBajaInmueble>()
     .AddTransient<CasoDeUsoListarInmuebles>()
-    .AddTransient<CasoDeUsoModificarInmueble>()
+    .AddTransient<CasoDeUsoEditarInmueble>()
     .AddTransient<CasoDeUsoEliminarInmueble>()
     .AddTransient<CasoDeUsoObtenerInmueble>()
     .AddTransient<CasoDeUsoVerInmueble>()

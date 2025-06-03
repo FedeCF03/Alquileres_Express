@@ -102,6 +102,13 @@
             }
         </div>
     }
+@if (errorPorFaltaDeFotos != string.Empty)
+    {
+        <div class="alert alert-danger">
+            <p>@errorPorFaltaDeFotos</p>
+        </div>
+    }
+
 @if (mensajeError != string.Empty)
     {
         <div class="alert alert-danger">
@@ -119,6 +126,7 @@
     private long maxFileSize = 1024 * 1024 * 5; // 5 MB
     private int maxAllowedFiles = 30;
     private List<String> errores = new();
+    private string errorPorFaltaDeFotos = string.Empty;
     private List<Foto> fotos = new();
     private Guid inputFileId = Guid.NewGuid();
     private InputFileChangeEventArgs? browser;
@@ -128,7 +136,7 @@
         inmueble.CoordLong = Longitud;
         if (fotos.Count == 0)
         {
-            errores.Add("Debe cargar al menos una foto del inmueble.");
+            errorPorFaltaDeFotos = "Debe cargar al menos una foto del inmueble.";
             StateHasChanged();
             return;
         }   
@@ -181,6 +189,7 @@
                 errores.Add("No se ha seleccionado ningún archivo.");
                 return;
             }
+            errorPorFaltaDeFotos = string.Empty;
 
             if (browser.FileCount > maxAllowedFiles)
             {
