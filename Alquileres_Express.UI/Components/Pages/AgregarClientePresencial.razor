@@ -1,0 +1,116 @@
+@page "/agregar-cliente-presencial"
+
+@rendermode InteractiveServer
+@inject NavigationManager Navegadsor
+@attribute [Authorize(Roles = "Administrador,Gerente,Empleado")]
+@inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
+@inject ServicioEnviarEmail servicioEnviarEmail
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+<div class="login-card">
+    <h3 class="login-title">Registrate</h3>
+
+    <div class="mb-2">
+        <label>Nombre</label>
+        <input @bind="_cliente.Nombre" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Apellido</label>
+        <input @bind="_cliente.Apellido" class="form-control" />
+    </div>
+
+
+    <div class="mb-2">
+        <label>Dni</label>
+        <input @bind="_cliente.Dni" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Correo</label>
+        <input @bind="_cliente.Correo" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Dirección</label>
+        <input @bind="_cliente.Direccion" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Fecha de Nacimiento</label>
+        <div class="d-flex">
+            <select class="form-select me-1" @bind="selectedDay">
+                <option value="">Día</option>
+                @foreach (var d in Enumerable.Range(1, 31))
+                {
+                    <option value="@d">@d</option>
+                }
+            </select>
+            <select class="form-select me-1" @bind="selectedMonth">
+                <option value="">Mes</option>
+                @foreach (var m in Enumerable.Range(1, 12))
+                {
+                    <option value="@m">@m</option>
+                }
+            </select>
+            <select class="form-select" @bind="selectedYear">
+                <option value="">Año</option>
+                @foreach (var y in Enumerable.Range(DateTime.Now.Year - 100, 101).Reverse())
+                {
+                    <option value="@y">@y</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+
+@code {
+    private Cliente _cliente = new Cliente();
+    private string? ErrorMessage;
+
+    private int? selectedDay;
+    private int? selectedMonth;
+    private int? selectedYear;
+
+    private void Aceptar()
+    {
+        ErrorMessage = null;
+
+        if (selectedDay == null || selectedMonth == null || selectedYear == null)
+        {
+            ErrorMessage = "Por favor, seleccioná día, mes y año de nacimiento.";
+            return;
+        }
+
+        try
+        {
+            _cliente.FechaNacimiento = new DateTime(
+            selectedYear.Value,
+            selectedMonth.Value,
+            selectedDay.Value
+            );
+            _cliente.Contraseña= _cliente.Dni; // Asignar DNI como contraseña
+            bool ok = casoDeUsoAltaCliente.Ejecutar(_cliente);
+            servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", "Su usuario ha sido registrado correctamente. por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Contraseña);
+            if (ok)
+            {
+                _cliente = new Cliente();
+                selectedDay = selectedMonth = selectedYear = null;
+                ErrorMessage = "Se registró un nuevo cliente correctamente.";
+            }
+        }   
+        catch (InvalidOperationException ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Ocurrió un error inesperado: " + ex.Message;
+        }
+    }
+}

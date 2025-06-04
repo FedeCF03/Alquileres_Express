@@ -1,16 +1,16 @@
 @page "/inmueble/{id:int}"
+@rendermode InteractiveServer
 @inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
-
+@inject IRepositorioFoto repositorioFotos
+@inject IJSRuntime JS
 @inject NavigationManager NavigationManager
-
-
 
 <div class="contenedor">
 
 
     <main class="contenido">
         <section class="info-propiedad">
-            <h2>@inmueble.Nombre</h2>
+            <h2>@inmueble.Nombre</h2> 
             <p class="direccion">@inmueble.Direccion</p>
             <div class="precio">
                 <span class="etiqueta">Alquilar</span>
@@ -18,12 +18,20 @@
             </div>
         </section>
 
+        
+        @if (imagenes.Length == 0)
+        {
+            <p>No hay fotos disponibles para esta propiedad.</p>
+        }
+        else
+        {
+            
         <section class="galeria">
             <button @onclick="FotoAnterior" class="btn-flecha">◀</button>
             <img src="@imagenes[fotoActual]" alt="Foto propiedad" class="foto" />
             <button @onclick="FotoSiguiente" class="btn-flecha">▶</button>
         </section>
-
+        }
         <section class="detalles">
             <h4>Detalles</h4>
             <ul>
@@ -35,12 +43,15 @@
             </ul>
         </section>
     </main>
+   
 </div>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initMap" async
+ <img src="/images/fotosInmuebles/oxouzdoi.png" alt="Foto propiedad" class="foto" />
+<div id="map" style="height: 400px; width: 80%;">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initializeMap" async
     defer></script>
 <script>
-    function initializeMap(dotNetHelper) {
-        const initialPosition = { lat: @inmueble.CoordLat, lng: @inmueble.CoordLong }; // Coordenadas de Buenos Aires
+    function initializeMap(dotNetHelper, lat, lng) {
+        const initialPosition = { lat: lat, lng: lng}; // Coordenadas de Buenos Aires
 
         const map = new google.maps.Map(document.getElementById("map"), {
             center: initialPosition,
@@ -50,45 +61,41 @@
         const marker = new google.maps.Marker({
             position: initialPosition,
             map: map,
-            draggable: false,
+            draggable: true,
         });
 
     }
 
 </script>
+</div>
 
 @code {
     private int fotoActual = 0;
-    private string[] imagenes = new[]
-    {
-"img/departamento1.jpg",
-"img/departamento2.jpg",
-"img/departamento3.jpg"
-};
+    private string[] imagenes = new string[0];
 
     void FotoSiguiente()
     {
         fotoActual = (fotoActual + 1) % imagenes.Length;
+        StateHasChanged(); // Actualiza la vista para mostrar la nueva foto
     }
 
     void FotoAnterior()
     {
         fotoActual = (fotoActual - 1 + imagenes.Length) % imagenes.Length;
+        StateHasChanged();
     }
-}
 
-
-@code {
     [Parameter]
     public int Id { get; set; }
 
-    private Inmueble? inmueble;
+    private Inmueble inmueble = new Inmueble();
 
     protected override void OnParametersSet()
     {
         try
         {
-            // inmueble = await casoDeUsoObtenerInmueble.Ejecutar(Id);
+            inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            imagenes = repositorioFotos.ObtenerFotosPorInmueble(Id).Select(f => f.Url).ToArray();
 
         }
         catch (Exception ex)
@@ -97,108 +104,12 @@
             NavigationManager.NavigateTo("/error");
         }
     }
-
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+         if (firstRender)
+        {
+            var dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initializeMap", dotNetRef, @inmueble.CoordLat, @inmueble.CoordLong);
+        }
+    }
 }
-
-<script>
-    .contenedor {
-        font - family: sans - serif;
-        padding: 1rem;
-        max - width: 1000px;
-        margin: auto;
-    }
-
-.encabezado {
-        display: flex;
-        justify - content: space - between;
-        align - items: center;
-        margin - bottom: 1rem;
-    }
-
-.logo {
-        height: 40px;
-    }
-
-nav a {
-        margin: 0 1rem;
-        text - decoration: none;
-        color: black;
-    }
-
-    nav.activo {
-        font - weight: bold;
-    }
-
-.btn - contacto {
-        background - color: #9ccbbb;
-        border: none;
-        padding: 0.5rem 1rem;
-        border - radius: 8px;
-    }
-
-.contenido {
-        background - color: #2c3e3e;
-        padding: 1rem;
-        color: white;
-        border - radius: 10px;
-    }
-
-.info - propiedad h2 {
-        margin: 0;
-    }
-
-.direccion {
-        color: #d6d6d6;
-    }
-
-.precio {
-        display: flex;
-        align - items: center;
-        margin - top: 0.5rem;
-    }
-
-.etiqueta {
-        background - color: #afca4c;
-        padding: 0.25rem 0.75rem;
-        border - radius: 6px;
-        margin - right: 1rem;
-    }
-
-.valor {
-        font - size: 1.5rem;
-        font - weight: bold;
-    }
-
-.galeria {
-        display: flex;
-        align - items: center;
-        justify - content: center;
-        margin: 1rem 0;
-    }
-
-.foto {
-        max - height: 250px;
-        border - radius: 10px;
-        margin: 0 1rem;
-    }
-
-.btn - flecha {
-        background: none;
-        border: none;
-        font - size: 2rem;
-        color: white;
-        cursor: pointer;
-    }
-
-.detalles {
-        background - color: #3c5655;
-        padding: 1rem;
-        border - radius: 10px;
-        margin - top: 1rem;
-    }
-
-.detalles ul {
-        list - style: none;
-        padding: 0;
-    }
-</script>

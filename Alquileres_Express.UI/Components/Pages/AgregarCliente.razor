@@ -1,65 +1,83 @@
 @page "/usuario"
 @rendermode InteractiveServer
-
-@inject NavigationManager Navegadsor
+@inject NavigationManager Navegador
 @inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
+@using BlazorDateRangePicker
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
     <div class="alert alert-danger">@ErrorMessage</div>
 }
+    <DateRangePicker class="prueba" @bind-Value="date" 
+                         Placeholder="Selecciona tu fecha de nacimiento"  
+                         SingleDatePicker=true/>
+    <div class="login-card">
+        <h3 class="login-title">Registrate</h3>
 
-<div class="mb-2">
-    <label>Nombre</label>
-    <input @bind="_cliente.Nombre" class="form-control" />
-</div>
-<div class="mb-2">
-    <label>Apellido</label>
-    <input @bind="_cliente.Apellido" class="form-control" />
-</div>
-<div class="mb-2">
-    <label>Correo</label>
-    <input @bind="_cliente.Correo" class="form-control" />
-</div>
-<div class="mb-2">
-    <label>Contraseña</label>
-    <input @bind="_cliente.Contraseña" type="password" class="form-control" />
-</div>
-<div class="mb-2">
-    <label>Dirección</label>
-    <input @bind="_cliente.Direccion" class="form-control" />
-</div>
+        <div class="mb-2">
+            <label>Nombre</label>
+            <input @bind="_cliente.Nombre" class="form-control" />
+        </div>
 
-<div class="mb-2">
-    <label>Fecha de Nacimiento</label>
-    <div class="d-flex">
-        <select class="form-select me-1" @bind="selectedDay">
-            <option value="">Día</option>
-            @foreach (var d in Enumerable.Range(1, 31))
-            {
-                <option value="@d">@d</option>
-            }
-        </select>
-        <select class="form-select me-1" @bind="selectedMonth">
-            <option value="">Mes</option>
-            @foreach (var m in Enumerable.Range(1, 12))
-            {
-                <option value="@m">@m</option>
-            }
-        </select>
-        <select class="form-select" @bind="selectedYear">
-            <option value="">Año</option>
-            @foreach (var y in Enumerable.Range(DateTime.Now.Year - 100, 101).Reverse())
-            {
-                <option value="@y">@y</option>
-            }
-        </select>
+        <div class="mb-2">
+            <label>Apellido</label>
+            <input @bind="_cliente.Apellido" class="form-control" />
+        </div>
+
+        <div class="mb-2">
+            <label>DNI</label>
+            <input @bind="_cliente.Dni" class="form-control" />
+        </div>
+
+        <div class="mb-2">
+            <label>Correo</label>
+            <input @bind="_cliente.Correo" class="form-control" />
+        </div>
+
+        <div class="mb-2">
+            <label>Contraseña</label>
+            <input @bind="_cliente.Contraseña" type="password" class="form-control" />
+        </div>
+
+        <div class="mb-2">
+            <label>Dirección</label>
+            <input @bind="_cliente.Direccion" class="form-control" />
+        </div>
+
+        
+
+        <div class="mb-2">
+            <label>Fecha de Nacimiento</label>
+            <div class="d-flex">
+                <select class="form-select me-1" @bind="selectedDay">
+                    <option value="">Día</option>
+                    @foreach (var d in Enumerable.Range(1, 31))
+                    {
+                        <option value="@d">@d</option>
+                    }
+                </select>
+                <select class="form-select me-1" @bind="selectedMonth">
+                    <option value="">Mes</option>
+                    @foreach (var m in Enumerable.Range(1, 12))
+                    {
+                        <option value="@m">@m</option>
+                    }
+                </select>
+                <select class="form-select" @bind="selectedYear">
+                    <option value="">Año</option>
+                    @foreach (var y in Enumerable.Range(DateTime.Now.Year - 100, 101).Reverse())
+                    {
+                        <option value="@y">@y</option>
+                    }
+                </select>
+            </div>
+        </div>
     </div>
-</div>
 
 <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
 
 @code {
+    DateTimeOffset? date;
     private Cliente _cliente = new Cliente();
     private string? ErrorMessage;
 
@@ -81,7 +99,7 @@
         {
             _cliente.FechaNacimiento = new DateTime(
             selectedYear.Value,
-            selectedMonth.Value,
+            selectedMonth.Value,    
             selectedDay.Value
             );
 

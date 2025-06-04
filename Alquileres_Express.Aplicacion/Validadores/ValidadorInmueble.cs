@@ -15,13 +15,9 @@ public class ValidadorInmueble
 
     private bool ValidarCampos(Inmueble inmueble)
     {
-        if (string.IsNullOrWhiteSpace(inmueble.Nombre) || string.IsNullOrWhiteSpace(inmueble.Direccion) || string.IsNullOrWhiteSpace(inmueble.CoordLat) ||
-        string.IsNullOrWhiteSpace(inmueble.CoordLong) || string.IsNullOrWhiteSpace(inmueble.Ciudad) || string.IsNullOrWhiteSpace(inmueble.CodigoPostal) ||
-        inmueble.Precio == null || inmueble.Banios == null || inmueble.CantidadDeCamas == null)
-            return false;
-
-        //Verificar enumerativo
-        if (!Enum.IsDefined(typeof(TipoDeInmueble), inmueble.TipoInmueble))
+        if (string.IsNullOrWhiteSpace(inmueble.Nombre) ||
+        string.IsNullOrWhiteSpace(inmueble.Direccion) ||
+        string.IsNullOrWhiteSpace(inmueble.Ciudad))
             return false;
         return true;
     }

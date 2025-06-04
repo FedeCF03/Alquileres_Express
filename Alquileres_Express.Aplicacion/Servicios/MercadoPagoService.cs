@@ -11,7 +11,7 @@ public class MercadoPagoService
         MercadoPagoConfig.AccessToken = "APP_USR-4758729501201277-052522-20570b3514929dcdd539c2ecd6ff1b30-2456261951";
     }
 
-    public async Task<string> CrearPreferenciaAsync()
+    public async Task<string> CrearPreferenciaAsync( string title, decimal price)
 
     {
         var request = new PreferenceRequest
@@ -20,15 +20,15 @@ public class MercadoPagoService
             {
                 new PreferenceItemRequest
                 {
-                    Title = "Producto de prueba",
+                    Title = title,
                     Quantity = 1,
-                    UnitPrice = 1000m,
+                    UnitPrice = price,
                     CurrencyId = "ARS"
                 }
             },
             BackUrls = new PreferenceBackUrlsRequest
             {
-                Success = "https://localhost:5153/success",
+                Success = "https://localhost:5153/success/" ,
                 Failure = "https://localhost:5153/failure",
                 Pending = "https://localhost:5153/pending"
             },

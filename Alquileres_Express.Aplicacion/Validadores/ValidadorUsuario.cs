@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Alquileres_Express.Aplicacion.Entidades;
 using RestSharp.Extensions;
 
@@ -5,17 +6,21 @@ namespace Alquileres_Express.Aplicacion.Validadores;
 
 public class ValidadorUsuario
 {
+
     public void Ejecutar(Usuario usuario)
     {
         ValidarCampos(usuario);
         ValidarContraseña(usuario.Contraseña);
         ValidarEdad(usuario.FechaNacimiento);
+        ValidarDni(usuario.Dni);
     }
 
     private void ValidarCampos(Usuario u)
     {
         if (string.IsNullOrWhiteSpace(u.Nombre))
             throw new InvalidOperationException("El nombre no puede estar vacío.");
+        if (string.IsNullOrWhiteSpace(u.Dni))
+            throw new InvalidOperationException("El DNI no puede estar vacío.");
         if (string.IsNullOrWhiteSpace(u.Apellido))
             throw new InvalidOperationException("El apellido no puede estar vacío.");
         if (string.IsNullOrWhiteSpace(u.Correo))
@@ -41,4 +46,10 @@ public class ValidadorUsuario
         if (diferencia.TotalDays < 6570) // 6570 días = 18 años
             throw new InvalidOperationException("El usuario debe ser mayor de edad.");
     }
+    private void ValidarDni(string dni)
+{
+    if (!Regex.IsMatch(dni, @"^\d{7,8}$"))
+        throw new InvalidOperationException("El DNI debe contener solo números y tener entre 7 y 8 dígitos.");
+}
+
 }

@@ -10,7 +10,7 @@ public class RepositorioPersonal : IRepositorioPersonal
     readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
     public void AgregarPersonal(Personal p)
     {
-        bool existe = _context.Personal.Any(x => x.Correo.ToLower() == p.Correo.ToLower());
+        bool existe = (_context.Clientes.Any(x => x.Correo.ToLower() == p.Correo.ToLower())) || (_context.Personal.Any(x => x.Correo.ToLower() == p.Correo.ToLower()));
         if (existe)
             throw new InvalidOperationException("El correo ya está registrado por otro cliente.");
         p.Contraseña = BCrypt.Net.BCrypt.HashPassword(p.Contraseña.Trim());
@@ -53,15 +53,12 @@ public class RepositorioPersonal : IRepositorioPersonal
     public Personal? ObtenerPersonalPorMailYContraseña(string mail, string contraseña)
     {
 
-        contraseña = BCrypt.Net.BCrypt.HashPassword(contraseña);
-
-        var per = _context.Personal.FirstOrDefault(p => p.Correo == mail && p.Contraseña == contraseña);
-        if (per == null)
+        var per = _context.Personal.FirstOrDefault(p => p.Correo == mail);
+        if (per != null && BCrypt.Net.BCrypt.Verify(contraseña, per.Contraseña))
         {
-            return null;
+            return per;
         }
-        return per;
-
+        return null;
     }
 
     public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad)

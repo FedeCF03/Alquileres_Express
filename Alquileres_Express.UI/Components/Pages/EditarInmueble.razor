@@ -1,0 +1,197 @@
+@page "/editar-inmueble/{id:int}"
+@rendermode InteractiveServer
+@inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
+@inject CasoDeUsoModificarInmueble casoDeUsoModificarInmueble
+@inject IRepositorioFoto repositorioFotos
+
+@inject IJSRuntime JS
+
+
+@inject NavigationManager NavigationManager
+
+
+<div class="contenedor">
+
+
+    <main class="contenido">
+        <section class="info-propiedad">
+                <h1>Nombre</h1>
+                <input placeholder="@inmueble.Nombre" type="text" @bind="inmuebleAuxiliar.Nombre" class="form-control mb-2" />
+
+                <h2>Direccion</h2>
+                <input type="text" @bind="inmuebleAuxiliar.Direccion" class="form-control mb-2" />
+ 
+            <div class="precio">
+
+                    <input type="number" @bind="inmueble.Precio" class="form-control mb-2" />
+                    <button class="btn btn-success" @onclick="() => EditandoPrecio = false">Guardar</button>
+
+            </div>
+        </section>
+
+        
+        @if (imagenes.Length == 0)
+        {
+            <p>No hay fotos disponibles para esta propiedad.</p>
+        }
+        else
+        {
+        <section class="galeria">
+            @foreach (var imagen in imagenes)
+            {
+            <img src="@inmueble.Fotos!.ElementAt(fotoActual)" alt="Foto propiedad" class="foto" />
+            @* <button class="btn btn-secondary" @onclick="EliminarFoto">Eliminar</button> *@
+            }
+            <button class="btn btn-secondary" @onclick="()=>AgregandoFotos=true">Agregar fotos</button>
+            <button class="btn btn-secondary" @onclick="()=>AgregandoFotos=false">Guardar</button>
+
+            <button class="btn btn-secondary" @onclick="()=>AgregandoFotos=false">Cancelar</button>
+
+        </section>
+        }
+        <section class="detalles">
+            <h4>Detalles</h4>
+            <ul>
+                <li><strong>Tipo:</strong>@inmueble.Ciudad</li>
+                <li><strong>Tipo:</strong>@inmueble.TipoInmueble.ToString()</li>
+                <li><strong>Cantidad de baños: @inmueble.Banios</strong> 1</li>
+                <li><strong>Cantidad de Camas: @inmueble.CantidadDeCamas </strong> 1</li>
+                <li><strong>Otras características:</strong> Cocina - Balcón</li>
+            </ul>
+        </section>
+    </main>
+   
+</div>
+
+ <img src="/images/fotosInmuebles/oxouzdoi.png" alt="Foto propiedad" class="foto" />
+<div id="map" style="height: 400px; width: 80%;">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initializeMap" async
+    defer></script>
+<script>
+    function initializeMap(dotNetHelper, lat, lng) {
+        const initialPosition = { lat: lat, lng: lng }; // Coordenadas de Buenos Aires
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: initialPosition,
+            zoom: 12,
+        });
+
+        const marker = new google.maps.Marker({
+            position: initialPosition,
+            map: map,
+            draggable: true,
+        });
+
+        // Actualizar coordenadas al mover el marcador
+        marker.addListener("dragend", () => {
+            const position = marker.getPosition();
+            dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', position.lat(), position.lng());
+        });
+
+        // Permitir al usuario colocar un nuevo marcador al hacer clic en el mapa
+        map.addListener("click", (event) => {
+            marker.setPosition(event.latLng);
+            dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', event.latLng.lat(), event.latLng.lng());
+        });
+    }
+</script>
+</div>
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger mt-3">
+        @mensajeError
+    </div>
+}
+
+<button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
+
+@code {
+    private bool EditandoPrecio = false;
+    private bool EditandoNombre = false;
+    private bool EditandoDireccion = false;
+    private bool EditandoCiudad = false;
+    private bool EditandoTipoInmueble = false;
+    private bool EditandoBanios = false;
+    private bool EditandoCantidadDeCamas = false;
+    private bool AgregandoFotos = false;
+
+
+    private int fotoActual = 0;
+    private string[] imagenes = new string[0];
+    [Parameter]
+    public int Id { get; set; }
+    private Inmueble inmueble = new Inmueble();
+    private double Latitud { get; set; }
+    private double Longitud { get; set; }
+    private string mensajeError = string.Empty;
+
+    private Inmueble inmuebleAuxiliar = new Inmueble();
+
+    void FotoSiguiente()
+    {
+        fotoActual = (fotoActual + 1) % imagenes.Length;
+        StateHasChanged();
+    }
+
+    void FotoAnterior()
+    {
+        fotoActual = (fotoActual - 1 + imagenes.Length) % imagenes.Length;
+        StateHasChanged();
+    }
+
+    private void GuardarCambios()
+    {
+        inmueble.CoordLat = Latitud;
+        inmueble.CoordLong = Longitud;
+        if (casoDeUsoModificarInmueble.Ejecutar(inmueble, out mensajeError))
+        {
+            Task.Delay(1000).ContinueWith(_ => NavigationManager.NavigateTo("/inmuebles"));
+        }
+            Task.Delay(1000).ContinueWith(_ => NavigationManager.NavigateTo("/inmuebles"));
+    }
+    
+
+    protected override void OnParametersSet()
+    {
+        try
+        {
+            inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            inmuebleAuxiliar = new Inmueble
+            {
+                Id = inmueble.Id,
+                Nombre = inmueble.Nombre,
+                Direccion = inmueble.Direccion,
+                Precio = inmueble.Precio,
+                Ciudad = inmueble.Ciudad,
+                TipoInmueble = inmueble.TipoInmueble,
+                Banios = inmueble.Banios,
+                CantidadDeCamas = inmueble.CantidadDeCamas,
+                CoordLat = inmueble.CoordLat,
+                CoordLong = inmueble.CoordLong
+            };
+
+            imagenes = repositorioFotos.ObtenerFotosPorInmueble(Id).Select(f => f.Url).ToArray();
+        }
+        catch (Exception)
+        {
+            NavigationManager.NavigateTo("/error");
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+         if (firstRender)
+        {
+            var dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initializeMap", dotNetRef, @inmueble.CoordLat, @inmueble.CoordLong);
+        }
+    }
+    [JSInvokable]
+    public void ActualizarCoordenadas(double lat, double lng)
+    {
+        Latitud = lat;
+        Longitud = lng;
+        StateHasChanged(); 
+        
+    }
+}
