@@ -44,15 +44,10 @@
 @code
 {
     private List<Inmueble> inmuebles = new List<Inmueble>();
-    private List<List<Foto>> imagenes = new List<List<Foto>>();
     private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
         protected override void OnInitialized()
     {
         inmuebles = casoDeUsoListarInmuebles.Ejecutar();
-        foreach(var inmueble in inmuebles){
-           var fotos = repositorioFotos.ObtenerFotosPorInmueble(inmueble.Id);
-           imagenes.Add(fotos);
-        }
-
+       
     }
 }
