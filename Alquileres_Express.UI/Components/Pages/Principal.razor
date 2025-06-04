@@ -1,5 +1,5 @@
-@page "/Principal"
-
+@page "/"
+@inject IRepositorioFoto repositorioFotos
 @inject FiltroDeInmueblesService FiltroDeInmueblesService
 @inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
 @using Alquileres_Express.Aplicacion.Servicios;
@@ -7,64 +7,52 @@
 
 <PageTitle>Inmuebles</PageTitle>
 
-<div class="inmuebles-container">
-    <div class="inmuebles-listado">
+<PageTitle>Inmuebles</PageTitle>
+
+<div class="contenedor-principal">
+    <!-- COLUMNA IZQUIERDA: IMÁGENES -->
+    <div class="columna-imagenes">
         <h2>Propiedades</h2>
-        <div class="imagenes">
-            @if (inmuebles == null || !inmuebles.Any())
-            {
-                <p>No hay inmuebles disponibles.</p>
-            }
-            else
-            {
-                <table class="table table-striped table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Precio</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var inmueble in inmuebles)
-                        {
-                            <tr>
-                                <td>@inmueble.Nombre</td>
-                                <td>$@inmueble.Precio</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-        </div>
+        @if (imagenes == null || !imagenes.Any())
+        {
+            <p>No hay inmuebles disponibles.</p>
+        }
+        else
+        {
+            <div class="galeria-imagenes">
+                @foreach (var imagen in imagenes)
+                {
+                    <NavLink class="imagen-link" href="@($"/inmueble/{imagen[0].Id}")">
+                        <img src="@imagen[0].Url" alt="Foto propiedad" class="foto" />
+                    </NavLink>
+                }
+            </div>
+        }
     </div>
 
-    <div class="filtros">
+    <!-- COLUMNA DERECHA: FILTROS -->
+    <div class="columna-filtros">
         <h2>Ordenar</h2>
-        <p>FILTROS</p>
-        <select>
-            <option>Localidad</option>
-        </select>
-        <select>
-            <option>Precio</option>
-        </select>
-        <select>
-            <option>Cantidad de personas</option>
-        </select>
-        <select>
-            <option>Mejor valoradas</option>
-        </select>
+        <select><option>Localidad</option></select>
+        <select><option>Precio</option></select>
+        <select><option>Cantidad de personas</option></select>
+        <select><option>Mejor valoradas</option></select>
     </div>
 </div>
 
+
 @code
 {
-    private List<Inmueble> inmuebles;
+    private List<Inmueble>? inmuebles;
+    private List<List<Foto>> imagenes = new List<List<Foto>>();
     private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
-
-
-    
-    protected override void OnInitialized()
+        protected override void OnInitialized()
     {
         inmuebles = casoDeUsoListarInmuebles.Ejecutar();
+        foreach(var inmueble in inmuebles){
+           var fotos = repositorioFotos.ObtenerFotosPorInmueble(inmueble.Id);
+           imagenes.Add(fotos);
+        }
+
     }
 }

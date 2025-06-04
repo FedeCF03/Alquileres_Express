@@ -20,8 +20,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     options.SlidingExpiration = true;
     options.AccessDeniedPath = "/";
-    options.LoginPath = "/Principal";
-
+    options.LoginPath = "/";
 });
 
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
