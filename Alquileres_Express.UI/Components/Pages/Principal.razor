@@ -20,10 +20,10 @@
         else
         {
             <div class="galeria-imagenes">
-                @foreach (var imagen in imagenes)
+                @foreach (var inmueble in inmuebles)
                 {
-                    <NavLink class="imagen-link" href="@($"/inmueble/{imagen[0].Id}")">
-                        <img src="@imagen[0].Url" alt="Foto propiedad" class="foto" />
+                    <NavLink class="imagen-link" href="@($"/inmueble/{inmueble.Id}")">
+                        <img src="@inmueble.Fotos[0].Url" alt="Foto propiedad" class="foto" />
                     </NavLink>
                 }
             </div>
@@ -43,7 +43,7 @@
 
 @code
 {
-    private List<Inmueble>? inmuebles;
+    private List<Inmueble> inmuebles = new List<Inmueble>();
     private List<List<Foto>> imagenes = new List<List<Foto>>();
     private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
         protected override void OnInitialized()
