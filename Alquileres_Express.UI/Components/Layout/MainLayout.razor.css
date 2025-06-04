@@ -8,6 +8,13 @@
     padding-right: 1rem;
 }
 
+.main-content-contactos {
+    background: url('/images/logos/fondoContactos.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    width: 100vw;
+}
+
 /* Barra superior toda blanca */
 .top-bar {
     background-color: white;

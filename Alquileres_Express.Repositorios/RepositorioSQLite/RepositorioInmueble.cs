@@ -79,6 +79,6 @@ public class RepositorioInmueble : IRepositorioInmueble
     public List<Inmueble> ObtenerInmueblesDisponibles()
     {
     using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Where(i => i.Disponible)];
+        return [.. _context.Inmuebles.Include(i => i.Fotos).Where(i => i.Disponible)];
     }
 }

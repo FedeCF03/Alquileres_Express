@@ -1,19 +1,53 @@
-@page "/Principal"
+@page "/"
+@inject IRepositorioFoto repositorioFotos
+@inject FiltroDeInmueblesService FiltroDeInmueblesService
+@inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
+@using Alquileres_Express.Aplicacion.Servicios;
+@rendermode InteractiveServer
 
-<div class="bloque-principal">
-  <img src="images/Inicial.png" class="imagen-grande" alt="Imagen principal" />
+<PageTitle>Inmuebles</PageTitle>
 
-  <div class="contenido-inferior">
-    <div class="texto">
-      <h2>Encontra tu propiedad ideal</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...</p>
-      <button>Más</button>
+<PageTitle>Inmuebles</PageTitle>
+
+<div class="contenedor-principal">
+    <!-- COLUMNA IZQUIERDA: IMÁGENES -->
+    <div class="columna-imagenes">
+        <h2>Propiedades</h2>
+        @if (inmuebles == null || !inmuebles.Any())
+        {
+            <p>No hay inmuebles disponibles.</p>
+        }
+        else
+        {
+            <div class="galeria-imagenes">
+                @foreach (var inmueble in inmuebles)
+                {
+                    <NavLink class="imagen-link" href="@($"/inmueble/{inmueble.Id}")">
+                        <img src="@inmueble.Fotos[0].Url" alt="Foto propiedad" class="foto" />
+                    </NavLink>
+                }
+            </div>
+        }
     </div>
 
-    <div class="galeria-miniaturas">
-      <img src="images/Inicial1.png" alt="Propiedad 1" />
-      <img src="images/Inicial2.png" alt="Propiedad 2" />
-      <img src="images/Inicial3.png" alt="Propiedad 3" />
+    <!-- COLUMNA DERECHA: FILTROS -->
+    <div class="columna-filtros">
+        <h2>Ordenar</h2>
+        <select><option>Localidad</option></select>
+        <select><option>Precio</option></select>
+        <select><option>Cantidad de personas</option></select>
+        <select><option>Mejor valoradas</option></select>
     </div>
-  </div>
 </div>
+
+
+@code
+{
+    private List<Inmueble> inmuebles = new List<Inmueble>();
+    private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
+        protected override void OnInitialized()
+    {
+        inmuebles = casoDeUsoListarInmuebles.Ejecutar();
+       
+    }
+}
