@@ -10,8 +10,26 @@ public class Alquiler
     public double Precio;
     public bool Cancelado { get; set; }
     public Inmueble? Inmueble { get; set; }
-    public string NombreEmpleado {get; set;} = "";
+    public string NombreDePersonal { get; set; } = "";
+    public string ApellidoDePersonal { get; set; } = "";
     public RegistroDeLlave? Registro;
+
+    public Alquiler() { }//Necesario
+
+    public Alquiler(Cliente cliente, Inmueble inmueble, DateTime fechaDeInicio, DateTime fechaDeFin, double precio, string nombreDePersonal, string apellidoDePersonal)
+    {
+        if (fechaDeFin <= fechaDeInicio)
+            throw new ArgumentException("La fecha de fin debe ser mayor que la fecha de inicio.");
+        Cliente = cliente;
+        Inmueble = inmueble;
+        FechaDeInicio = fechaDeInicio;
+        FechaDeFin = fechaDeFin;
+        Precio = precio;
+        NombreDePersonal = nombreDePersonal;
+        ApellidoDePersonal = apellidoDePersonal;
+        Registro = null;//Lo creo en null y despues lo agrego
+        Cancelado = false;  // Por defecto, un alquiler recién creado no está cancelado.
+    }
 
     public EstadoDeAlquiler GetEstadoDeAlquiler()
     {

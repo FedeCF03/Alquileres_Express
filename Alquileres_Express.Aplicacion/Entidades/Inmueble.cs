@@ -1,5 +1,5 @@
-using System;
 using Alquileres_Express.Aplicacion.Enumerativo;
+
 namespace Alquileres_Express.Aplicacion.Entidades
 {
     public class Inmueble
@@ -31,5 +31,12 @@ namespace Alquileres_Express.Aplicacion.Entidades
             }
             return false;
         }
+
+
+        public Inmueble()
+        {
+            Alquileres = new List<Alquiler>();
+            Fotos = new List<Foto>();
+        }
     }
-}
+} 

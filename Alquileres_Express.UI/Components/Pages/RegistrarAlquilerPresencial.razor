@@ -1,0 +1,58 @@
+@page "/registrar-alquiler"
+@using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler
+@rendermode InteractiveServer
+@inject NavigationManager Navegador
+@inject CasoDeUsoRegistrarAlquilerPresencial casoDeUsoRegistrarAlquiler
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
+<div class="card">
+    <h3 class="card-title">Registrar Alquiler Presencial</h3>
+
+    <div class="mb-2">
+        <label>Correo del Cliente</label>
+        <input @bind="correoCliente" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Fecha de Inicio</label>
+        <InputDate @bind-Value="fechaInicio" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Fecha de Fin</label>
+        <InputDate @bind-Value="fechaFin" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Número de Personal</label>
+        <InputNumber @bind-Value="numeroPersonal" class="form-control" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="RegistrarAlquiler">Registrar</button>
+</div>
+
+@code {
+    private string correoCliente = "";
+    private DateTime fechaInicio = DateTime.Today;  // Inicializa con la fecha actual
+    private DateTime fechaFin = DateTime.Today.AddDays(1);
+    private int numeroPersonal;
+    private string ErrorMessage = "";
+    private Inmueble temp;
+
+    private async Task RegistrarAlquiler()
+    {
+        try
+        {
+            casoDeUsoRegistrarAlquiler.Ejecutar(correoCliente, temp, fechaInicio, fechaFin, numeroPersonal);
+            ErrorMessage = "Alquiler registrado exitosamente.";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+}

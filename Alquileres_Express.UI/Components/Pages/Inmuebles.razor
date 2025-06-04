@@ -1,0 +1,69 @@
+@page "/Inmuebles"
+@inject FiltroDeInmueblesService FiltroDeInmueblesService
+@inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
+@using Alquileres_Express.Aplicacion.Servicios;
+@rendermode InteractiveServer
+
+<PageTitle>Inmuebles</PageTitle>
+
+<div class="inmuebles-container">
+    <div class="inmuebles-listado">
+        <h2>Propiedades</h2>
+        <div class="imagenes">
+            @if (inmuebles == null || !inmuebles.Any())
+            {
+                <p>No hay inmuebles disponibles.</p>
+            }
+            else
+            {
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var inmueble in inmuebles)
+                        {
+                            <tr>
+                                <td>@inmueble.Nombre</td>
+                                <td>$@inmueble.Precio</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <div class="filtros">
+        <h2>Ordenar</h2>
+        <p>FILTROS</p>
+        <select>
+            <option>Localidad</option>
+        </select>
+        <select>
+            <option>Precio</option>
+        </select>
+        <select>
+            <option>Cantidad de personas</option>
+        </select>
+        <select>
+            <option>Mejor valoradas</option>
+        </select>
+    </div>
+</div>
+
+@code
+{
+    private List<Inmueble> inmuebles;
+    private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
+
+
+    
+    protected override void OnInitialized()
+    {
+        inmuebles = casoDeUsoListarInmuebles.Ejecutar();
+    }
+}

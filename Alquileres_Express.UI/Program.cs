@@ -8,6 +8,8 @@ using Alquileres_Express.Aplicacion.Validadores;
 using Alquileres_Express.Aplicacion.Servicios;
 using Alquileres_Express.Repositorio;
 using Microsoft.Extensions.FileProviders;
+using Alquileres_Express.Repositorios.RepositorioSQLite;
+using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.SlidingExpiration = true;
     options.AccessDeniedPath = "/";
     options.LoginPath = "/";
+
 });
 
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
@@ -30,10 +33,13 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
 
-    .AddTransient<CasoDeUsoAltaInmueble>()
     .AddTransient<CasoDeUsoBajaInmueble>()
     .AddTransient<CasoDeUsoListarInmuebles>()
     .AddTransient<CasoDeUsoEditarInmueble>()
+
+    .AddTransient<CasoDeUsoModificarInmueble>()
+    .AddTransient<CasoDeUsoAltaInmueble>()
+
     .AddTransient<CasoDeUsoEliminarInmueble>()
     .AddTransient<CasoDeUsoObtenerInmueble>()
     .AddTransient<CasoDeUsoVerInmueble>()
@@ -50,6 +56,11 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddScoped<IRepositorioFoto, RepositorioFoto>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
 
+
+    .AddScoped<IRepositorioAlquiler,RepositorioAlquiler>()
+    .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
+    .AddTransient<ValidadorAlquiler>()
+
     .AddTransient<ServicioEnviarEmail>()
     .AddTransient<FiltroDeInmueblesService>()
     .AddTransient<MercadoPagoService>()
@@ -59,7 +70,9 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddHttpContextAccessor()
     .AddCascadingAuthenticationState()
     .AddTransient<ServicioFotos>();
+    
 builder.WebHost.UseStaticWebAssets();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -83,5 +96,4 @@ app.UseAuthorization();
 builder.Services.AddAuthorization();
 
 Crear.Inicializar();
-
 app.Run();
