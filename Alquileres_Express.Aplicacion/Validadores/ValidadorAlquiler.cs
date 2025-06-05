@@ -7,7 +7,7 @@ public class ValidadorAlquiler
 {
     public void EstaDisponible(Inmueble inmueble, DateTime fechaInicio, DateTime fechaFin)
     {
-        ValidarFechas(fechaInicio, fechaFin);
+        ValidarFechas(fechaInicio, fechaFin);//no va
         ValidarDisponibilidad(inmueble, fechaInicio, fechaFin);
     }
 

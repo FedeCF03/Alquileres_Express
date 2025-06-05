@@ -15,7 +15,7 @@ public class CasoDeUsoAltaInmueble(ValidadorInmueble validador, IRepositorioInmu
         try
         {
             Validador.Ejecutar(inmueble);
-            if (SeRepiteNombre(inmueble))
+            if (RepoInmueble.SeRepiteNombre(inmueble))
             {
                 mensajeError = "Ya existe un inmueble con el mismo nombre.";
                 return -1;
@@ -31,18 +31,6 @@ public class CasoDeUsoAltaInmueble(ValidadorInmueble validador, IRepositorioInmu
         {
             mensajeError = ex.Message;
             return -1;
-        }
-    }
-    private bool SeRepiteNombre(Inmueble inmueble)
-    {
-        try
-        {
-            var inmuebleExistente = repoInmueble.ObtenerInmueblePorNombre(inmueble.Nombre!);
-            return true;
-        }
-        catch (KeyNotFoundException)
-        {
-            return false;
         }
     }
 }

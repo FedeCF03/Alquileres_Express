@@ -16,7 +16,7 @@ public class RepositorioInmueble : IRepositorioInmueble
         _context.Inmuebles.Add(inmueble);
         _context.SaveChanges();
         return inmueble.Id;
-    }   
+    }
 
     public void EliminarInmueble(int id)
     {
@@ -32,6 +32,7 @@ public class RepositorioInmueble : IRepositorioInmueble
         //lo del nombre se checke en el caso de uso, no es necesario hacerlo aquí
         using var _context = new Alquileres_ExpressContext();
         Inmueble inmuebleExistente = _context.Inmuebles
+        .Include(i => i.Alquileres)
         .Include(i => i.Fotos)
         .FirstOrDefault(i => i.Id == inmueble.Id)
         ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {inmueble.Id}");
@@ -52,33 +53,46 @@ public class RepositorioInmueble : IRepositorioInmueble
     public Inmueble ObtenerInmueblePorId(int id)
     {
         using var _context = new Alquileres_ExpressContext();
-        var inmueble = _context.Inmuebles.Include(i => i.Fotos).FirstOrDefault(i => i.Id == id) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {id}");
+        var inmueble = _context.Inmuebles.Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Id == id) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {id}");
         return inmueble;
     }
 
     public Inmueble ObtenerInmueblePorNombre(string nombre)
     {
         using var _context = new Alquileres_ExpressContext();
-        var inmueble = _context.Inmuebles.Include(i=>i.Fotos).FirstOrDefault(i=> i.Nombre!.Equals(nombre)) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el nombre {nombre}");
+        var inmueble = _context.Inmuebles.Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Nombre!.Equals(nombre)) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el nombre {nombre}");
         return inmueble;
     }
 
     public List<Inmueble> ObtenerInmueblesPorTipo(TipoDeInmueble tipo)
     {
         using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Fotos).Where(i => i.TipoInmueble == tipo)];
+        return [.. _context.Inmuebles.Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.TipoInmueble == tipo)];
     }
 
 
     public List<Inmueble> ObtenerTodosLosInmuebles()
     {
         using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Fotos)];
+        return [.. _context.Inmuebles.Include(i => i.Alquileres).Include(i => i.Fotos)];
     }
 
     public List<Inmueble> ObtenerInmueblesDisponibles()
     {
-    using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Fotos).Where(i => i.Disponible)];
+        using var _context = new Alquileres_ExpressContext();
+        return [.. _context.Inmuebles.Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Disponible)];
+    }
+    
+    public bool SeRepiteNombre(Inmueble inmueble)
+    {
+        try
+        {
+            var inmuebleExistente = ObtenerInmueblePorNombre(inmueble.Nombre!);
+            return inmuebleExistente.Id != inmueble.Id;
+        }
+        catch (KeyNotFoundException)
+        {
+            return false;
+        }
     }
 }

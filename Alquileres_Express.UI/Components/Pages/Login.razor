@@ -54,14 +54,14 @@
 
     private async Task IniciarSesionComoGerenteFake()
     {
-        user.Correo = "maria@gmail.com";
+        user.Correo = "tomicarp12@gmail.com";
         user.Rol = RolUsuario.Gerente;
         await guardarEnCookie();
 
     }
     private async Task IniciarSesion()
     {
-        Personal personal = casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
+        Personal? personal = casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
         if (personal != null)
         {
             user.Rol = personal.Rol;
@@ -82,7 +82,7 @@
         }
         else
         {
-            Cliente cliente = casoDeUsoBuscarCliente.Ejecutar(user.Correo, user.Contraseña);
+            Cliente? cliente = casoDeUsoBuscarCliente.Ejecutar(user.Correo, user.Contraseña);
             if (cliente != null)
             {
                 user.Rol = cliente.Rol;

@@ -11,19 +11,19 @@ public class CasoDeUsoEditarInmueble(IRepositorioInmueble repositorio, Validador
         mensajeError = string.Empty;
         try
         {
-        validadorInmueble.Ejecutar(inmueble);
-        
-        // if (SeRepiteNombre(inmueble))
-        // {
-        //     mensajeError = "Ya existe un inmueble con el mismo nombre.";
-        //     return false;
-        // }
-        if (rol != RolUsuario.Gerente)
-        {
-            mensajeError = "Solo los administradores o gerentes pueden agregar inmuebles.";
+            validadorInmueble.Ejecutar(inmueble);
+
+            if (repositorio.SeRepiteNombre(inmueble))
+            {
+                mensajeError = "Ya existe un inmueble con el mismo nombre.";
                 return false;
-        }
-        
+            }
+            if (rol != RolUsuario.Gerente)
+            {
+                mensajeError = "Solo los administradores o gerentes pueden agregar inmuebles.";
+                return false;
+            }
+
             repositorio.ModificarInmueble(inmueble);
             return true;
         }
@@ -32,20 +32,7 @@ public class CasoDeUsoEditarInmueble(IRepositorioInmueble repositorio, Validador
             mensajeError = ex.Message;
             return false;
         }
-    
-    }
 
-    private bool SeRepiteNombre(Inmueble inmueble)
-    {
-        try
-        {
-            var inmuebleExistente = repositorio.ObtenerInmueblePorNombre(inmueble.Nombre!);
-            return true;
-        }
-        catch (KeyNotFoundException)
-        {
-            return false;
-        }
     }
 
 }

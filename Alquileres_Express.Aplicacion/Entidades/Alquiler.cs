@@ -4,33 +4,48 @@ using Alquileres_Express.Aplicacion.Enumerativo;
 public class Alquiler
 {
     public int Id { get; set; }
-    public Cliente? Cliente { get; set; }
+    public string CorreoCliente { get; set; } //Cambiar por id
     public DateTime FechaDeInicio { get; set; }
     public DateTime FechaDeFin { get; set; }
-    public double Precio;
-    public bool Cancelado { get; set; }
-    public Inmueble? Inmueble { get; set; }
-    public string NombreDePersonal { get; set; } = "";
-    public string ApellidoDePersonal { get; set; } = "";
-    public RegistroDeLlave? Registro;
+    public decimal Precio;
+    public bool Cancelado { get; set; } = false;
+    public int InmuebleId { get; set; }
+    public string? NombreDePersonal { get; set; } 
+    public string? ApellidoDePersonal { get; set; }
+    public RegistroDeLlave? Registro { get; set; }
+    public bool Pagado { get; set; } = false;
 
-    public Alquiler() { }//Necesario
+    public Alquiler() { }
 
-    public Alquiler(Cliente cliente, Inmueble inmueble, DateTime fechaDeInicio, DateTime fechaDeFin, double precio, string nombreDePersonal, string apellidoDePersonal)
+    public Alquiler(string correoCLiente, DateTime fechaDeInicio, DateTime fechaDeFin,  decimal precio,int idInmueble)
     {
-        if (fechaDeFin <= fechaDeInicio)
-            throw new ArgumentException("La fecha de fin debe ser mayor que la fecha de inicio.");
-        Cliente = cliente;
-        Inmueble = inmueble;
+ 
+        CorreoCliente = correoCLiente;
+        InmuebleId = idInmueble;
         FechaDeInicio = fechaDeInicio;
         FechaDeFin = fechaDeFin;
+        Precio = precio;
+        //NombreDePersonal = nombreDePersonal;
+        //ApellidoDePersonal = apellidoDePersonal;
+        Registro = null;//Lo creo en null y despues lo agrego
+        Cancelado = false;  // Por defecto, un alquiler recién creado no está cancelado.
+        Pagado = false; 
+    }
+
+    public Alquiler(string correoCLiente, int idInmueble, DateTime fechaInicio, DateTime fechaFin, decimal precio, string nombreDePersonal, string apellidoDePersonal)
+    {
+ 
+        CorreoCliente = correoCLiente;
+        InmuebleId = idInmueble;
+        FechaDeInicio = fechaInicio;
+        FechaDeFin = fechaFin;
         Precio = precio;
         NombreDePersonal = nombreDePersonal;
         ApellidoDePersonal = apellidoDePersonal;
         Registro = null;//Lo creo en null y despues lo agrego
         Cancelado = false;  // Por defecto, un alquiler recién creado no está cancelado.
+        Pagado = false; 
     }
-
     public EstadoDeAlquiler GetEstadoDeAlquiler()
     {
 

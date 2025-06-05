@@ -7,9 +7,8 @@ namespace Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
 
 public class CasoDeUsoRegistrarAlquilerPresencial(IRepositorioAlquiler repositorio, ValidadorAlquiler validador) : CasoDeUsoAlquiler(repositorio)
 {
-    public void Ejecutar(String correo, Inmueble inmueble, DateTime fechaInicio, DateTime fechaFin, int numeroPersonal)
+    public void Ejecutar(string correo, int idInmueble, DateTime fechaInicio, DateTime fechaFin, int numeroPersonal)
     {
-        validador.EstaDisponible(inmueble, fechaInicio, fechaFin);
-        Repositorio.RegistrarAlquilerPresencial(correo, inmueble, fechaInicio, fechaFin, numeroPersonal);
+        Repositorio.RegistrarAlquilerPresencial(correo, idInmueble, fechaInicio, fechaFin, numeroPersonal);
     }
 }

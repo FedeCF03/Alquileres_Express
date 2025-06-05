@@ -10,16 +10,16 @@ namespace Alquileres_Express.Aplicacion.Entidades
         public double CoordLong { get; set; }
         public double CoordLat { get; set; }
         public string? Ciudad { get; set; }
-        public double? Precio { get; set; }
-        public int? CantidadDeCamas { get; set; }//Cantidad habitaciones
+        public decimal? Precio { get; set; }
+        public int? CantidadDeCamas { get; set; }
         public int? Banios { get; set; }
         public TipoDeInmueble TipoInmueble { get; set; }
-        public List<Alquiler>? Alquileres;
         public bool Disponible { get; set; }
-        public List<Foto>? Fotos { get; set; }
+        public List<Foto>? Fotos { get; set; } = [];
+        public List<Alquiler> Alquileres { get; set; } = [];
 
 
-        public bool Equals(object? obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null)
             {
@@ -35,8 +35,6 @@ namespace Alquileres_Express.Aplicacion.Entidades
 
         public Inmueble()
         {
-            Alquileres = new List<Alquiler>();
-            Fotos = new List<Foto>();
         }
     }
 } 

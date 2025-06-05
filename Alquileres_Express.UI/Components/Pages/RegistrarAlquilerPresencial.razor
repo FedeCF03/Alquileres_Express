@@ -47,7 +47,7 @@
     {
         try
         {
-            casoDeUsoRegistrarAlquiler.Ejecutar(correoCliente, temp, fechaInicio, fechaFin, numeroPersonal);
+            casoDeUsoRegistrarAlquiler.Ejecutar(correoCliente, temp.Id, fechaInicio, fechaFin, numeroPersonal);
             ErrorMessage = "Alquiler registrado exitosamente.";
         }
         catch (Exception ex)

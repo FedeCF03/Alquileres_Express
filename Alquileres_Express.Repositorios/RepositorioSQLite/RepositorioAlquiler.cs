@@ -10,23 +10,65 @@ namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 public class RepositorioAlquiler : IRepositorioAlquiler
 {
     readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
-    public void RegistrarAlquilerPresencial(String correo, Inmueble inmueble, DateTime fechaInicio, DateTime fechaFin, int numeroPersonal)
+    public void RegistrarAlquilerPresencial(String correo, int idInmueble, DateTime fechaInicio, DateTime fechaFin, int numeroPersonal)
     {
         Cliente? cliente = _context.Clientes.FirstOrDefault(c => c.Correo.ToLower() == correo.ToLower());
-        Personal? personal = _context.Personal.FirstOrDefault(p => p.NumeroPersonal == numeroPersonal);
+        Personal? personal = _context.Personal.FirstOrDefault(p => p.Id == numeroPersonal);
+        Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == idInmueble);
         if (cliente == null)
             throw new InvalidOperationException("El correo no esta vinculado a ningun cliente.");
         if (personal == null)
             throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
-
-        double precio = calcularPrecio(fechaInicio, fechaFin, inmueble.Precio);
-        Alquiler alquiler = new Alquiler(cliente, inmueble, fechaInicio, fechaFin, precio, personal.Nombre, personal.Apellido);
+        if (inmueble == null)
+            throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
         
-        RegistroDeLlave registro = generarRegistroDeLlave(inmueble, personal, cliente, alquiler);
+        // Registrar alquiler despues de pagar
 
-        alquiler.Registro = registro;
+        decimal precio = calcularPrecio(fechaInicio, fechaFin, inmueble.Precio);
+        
+    }
 
-        //Agrego el nuevo alquiler a la lista de alquileres de inmueble
+    private decimal calcularPrecio(DateTime fechaInicio, DateTime fechaFin, decimal? monto)
+    {
+        if (monto == null)
+            throw new ArgumentException("El monto debe tener valor");
+        int cantidadDias = (fechaFin - fechaInicio).Days;
+        decimal precioTotal = (cantidadDias - 1) * monto.Value;//Se cobra un dia menos
+        return precioTotal;
+    }
+
+    // private RegistroDeLlave generarRegistroDeLlave(Personal personal, int idCliente, int idAlquier)
+    // {
+
+    //     RegistroDeLlave registro = new RegistroDeLlave
+    //     {
+    //         AlquilerId = idAlquier,
+    //         ClienteId = idCliente,
+    //         PersonalEntrega = personal,
+    //         FechayHoraRegistro = DateTime.Now
+    //     };
+
+    //     _context.Llaves.Add(registro);
+    //     _context.SaveChanges();
+    //     return registro;
+    // }
+
+    public void RegistrarPagoEnEfectivo(String correo, int idInmueble, DateTime fechaInicio, DateTime fechaFin, Personal personal, decimal precio)
+    {
+        Alquiler alquiler = new Alquiler(correo, idInmueble, fechaInicio, fechaFin, precio, personal.Nombre, personal.Apellido);
+        alquiler.Pagado = true;
+        _context.Alquileres.Add(alquiler);
+        guardarAlquilerEnBaseDeDatos(correo, idInmueble, personal, alquiler);
+        
+    }
+
+    private void guardarAlquilerEnBaseDeDatos(String correo, int idInmueble, Personal personal, Alquiler alquiler)
+    {
+        Cliente? cliente = _context.Clientes.FirstOrDefault(c => c.Correo.ToLower() == correo.ToLower());//Tiene que estar
+        Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == idInmueble);//x2
+
+        // RegistroDeLlave registro = generarRegistroDeLlave(inmueble, personal, cliente.Id, alquiler.Id);
+        // alquiler.Registro = registro; 
         if (inmueble.Alquileres == null)
             inmueble.Alquileres = new List<Alquiler>();
 
@@ -41,29 +83,19 @@ public class RepositorioAlquiler : IRepositorioAlquiler
 
     }
 
-    private double calcularPrecio(DateTime fechaInicio, DateTime fechaFin, double? monto)
-    {
-        if (monto == null)
-            throw new ArgumentException("El monto debe tener valor");
-        int cantidadDias = (fechaFin - fechaInicio).Days;
-        double precioTotal = cantidadDias * monto.Value;
-        return precioTotal;
-    }
 
-    private RegistroDeLlave generarRegistroDeLlave(Inmueble inmueble, Personal personal, Cliente cliente, Alquiler alquiler)
+    public void pagarAlquilerMercadoPago(Alquiler alquiler)
     {
-        
-        RegistroDeLlave registro = new RegistroDeLlave
-        {   
-            Alquiler = alquiler,
-            Inmueble = inmueble,
-            Cliente = cliente,
-            PersonalEntrega = personal,
-            FechayHoraRegistro = DateTime.Now
-        };
-
-        _context.Llaves.Add(registro);
+        alquiler.Pagado = true; 
+        _context.Alquileres.Add(alquiler);
         _context.SaveChanges();
-        return registro;
+
+    }
+    public void RegistrarAlquilerVirtual(Alquiler alquiler)
+    {
+        alquiler.Pagado = true; 
+        _context.Alquileres.Add(alquiler);
+        _context.SaveChanges();
+
     }
 }
