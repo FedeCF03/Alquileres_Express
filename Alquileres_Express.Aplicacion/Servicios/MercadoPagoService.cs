@@ -9,13 +9,14 @@ using Alquileres_Express.Aplicacion.Servicios;
 
 public class MercadoPagoService
 {
-    ServicioEnviarEmail _servicioEnviarEmail { get; set; } 
-     IRepositorioAlquiler _repositorioAlquiler{ get; set; }
-    public MercadoPagoService(IConfiguration configuration, IRepositorioAlquiler repositorioAlquiler, ServicioEnviarEmail servicioEnviarEmail)
-    {   
+    ServicioEnviarEmail _servicioEnviarEmail { get; set; }
+    IRepositorioAlquiler _repositorioAlquiler { get; set; }
+    ServicioVerificarPago _servicioVerificarPago { get; set; }
+    public MercadoPagoService(IConfiguration configuration, IRepositorioAlquiler repositorioAlquiler, ServicioVerificarPago servicioVerificarPago)
+    {
+        _servicioVerificarPago = servicioVerificarPago;
         _repositorioAlquiler = repositorioAlquiler;
-        _servicioEnviarEmail = servicioEnviarEmail;
-        MercadoPagoConfig.AccessToken = "APP_USR-4758729501201277-052522-20570b3514929dcdd539c2ecd6ff1b30-2456261951";
+        MercadoPagoConfig.AccessToken = "TEST-2709845014061287-060518-dfd5917bcf575f80fc7e47d5e16eae72-769910256";
     }
 
     public async Task<string> CrearPreferenciaAsync(string titulo, Alquiler alquiler)
@@ -36,22 +37,19 @@ public class MercadoPagoService
             },
             BackUrls = new PreferenceBackUrlsRequest
             {
-                Success = RegistrarCompra(alquiler),
+                Success = "https://localhost:5153/success",
                 Failure = "https://localhost:5153/failure",
                 Pending = "https://localhost:5153/pending"
             },
-            AutoReturn = "approved"
+            AutoReturn = "approved",
+
         };
         var client = new PreferenceClient();
+
         Preference preference = await client.CreateAsync(request);
-        return preference.InitPoint; // URL para redirigir al checkout
+        _servicioVerificarPago.AgregarPagoPendiente(new PagoPendiente(preference.Id, alquiler));
+        return preference.SandboxInitPoint; // URL para redirigir al checkout
+
     }
 
-    private string RegistrarCompra( Alquiler alquiler)
-    {
-
-        _repositorioAlquiler.RegistrarAlquilerVirtual(alquiler);
-        _servicioEnviarEmail.EnviarEmail(alquiler.CorreoCliente, "Alquiler registrado exitosamente","Su pago fue exitoso! Por favor contáctese","" );
-        return "https://localhost:5153/";
-    }
 }

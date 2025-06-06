@@ -4,10 +4,15 @@
 @inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
 @using Alquileres_Express.Aplicacion.Servicios;
 @rendermode InteractiveServer
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.WebUtilities
 
 <PageTitle>Inmuebles</PageTitle>
 
 <PageTitle>Inmuebles</PageTitle>
+
+<h3>Mensaje: @Mensaje</h3>
+
 
 <div class="contenedor-principal">
     <!-- COLUMNA IZQUIERDA: IMÁGENES -->
@@ -39,21 +44,32 @@
     <!-- COLUMNA DERECHA: FILTROS -->
     <div class="columna-filtros">
         <h2>Ordenar</h2>
-        <select><option>Localidad</option></select>
-        <select><option>Precio</option></select>
-        <select><option>Cantidad de personas</option></select>
-        <select><option>Mejor valoradas</option></select>
+        <select>
+            <option>Localidad</option>
+        </select>
+        <select>
+            <option>Precio</option>
+        </select>
+        <select>
+            <option>Cantidad de personas</option>
+        </select>
+        <select>
+            <option>Mejor valoradas</option>
+        </select>
     </div>
 </div>
 
 
 @code
 {
+    [SupplyParameterFromQuery]
+    private string? Mensaje { get; set; }
+
     private List<Inmueble> inmuebles = new List<Inmueble>();
     private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
-        protected override void OnInitialized()
+    protected override void OnInitialized()
     {
         inmuebles = casoDeUsoListarInmuebles.Ejecutar();
-       
+
     }
 }

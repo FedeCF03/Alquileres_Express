@@ -6,6 +6,7 @@
 @inject MercadoPagoService MPService
 @inject NavigationManager NavigationManager
 @using BlazorDateRangePicker
+@inject ServicioVerificarPago _servicioVerificarPago
 
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -31,6 +32,7 @@
         </div>
 
         <div class="col-md-5">
+<<<<<<< HEAD
     <div class="card p-3 shadow-sm">
         <h2 class="text-success">$@inmueble.Precio.ToString()</h2>
         <p><strong>Camas:</strong> @inmueble.CantidadDeCamas</p>
@@ -63,6 +65,33 @@
             <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
                 <button class="btn btn-sm btn-primary">Alquilar Presencial</button>
             </NavLink>
+=======
+            <div class="card p-3 shadow-sm">
+                <h2 class="text-success">$@inmueble.Precio.ToString()</h2>
+                <p><strong>Camas:</strong> @inmueble.CantidadDeCamas</p>
+                <p><strong>Baños:</strong> @inmueble.Banios</p>
+                <DateRangePicker @bind-StartDate="StartDate" @bind-EndDate="EndDate"
+                    DaysEnabledFunction="(d)=>!NoEsHabil(d)" class="form-control form-control-sm"
+                    placeholder="Select dates..." OnRangeSelect="VerificarFechas" />
+                @if (!string.IsNullOrEmpty(mensajeError))
+                {
+                    <div class="text-danger">@mensajeError</div>
+                }
+                <AuthorizeView Roles="Gerente">
+
+                    @if (!podesPagar)
+                    {
+                        <button class="btn btn-primary mt-3" disabled>Reservar</button>
+                    }
+                    else
+                    {
+                        <div class="text-success">Precio total: $@calcularPrecio().ToString("F2")</div>
+                        <button class="btn btn-primary mt-3" @onclick="IniciarCompra">Reservar</button>
+
+                    }
+                </AuthorizeView>
+            </div>
+>>>>>>> federamatodoanda2
         </div>
     </div>
 </div>
@@ -135,26 +164,33 @@
     private async Task IniciarCompra()
     {
         decimal precio = calcularPrecio();
+<<<<<<< HEAD
         Alquiler alquiler = new Alquiler { CorreoCliente = correo, 
         FechaDeInicio = StartDate.Value.Date, 
         FechaDeFin = EndDate.Value.Date,
         Precio = precio,
         InmuebleId = inmueble.Id};
         var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre,alquiler);
+=======
+        Alquiler alquiler = new Alquiler(correo, StartDate.Value.Date, EndDate.Value.Date, precio, inmueble.Id);
+        var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre, alquiler);
+
+>>>>>>> federamatodoanda2
         NavigationManager.NavigateTo(url, forceLoad: true); // redirige al checkout de MP
     }
 
     private void CrearRangosDeFechaReservados(List<Alquiler> alquileres)
     {
         FechasReservadas.Clear();
-        alquileres.Where(a=>!a.Cancelado && !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado)).ToList().ForEach(alquiler =>
+        alquileres.Where(a => !a.Cancelado &&
+        !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado)).ToList().ForEach(alquiler =>
         {
             FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin));
         });
     }
     private bool NoEsHabil(DateTimeOffset date)
     {
-        return FechasReservadas.Any(rango => rango.Contains(date.Date));
+        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date < DateTime.Today;
     }
 
     private void VerificarFechas()
@@ -171,7 +207,6 @@
             {
                 mensajeError = $"La fecha {date.ToShortDateString()} ya está reservada.";
                 podesPagar = false;
-                Console.WriteLine("hola");
                 return;
             }
         }
@@ -185,7 +220,7 @@
     {
         if ((StartDate != null && EndDate != null) && inmueble.Precio != null)
         {
-            int dias =  (int) (EndDate.Value - StartDate.Value).TotalDays;
+            int dias = (int)(EndDate.Value - StartDate.Value).TotalDays + 1;
             return dias * inmueble.Precio.Value;
         }
         return 0;
