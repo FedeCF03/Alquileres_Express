@@ -6,7 +6,6 @@
 
 @code {
     [SupplyParameterFromQuery]
-
     public string Status { get; set; } = "";
     [SupplyParameterFromQuery]
 
@@ -14,7 +13,6 @@
 
     protected override void OnInitialized()
     {
-
         bool aprobado = servicioVerificarPago.VerificarPago(preference_id);
         Navigation.NavigateTo($"/?mensaje=Pago aprobado");
     }

@@ -58,9 +58,9 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
 
 
     .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
+    .AddTransient<CasoDeUsoRegistrarAlquilerOnline>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<ValidadorAlquiler>()
-
     .AddTransient<ServicioEnviarEmail>()
     .AddTransient<FiltroDeInmueblesService>()
     .AddTransient<ServicioGenerarCodigo>()
