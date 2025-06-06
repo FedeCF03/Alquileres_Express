@@ -7,4 +7,6 @@ public interface IRepositorioAlquiler
 {
     public void RegistrarAlquilerPresencial(String correo, int idInmueble, DateTime fechaInicio, DateTime fechaFin, int numeroPersonal);
     public void RegistrarAlquilerVirtual(Alquiler alquiler);
+
+    public void RegistrarPagoEnEfectivo(Alquiler alquiler);
 }

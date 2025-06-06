@@ -17,22 +17,13 @@ public class Alquiler
 
     public Alquiler() { }
 
-    public Alquiler(string correoCLiente, DateTime fechaDeInicio, DateTime fechaDeFin,  decimal precio,int idInmueble)
-    {
- 
-        CorreoCliente = correoCLiente;
-        InmuebleId = idInmueble;
-        FechaDeInicio = fechaDeInicio;
-        FechaDeFin = fechaDeFin;
-        Precio = precio;
-        //NombreDePersonal = nombreDePersonal;
-        //ApellidoDePersonal = apellidoDePersonal;
-        Registro = null;//Lo creo en null y despues lo agrego
-        Cancelado = false;  // Por defecto, un alquiler recién creado no está cancelado.
-        Pagado = false; 
-    }
+    // public RegistroDeLlave? Entrega { get; set; }
+    // public RegistroDeLlave? Devolucion { get; set; }
 
-    public Alquiler(string correoCLiente, int idInmueble, DateTime fechaInicio, DateTime fechaFin, decimal precio, string nombreDePersonal, string apellidoDePersonal)
+
+    
+
+    public Alquiler(string correoCLiente, DateTime fechaInicio, DateTime fechaFin, decimal precio, int idInmueble, string nombreDePersonal, string apellidoDePersonal)
     {
  
         CorreoCliente = correoCLiente;
@@ -42,7 +33,6 @@ public class Alquiler
         Precio = precio;
         NombreDePersonal = nombreDePersonal;
         ApellidoDePersonal = apellidoDePersonal;
-        Registro = null;//Lo creo en null y despues lo agrego
         Cancelado = false;  // Por defecto, un alquiler recién creado no está cancelado.
         Pagado = false; 
     }

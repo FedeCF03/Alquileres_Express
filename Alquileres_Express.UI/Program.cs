@@ -7,9 +7,12 @@ using Alquileres_Express.Repositorios.RepositoriosSQLite;
 using Alquileres_Express.Aplicacion.Validadores;
 using Alquileres_Express.Aplicacion.Servicios;
 using Alquileres_Express.Repositorio;
+
 using Microsoft.Extensions.FileProviders;
 using Alquileres_Express.Repositorios.RepositorioSQLite;
 using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
+using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoPagarEfectivo;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,10 +60,15 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
     .AddScoped<IRepositorioFoto, RepositorioFoto>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
+    .AddScoped<IRepositorioAlquiler, RepositorioAlquiler>()
+    .AddScoped<IRepositorioLlave, RepositorioLlave>()
 
 
-    .AddScoped<IRepositorioAlquiler,RepositorioAlquiler>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
+    .AddTransient<CasoDeUsoRegistrarEntregaPresencial>()
+    .AddScoped<CasoDeUsoPagarEfectivo>()
+    .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
+    .AddTransient<CasoDeUsoPagarEfectivo>()
     .AddTransient<ValidadorAlquiler>()
 
     .AddTransient<ServicioEnviarEmail>()

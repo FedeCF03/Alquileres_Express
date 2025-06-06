@@ -3,7 +3,7 @@ using Alquileres_Express.Aplicacion.Entidades;
 using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Repositorios.Context;
 
-namespace Alquileres_Express.Repositorios.RepositoriosSQLite;
+namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
 public class RepositorioPersonal : IRepositorioPersonal
 {
