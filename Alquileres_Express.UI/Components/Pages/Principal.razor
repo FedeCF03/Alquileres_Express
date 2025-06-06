@@ -56,18 +56,13 @@
 
 @code
 {
-
-    private string? Mensaje;
+    [SupplyParameterFromQuery]
+    private string? Mensaje { get; set; }
 
     private List<Inmueble> inmuebles = new List<Inmueble>();
     private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
     protected override void OnInitialized()
     {
-        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("mensaje", out var valor))
-        {
-            Mensaje = valor;
-        }
         inmuebles = casoDeUsoListarInmuebles.Ejecutar();
 
     }
