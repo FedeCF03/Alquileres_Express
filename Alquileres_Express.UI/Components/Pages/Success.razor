@@ -5,27 +5,17 @@
 @inject ServicioVerificarPago servicioVerificarPago
 
 @code {
+    [SupplyParameterFromQuery]
 
     public string Status { get; set; } = "";
+    [SupplyParameterFromQuery]
 
-    public string PreferenceId { get; set; } = "";
+    public string preference_id { get; set; } = "";
 
     protected override void OnInitialized()
     {
-        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        var query = QueryHelpers.ParseQuery(uri.Query);
-        Status = query.TryGetValue("status", out var val4) ? val4.ToString() : "";
-        PreferenceId = query.TryGetValue("preference_id", out var val8) ? val8.ToString() : "";
-        if (string.IsNullOrEmpty(Status) || string.IsNullOrEmpty(PreferenceId) || Status != "approved")
-        {
-            Navigation.NavigateTo($"/?mensaje=Pago rechazado o no encontrado");
-        }
-        else
-        {
-            bool aprobado = servicioVerificarPago.VerificarPago(PreferenceId);
-            Navigation.NavigateTo($"/?mensaje=Pago aprobado");
-        }
 
-
+        bool aprobado = servicioVerificarPago.VerificarPago(preference_id);
+        Navigation.NavigateTo($"/?mensaje=Pago aprobado");
     }
 }
