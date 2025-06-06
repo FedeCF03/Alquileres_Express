@@ -60,20 +60,16 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
     .AddScoped<IRepositorioFoto, RepositorioFoto>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
-    .AddScoped<IRepositorioAlquiler, RepositorioAlquiler>()
+    .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
     .AddScoped<IRepositorioLlave, RepositorioLlave>()
 
 
-<<<<<<< HEAD
-=======
-    .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
-    .AddTransient<CasoDeUsoRegistrarAlquilerOnline>()
->>>>>>> federamatodoanda2
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<CasoDeUsoRegistrarEntregaPresencial>()
     .AddScoped<CasoDeUsoPagarEfectivo>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<CasoDeUsoPagarEfectivo>()
+    .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
     .AddTransient<ValidadorAlquiler>()
     .AddTransient<ServicioEnviarEmail>()
     .AddTransient<FiltroDeInmueblesService>()
@@ -82,9 +78,9 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<ValidadorUsuario>()
     .AddHttpContextAccessor()
     .AddCascadingAuthenticationState()
-    .AddTransient<ServicioFotos>();
-builder.Services.AddSingleton<ServicioVerificarPago>();
-builder.Services.AddSingleton<MercadoPagoService>();
+    .AddTransient<ServicioFotos>()
+    .AddSingleton<ServicioVerificarPago>()
+    .AddSingleton<MercadoPagoService>();
 builder.WebHost.UseStaticWebAssets();
 
 var app = builder.Build();
