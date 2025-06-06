@@ -1,1 +1,65 @@
 @page "/Perfil"
+@using BlazorDateRangePicker
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+
+@if(cliente != null){
+<h2 class="titulo">Hola @cliente?.Nombre</h2>
+<div class="perfil-card">
+    <div><strong>Apellido:</strong> @cliente.Apellido</div>
+    <div><strong>DNI:</strong> @cliente.Dni</div>
+    <div><strong>Correo:</strong> @cliente.Correo</div>
+    <div><strong>Dirección:</strong> @cliente.Direccion</div>
+    <div><strong>Fecha de Nacimiento:</strong> @cliente.FechaNacimiento.ToString("dd/MM/yyyy")</div>
+    <button class="btn-editar" @onclick="EditarPerfil">Editar perfil</button>
+    <button class="btn-editar" @onclick="EditarPerfil">Cambiar contraseña</button>
+</div>
+}
+
+@if(personal != null){
+<h2 class="titulo">Hola @personal?.Nombre</h2>
+<div class="perfil-card">
+    <div><strong>Apellido:</strong> @personal.Apellido</div>
+    <div><strong>DNI:</strong> @personal.Dni</div>
+    <div><strong>Correo:</strong> @personal.Correo</div>
+    <div><strong>Dirección:</strong> @personal.Direccion</div>
+    <div><strong>Fecha de Nacimiento:</strong> @personal.FechaNacimiento.ToString("dd/MM/yyyy")</div>
+    <button class="btn-editar" @onclick="EditarPerfil">Editar perfil</button>
+    <button class="btn-editar" @onclick="CambiarContraseña">Cambiar contraseña</button>
+</div>
+}
+
+@code{
+    String? correo { get; set; }
+    String? rol { get; set; }
+    private Cliente cliente;
+    private Personal personal;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            correo = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
+            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+        }
+    }
+    private void EditarPerfil()
+    {
+       //algo o es un boton despues vemos
+    }
+
+    private void CambiarContraseña()
+    {
+       //algo o es un boton despues vemos
+    }
+    
+}

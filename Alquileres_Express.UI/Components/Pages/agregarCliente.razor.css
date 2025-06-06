@@ -42,6 +42,7 @@ body {
 /* Margen entre elementos */
 .mb-2 {
     margin-bottom: 1rem;
+    color: #333;
 }
 
 /* Selects para la fecha */
@@ -52,16 +53,19 @@ body {
 
 /* Botón */
 .btn-primary {
-    display: block;
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1rem;
-    border-radius: 8px;
-    background-color: #4a63f5;
+    display: inline-block;     /* cambia de block a inline-block para que no ocupe todo el ancho */
+    width: auto;               /* quita el ancho completo */
+    padding: 0.4rem 1rem;      /* menos alto y un poco ancho para que el texto quede cómodo */
+    font-size: 0.9rem;         /* fuente un poco más chica */
+    border-radius: 6px;        /* bordes un poco más chicos */
+    background-color: #ffffff;
     border: none;
-    color: white;
+    color: #333;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin: 0 auto;            /* para centrar si está en bloque */
+    display: block;            /* opcional, si querés que esté centrado en bloque */
+    max-width: 150px;          /* limita ancho máximo */
 }
 
 .btn-primary:hover {

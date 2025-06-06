@@ -1,0 +1,43 @@
+.titulo {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 1.8rem;
+    color: #24292e;
+}
+
+.perfil-card {
+    max-width: 700px;
+    margin: 2rem auto;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    font-family: system-ui, sans-serif;
+    border: 1px solid #d0d7de;
+}
+
+.perfil-card div {
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    color: #222;
+}
+
+.perfil-card strong {
+    color: #222;
+}
+
+.btn-editar {
+    margin-top: 1.5rem;
+    padding: 0.6rem 1.2rem;
+    background-color: #2ea44f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-editar:hover {
+    background-color: #218739;
+}
