@@ -37,6 +37,20 @@ public class RepositorioFoto : IRepositorioFoto
             throw new KeyNotFoundException($"Foto with id {id} not found.");
         }
     }
+    public void EliminarFotosPorInmueble(int idInmueble)
+    {
+        using Alquileres_ExpressContext AlquileresExpressContext = new();
+        List<Foto> fotos = AlquileresExpressContext.Fotos.Where(f => f.InmuebleId == idInmueble).ToList();
+        if (fotos.Count > 0)
+        {
+            AlquileresExpressContext.Fotos.RemoveRange(fotos);
+            AlquileresExpressContext.SaveChanges();
+        }
+        else
+        {
+            throw new KeyNotFoundException($"No photos found for Inmueble with id {idInmueble}.");
+        }
+    }
 
     public List<Foto> ObtenerFotosPorInmueble(int idInmueble)
     {

@@ -18,5 +18,14 @@ public class Alquileres_ExpressContext : DbContext
     {
         optionsBuilder.UseSqlite("Data Source=Alquiler_Express.sqlite");
     }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<RegistroDeLlave>()
+            .HasKey(c => new { c.AlquilerId, c.EsEntega });
+        modelBuilder.Entity<Cliente>()
+            .HasAlternateKey(p => p.Dni);
+        modelBuilder.Entity<Personal>()
+            .HasAlternateKey(p => p.Dni); 
+}
 
 }

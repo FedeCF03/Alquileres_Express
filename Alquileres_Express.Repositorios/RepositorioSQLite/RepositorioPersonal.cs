@@ -12,7 +12,7 @@ public class RepositorioPersonal : IRepositorioPersonal
     {
         bool existe = (_context.Clientes.Any(x => x.Correo.ToLower() == p.Correo.ToLower())) || (_context.Personal.Any(x => x.Correo.ToLower() == p.Correo.ToLower()));
         if (existe)
-            throw new InvalidOperationException("El correo ya está registrado por otro cliente.");
+            throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
         p.Contraseña = BCrypt.Net.BCrypt.HashPassword(p.Contraseña.Trim());
         _context.Personal.Add(p);
         _context.SaveChanges();

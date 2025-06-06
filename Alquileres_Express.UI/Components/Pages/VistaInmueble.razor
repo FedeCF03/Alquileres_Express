@@ -3,75 +3,104 @@
 @inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
 @inject IRepositorioFoto repositorioFotos
 @inject IJSRuntime JS
+@inject MercadoPagoService MPService
 @inject NavigationManager NavigationManager
+@using BlazorDateRangePicker
 
-<div class="contenedor">
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
+<div class="container">
+    <h1>@inmueble.Nombre</h1>
+    <p class="text-muted">@inmueble.Direccion - @inmueble.Ciudad</p>
 
-    <main class="contenido">
-        <section class="info-propiedad">
-            <h2>@inmueble.Nombre</h2> 
-            <p class="direccion">@inmueble.Direccion</p>
-            <div class="precio">
-                <span class="etiqueta">Alquilar</span>
-                <span class="valor">@inmueble.Precio</span>
-            </div>
-        </section>
+    <div class="row">
+        <div class="col-md-7">
+            @if (imagenes.Length > 0)
+            {
+                <section class="galeria">
+                    <button @onclick="FotoAnterior" class="btn-flecha">◀</button>
+                    <img src="@imagenes[fotoActual]" alt="Foto propiedad" class="foto" />
+                    <button @onclick="FotoSiguiente" class="btn-flecha">▶</button>
+                </section>
+            }
+            else
+            {
+                <p><em>Sin imágenes disponibles</em></p>
+            }
+        </div>
 
-        
-        @if (imagenes.Length == 0)
+        <div class="col-md-5">
+    <div class="card p-3 shadow-sm">
+        <h2 class="text-success">$@inmueble.Precio.ToString()</h2>
+        <p><strong>Camas:</strong> @inmueble.CantidadDeCamas</p>
+        <p><strong>Baños:</strong> @inmueble.Banios</p>
+
+        <DateRangePicker @bind-StartDate="StartDate" @bind-EndDate="EndDate"
+                         DaysEnabledFunction="(d)=>!NoEsHabil(d)"
+                         class="form-control form-control-sm"
+                         placeholder="Seleccionar fechas..."
+                         OnRangeSelect="VerificarFechas" />
+
+        @if (!string.IsNullOrEmpty(mensajeError))
         {
-            <p>No hay fotos disponibles para esta propiedad.</p>
+            <div class="text-danger">@mensajeError</div>
         }
-        else
-        {
-            
-        <section class="galeria">
-            <button @onclick="FotoAnterior" class="btn-flecha">◀</button>
-            <img src="@imagenes[fotoActual]" alt="Foto propiedad" class="foto" />
-            <button @onclick="FotoSiguiente" class="btn-flecha">▶</button>
-        </section>
-        }
-        <section class="detalles">
-            <h4>Detalles</h4>
-            <ul>
-                <li><strong>Tipo:</strong>@inmueble.Ciudad</li>
-                <li><strong>Tipo:</strong>@inmueble.TipoInmueble.ToString()</li>
-                <li><strong>Cantidad de baños: @inmueble.Banios</strong> 1</li>
-                <li><strong>Cantidad de Camas: @inmueble.CantidadDeCamas </strong> 1</li>
-                <li><strong>Otras características:</strong> Cocina - Balcón</li>
-            </ul>
-        </section>
-    </main>
-   
-</div>
- <img src="/images/fotosInmuebles/oxouzdoi.png" alt="Foto propiedad" class="foto" />
-<div id="map" style="height: 400px; width: 80%;">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initializeMap" async
-    defer></script>
-<script>
-    function initializeMap(dotNetHelper, lat, lng) {
-        const initialPosition = { lat: lat, lng: lng}; // Coordenadas de Buenos Aires
 
-        const map = new google.maps.Map(document.getElementById("map"), {
-            center: initialPosition,
-            zoom: 12,
-        });
+        <AuthorizeView Roles="Gerente">
+            @if (!podesPagar)
+            {
+                <button class="btn btn-primary mt-3" disabled>Reservar</button>
+            }
+            else
+            {
+                <div class="text-success">Precio total: $@calcularPrecio().ToString("F2")</div>
+                <button class="btn btn-primary mt-3" @onclick="IniciarCompra">Reservar</button>
+            }
+        </AuthorizeView>
 
-        const marker = new google.maps.Marker({
-            position: initialPosition,
-            map: map,
-            draggable: true,
-        });
-
-    }
-
-</script>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
+                <button class="btn btn-sm btn-primary">Alquilar Presencial</button>
+            </NavLink>
+        </div>
+    </div>
 </div>
 
+    </div>
+
+    <div class="mt-5">
+        <h4>Ubicación</h4>
+        <iframe width="100%" height="300" frameborder="0" style="border:0"
+            src="https://www.google.com/maps?q=@inmueble.CoordLat,@inmueble.CoordLong&hl=es;z=14&output=embed"
+            allowfullscreen>
+        </iframe>
+    </div>
+</div>
 @code {
+    [Parameter]
+    public int Id { get; set; }
+    DateTimeOffset? StartDate { get; set; } = DateTime.Today;
+    DateTimeOffset? EndDate { get; set; } = DateTime.Today.AddDays(1).AddTicks(-1);
+    private Inmueble inmueble;
+    private bool podesPagar { get; set; } = false;
+    private string mensajeError = string.Empty;
     private int fotoActual = 0;
-    private string[] imagenes = new string[0];
+    private string[] imagenes { get; set; } = new string[0];
+    String? correo { get; set; }
+    String? rol { get; set; }
+    private List<RangoDeFechas> FechasReservadas { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            correo = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+        }
+    }
 
     void FotoSiguiente()
     {
@@ -85,31 +114,76 @@
         StateHasChanged();
     }
 
-    [Parameter]
-    public int Id { get; set; }
 
-    private Inmueble inmueble = new Inmueble();
 
     protected override void OnParametersSet()
     {
         try
         {
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            CrearRangosDeFechaReservados(inmueble.Alquileres);
             imagenes = repositorioFotos.ObtenerFotosPorInmueble(Id).Select(f => f.Url).ToArray();
+
 
         }
         catch (Exception ex)
         {
             // Manejo de errores, por ejemplo, redirigir a una página de error o mostrar un mensaje
-            NavigationManager.NavigateTo("/error");
+            NavigationManager.NavigateTo("/");
         }
     }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task IniciarCompra()
     {
-         if (firstRender)
+        decimal precio = calcularPrecio();
+        Alquiler alquiler = new Alquiler(correo, StartDate.Value.Date, EndDate.Value.Date, precio, inmueble.Id);
+        var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre,alquiler);
+        NavigationManager.NavigateTo(url, forceLoad: true); // redirige al checkout de MP
+    }
+
+    private void CrearRangosDeFechaReservados(List<Alquiler> alquileres)
+    {
+        FechasReservadas.Clear();
+        alquileres.ForEach(alquiler =>
         {
-            var dotNetRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("initializeMap", dotNetRef, @inmueble.CoordLat, @inmueble.CoordLong);
+            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin));
+        });
+    }
+    private bool NoEsHabil(DateTimeOffset date)
+    {
+        return FechasReservadas.Any(rango => rango.Contains(date.Date));
+    }
+
+    private void VerificarFechas()
+    {
+        if (StartDate == null || EndDate == null)
+        {
+            mensajeError = "Debe seleccionar un rango de fechas.";
+            podesPagar = false;
+            return;
         }
+        for (DateTime date = StartDate.Value.Date; date <= EndDate.Value.Date; date = date.AddDays(1))
+        {
+            if (NoEsHabil(date))
+            {
+                mensajeError = $"La fecha {date.ToShortDateString()} ya está reservada.";
+                podesPagar = false;
+                Console.WriteLine("hola");
+                return;
+            }
+        }
+        mensajeError = string.Empty;
+        podesPagar = true;
+
+
+    }
+
+    private decimal calcularPrecio()
+    {
+        if ((StartDate != null && EndDate != null) && inmueble.Precio != null)
+        {
+            int dias =  (int) (EndDate.Value - StartDate.Value).TotalDays;
+            return dias * inmueble.Precio.Value;
+        }
+        return 0;
     }
 }

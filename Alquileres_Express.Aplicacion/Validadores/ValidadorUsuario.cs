@@ -12,6 +12,7 @@ public class ValidadorUsuario
         ValidarCampos(usuario);
         ValidarContraseña(usuario.Contraseña);
         ValidarEdad(usuario.FechaNacimiento);
+
         ValidarDni(usuario.Dni);
     }
 
@@ -46,10 +47,11 @@ public class ValidadorUsuario
         if (diferencia.TotalDays < 6570) // 6570 días = 18 años
             throw new InvalidOperationException("El usuario debe ser mayor de edad.");
     }
+
     private void ValidarDni(string dni)
-{
-    if (!Regex.IsMatch(dni, @"^\d{7,8}$"))
-        throw new InvalidOperationException("El DNI debe contener solo números y tener entre 7 y 8 dígitos.");
-}
+    {
+        if (!Regex.IsMatch(dni, @"^\d{7,8}$"))
+            throw new InvalidOperationException("El DNI debe contener solo números y tener entre 7 y 8 dígitos.");
+    }
 
 }

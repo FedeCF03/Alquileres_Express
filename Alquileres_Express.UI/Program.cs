@@ -7,8 +7,10 @@ using Alquileres_Express.Repositorios.RepositoriosSQLite;
 using Alquileres_Express.Aplicacion.Validadores;
 using Alquileres_Express.Aplicacion.Servicios;
 using Alquileres_Express.Repositorio;
+using Microsoft.Extensions.FileProviders;
 using Alquileres_Express.Repositorios.RepositorioSQLite;
 using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
+using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoPagarEfectivo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +24,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     options.SlidingExpiration = true;
     options.AccessDeniedPath = "/";
-    options.LoginPath = "/Principal";
+    options.LoginPath = "/";
 
 });
 
@@ -32,10 +34,13 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
 
-    .AddTransient<CasoDeUsoAltaInmueble>()
     .AddTransient<CasoDeUsoBajaInmueble>()
     .AddTransient<CasoDeUsoListarInmuebles>()
+    .AddTransient<CasoDeUsoEditarInmueble>()
+
     .AddTransient<CasoDeUsoModificarInmueble>()
+    .AddTransient<CasoDeUsoAltaInmueble>()
+
     .AddTransient<CasoDeUsoEliminarInmueble>()
     .AddTransient<CasoDeUsoObtenerInmueble>()
     .AddTransient<CasoDeUsoVerInmueble>()
@@ -52,8 +57,10 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddScoped<IRepositorioFoto, RepositorioFoto>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
 
-    .AddScoped<IRepositorioAlquiler, RepositorioAlquiler>()
+
+    .AddScoped<IRepositorioAlquiler,RepositorioAlquiler>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
+    .AddTransient<CasoDeUsoPagarEfectivo>()
     .AddTransient<ValidadorAlquiler>()
 
     .AddTransient<ServicioEnviarEmail>()
@@ -63,9 +70,10 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<ValidadorInmueble>()
     .AddTransient<ValidadorUsuario>()
     .AddHttpContextAccessor()
-    .AddCascadingAuthenticationState();
-
-
+    .AddCascadingAuthenticationState()
+    .AddTransient<ServicioFotos>();
+    
+builder.WebHost.UseStaticWebAssets();
 
 var app = builder.Build();
 
@@ -75,6 +83,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
+
+app.UseStaticFiles();
 
 app.UseAntiforgery();
 

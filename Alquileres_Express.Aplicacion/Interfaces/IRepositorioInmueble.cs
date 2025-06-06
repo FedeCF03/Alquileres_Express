@@ -8,10 +8,9 @@ public interface IRepositorioInmueble
     public void ModificarInmueble(Inmueble inmueble);
     public void EliminarInmueble(int id);
     public Inmueble ObtenerInmueblePorId(int id);
-
     public Inmueble ObtenerInmueblePorNombre(string nombre);
     public List<Inmueble> ObtenerTodosLosInmuebles();
     public List<Inmueble> ObtenerInmueblesPorTipo(TipoDeInmueble tipo);
     public List<Inmueble> ObtenerInmueblesDisponibles();
-
+    public bool SeRepiteNombre(Inmueble inmueble);
 }

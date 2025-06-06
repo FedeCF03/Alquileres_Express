@@ -1,0 +1,13 @@
+using System;
+using Alquileres_Express.Aplicacion.Entidades;
+using Alquileres_Express.Aplicacion.Interfaces;
+
+namespace Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoLlaves;
+
+public class CasoDeUsoRegistrarEntregaPresencial(IRepositorioLLave repositorio) : CasoDeUsoLLave(repositorio)
+{
+    public RegistroDeLlave Ejecutar(int idAlquiler, int idPersonal, int idCliente)
+    {
+        return Repositorio.RegistrarEntregaLLavePresencial(idAlquiler, idPersonal, idCliente);
+    }
+}

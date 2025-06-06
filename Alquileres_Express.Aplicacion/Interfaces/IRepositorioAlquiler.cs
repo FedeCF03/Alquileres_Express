@@ -5,6 +5,8 @@ namespace Alquileres_Express.Aplicacion.Interfaces;
 
 public interface IRepositorioAlquiler
 {
-    public void RegistrarAlquilerPresencial(String correo, Inmueble inmueble, DateTime fechaInicio, DateTime fechaFin, int numeroPersonal);
+    public void RegistrarAlquilerPresencial(String correo, int idInmueble, DateTime fechaInicio, DateTime fechaFin, int numeroPersonal);
+    public void RegistrarAlquilerVirtual(Alquiler alquiler);
 
+    public void RegistrarPagoEnEfectivo(Alquiler alquiler);
 }

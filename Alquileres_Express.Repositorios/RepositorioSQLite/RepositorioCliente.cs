@@ -11,9 +11,10 @@ public class RepositorioCliente : IRepositorioCliente
     readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
     public void AgregarCliente(Cliente c)
     {
-        bool existe = (_context.Clientes.Any(x => x.Correo.ToLower() == c.Correo.ToLower())) || (_context.Personal.Any(x => x.Correo.ToLower() == c.Correo.ToLower()));
+        c.Rol = Aplicacion.Enumerativo.RolUsuario.Gerente;
+        bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == c.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == c.Correo.ToLower());
         if (existe)
-            throw new InvalidOperationException("El correo ya está registrado por otro cliente.");
+            throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
         c.Contraseña = BCrypt.Net.BCrypt.HashPassword(c.Contraseña.Trim());//.trim() elimina espacios en blanco
         _context.Clientes.Add(c);
         _context.SaveChanges();
