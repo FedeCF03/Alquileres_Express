@@ -14,6 +14,7 @@ namespace Alquileres_Express.Aplicacion.Entidades
         public int? CantidadDeCamas { get; set; }
         public int? Banios { get; set; }
         public TipoDeInmueble TipoInmueble { get; set; }
+        public PoliticaDeCancelacion PoliticaDeCancelacion { get; set; } = PoliticaDeCancelacion.SinCosto;
         public bool Disponible { get; set; }
         public List<Foto>? Fotos { get; set; } = [];
         public List<Alquiler> Alquileres { get; set; } = [];

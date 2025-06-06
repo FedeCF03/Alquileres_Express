@@ -4,35 +4,36 @@ using Alquileres_Express.Aplicacion.Enumerativo;
 using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Aplicacion.Validadores;
 
-public class CasoDeUsoEditarInmueble(IRepositorioInmueble repositorio, ValidadorInmueble validadorInmueble)
+public class CasoDeUsoEditarInmueble(IRepositorioInmueble RepoInmueble, ValidadorInmueble Validador)
 {
-    public bool Ejecutar(Inmueble inmueble, RolUsuario rol, out string mensajeError)
+    public bool Ejecutar(Inmueble inmueble, RolUsuario rolUsuario, out List<string> errores)
     {
-        mensajeError = string.Empty;
+        if (rolUsuario != RolUsuario.Gerente)
+        {
+            errores = [];
+            errores.Add("Solo los administradores o gerentes pueden agregar inmuebles.");
+            return false;
+        }
+        errores = Validador.Ejecutar(inmueble);
+        if (errores.Count > 0)
+        {
+            return false;
+        }
+        if (inmueble.Nombre != null && RepoInmueble.SeRepiteNombre(inmueble))
+        {
+            errores.Add("Ya existe un inmueble con el mismo nombre.");
+            return false;
+        }
         try
         {
-            validadorInmueble.Ejecutar(inmueble);
-
-            if (repositorio.SeRepiteNombre(inmueble))
-            {
-                mensajeError = "Ya existe un inmueble con el mismo nombre.";
-                return false;
-            }
-            if (rol != RolUsuario.Gerente)
-            {
-                mensajeError = "Solo los administradores o gerentes pueden agregar inmuebles.";
-                return false;
-            }
-
-            repositorio.ModificarInmueble(inmueble);
+            RepoInmueble.ModificarInmueble(inmueble);
             return true;
         }
         catch (Exception ex)
         {
-            mensajeError = ex.Message;
+            errores.Add($"Error al agregar el inmueble: {ex.Message}");
             return false;
         }
-
     }
 
 }
