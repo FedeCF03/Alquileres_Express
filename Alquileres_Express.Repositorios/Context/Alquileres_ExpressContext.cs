@@ -21,7 +21,7 @@ public class Alquileres_ExpressContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<RegistroDeLlave>()
-            .HasKey(c => new { c.AlquilerId, c.EsEntega });
+            .HasKey(c => new { c.AlquilerId, c.EsEntrega });
         modelBuilder.Entity<Cliente>()
             .HasAlternateKey(p => p.Dni);
         modelBuilder.Entity<Personal>()
