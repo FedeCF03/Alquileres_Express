@@ -47,7 +47,13 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     public Personal ObtenerPersonalPorMail(string mail)
     {
-        throw new NotImplementedException();
+        var per = _context.Personal.FirstOrDefault(p => p.Correo == mail);
+        if (per != null)
+        {
+            return per;
+        }
+        return null;
+    
     }
 
     public Personal? ObtenerPersonalPorMailYContraseña(string mail, string contraseña)
@@ -60,6 +66,7 @@ public class RepositorioPersonal : IRepositorioPersonal
         }
         return null;
     }
+    
 
     public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad)
     {

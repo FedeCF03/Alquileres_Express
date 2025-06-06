@@ -22,9 +22,15 @@
             <div class="galeria-imagenes">
                 @foreach (var inmueble in inmuebles)
                 {
-                    <NavLink class="imagen-link" href="@($"/inmueble/{inmueble.Id}")">
-                        <img src="@inmueble.Fotos[0].Url" alt="Foto propiedad" class="foto" />
-                    </NavLink>
+                    <div class="tarjeta-inmueble">
+                        <NavLink class="imagen-link" href="@($"/inmueble/{inmueble.Id}")">
+                            <img src="@inmueble.Fotos[0].Url" alt="Foto propiedad" class="foto" />
+                        </NavLink>
+                        <div class="info-inmueble">
+                            <p class="nombre">@inmueble.Nombre</p>
+                            <p class="precio">$@inmueble.Precio</p>
+                        </div>
+                    </div>
                 }
             </div>
         }

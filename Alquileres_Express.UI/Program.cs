@@ -49,6 +49,8 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<CasoDeUsoBuscarPersonal>()
     .AddTransient<CasoDeUsoValidarCodigoDeSeguridad>()
     .AddTransient<CasoDeUsoRegistrarCliente>()
+    .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
+    .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
 
     .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
     .AddScoped<IRepositorioCliente, RepositorioCliente>()

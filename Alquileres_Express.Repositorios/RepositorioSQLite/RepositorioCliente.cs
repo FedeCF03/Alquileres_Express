@@ -54,9 +54,14 @@ public class RepositorioCliente : IRepositorioCliente
         throw new NotImplementedException();
     }
 
-    public Cliente ObtenerClientePorMail(string mail)
+    public Cliente? ObtenerClientePorMail(string mail)
     {
-        throw new NotImplementedException();
+        var cli = _context.Clientes.FirstOrDefault(p => p.Correo == mail);
+        if (cli != null)
+        {
+            return cli;
+        }
+        return null;
     }
 
     public Cliente? ObtenerClientePorMailYContraseña(string mail, string contraseña)
