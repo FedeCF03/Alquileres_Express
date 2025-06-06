@@ -57,20 +57,20 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
 
 
-    .AddScoped<IRepositorioAlquiler,RepositorioAlquiler>()
+    .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<ValidadorAlquiler>()
 
     .AddTransient<ServicioEnviarEmail>()
     .AddTransient<FiltroDeInmueblesService>()
-    .AddTransient<MercadoPagoService>()
     .AddTransient<ServicioGenerarCodigo>()
     .AddTransient<ValidadorInmueble>()
     .AddTransient<ValidadorUsuario>()
     .AddHttpContextAccessor()
     .AddCascadingAuthenticationState()
     .AddTransient<ServicioFotos>();
-    
+builder.Services.AddSingleton<ServicioVerificarPago>();
+builder.Services.AddSingleton<MercadoPagoService>();
 builder.WebHost.UseStaticWebAssets();
 
 var app = builder.Build();
@@ -81,9 +81,20 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
 
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseStaticFiles();
 
+app.UseRouting();
+
+app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
