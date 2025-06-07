@@ -6,8 +6,20 @@ using Alquileres_Express.Aplicacion.Interfaces;
 
 public class CasoDeUsoEliminarInmueble(IRepositorioInmueble repositorio)
 {
-    public bool Ejecutar(Inmueble inmueble)
+    public bool Ejecutar(int inmuebleId, out string mensajeErrror)
     {
-        throw new NotImplementedException("Este caso de uso no está implementado.");
+        mensajeErrror = string.Empty;
+        try
+        {
+            repositorio.EliminarInmueble(inmuebleId);
+            return true;
+
+        }
+        catch (Exception ex)
+        {
+            // Log the exception or handle it as needed
+            mensajeErrror = ex.Message;
+            return false;
+        }
     }
 }
