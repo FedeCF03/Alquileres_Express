@@ -1,8 +1,5 @@
 using Alquileres_Express.Aplicacion.Entidades;
-
 namespace Alquileres_Express.Aplicacion.Validadores;
-
-using Alquileres_Express.Aplicacion.Enumerativo;
 
 
 
@@ -32,6 +29,8 @@ public class ValidadorInmueble
             _errores.Add("El precio del inmueble debe ser mayor a 0.");
         if (inmueble.CantidadDeCamas < 0)
             _errores.Add("La cantidad de camas del inmueble debe ser mayor o igual a 0.");
+        if (inmueble.CantidadDeHabitaciones < 0)
+            _errores.Add("La cantidad de habitaciones del inmueble debe ser mayor o igual a 0.");
         if (inmueble.Banios < 0)
             _errores.Add("La cantidad de baños del inmueble debe ser mayor o igual a 0.");
     }

@@ -38,8 +38,6 @@ public class Alquiler
     }
     public EstadoDeAlquiler GetEstadoDeAlquiler()
     {
-
-
         if (Cancelado)
             return EstadoDeAlquiler.Cancelado;
 

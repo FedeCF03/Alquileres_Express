@@ -74,7 +74,7 @@
     [SupplyParameterFromQuery]
     private string? Mensaje { get; set; }
 
-    private List<Inmueble> inmuebles = new List<Inmueble>();
+    private List<Inmueble> inmuebles = [];
     private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
     private Filtro<Inmueble> filtroCiudad = new Filtro<Inmueble>();
     private Filtro<Inmueble> filtroCantidadPersonas = new Filtro<Inmueble>();
@@ -130,7 +130,14 @@
             StateHasChanged(); 
             return; 
         }
-        inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(inmuebles);
+        if (filtroPrecio.Aplicar || filtroCiudad.Aplicar || filtroCantidadPersonas.Aplicar)
+        {
+            inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(inmuebles);
+        }
+        else
+        {
+            inmuebles = casoDeUsoListarInmuebles.Ejecutar();
+        }
         StateHasChanged();
 
     }
