@@ -190,10 +190,10 @@
 
     private decimal calcularPrecio()
     {
-        if ((StartDate != null && EndDate != null) && inmueble.Precio != null)
+        if (StartDate != null && EndDate != null)
         {
             int dias = (int)(EndDate.Value - StartDate.Value).TotalDays + 1;
-            return dias * inmueble.Precio.Value;
+            return dias * inmueble.Precio;
         }
         return 0;
     }

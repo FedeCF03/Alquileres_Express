@@ -90,8 +90,7 @@
 </script>
 </div> 
 
-<label for="input"> Seleccione las f</label>
-<InputFile id="input" class="custom-file-input" @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
+<InputFile accept=".jpg,.png,.jpeg" id="input" @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
 <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
 
 <button class="btn btn-primary" @onclick="() => Cargar()">Cargar Inmueble</button>
@@ -222,7 +221,7 @@
 
             if (browser.FileCount > maxAllowedFiles)
             {
-                erroresDeFotos.Add($"No se pueden cargar más de {maxAllowedFiles} archivos.");
+                erroresDeFotos.Add($"El número de máximo de fotos que puede cargar es {maxAllowedFiles}. Por favor, intente de nuevo con menos fotos");
                 return;
             }   
             foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))
@@ -230,7 +229,7 @@
                 try{
                     if (file.Size > maxFileSize)
                     {
-                        erroresDeFotos.Add($"El archivo {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
+                        erroresDeFotos.Add($"La foto {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
                         return;
 
                     }

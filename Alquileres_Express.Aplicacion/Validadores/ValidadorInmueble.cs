@@ -25,20 +25,14 @@ public class ValidadorInmueble
             _errores.Add("La dirección del inmueble no puede estar vacía.");
         if (string.IsNullOrWhiteSpace(inmueble.Ciudad))
             _errores.Add("La ciudad del inmueble no puede estar vacía.");
-        if (inmueble.Precio == null)
-            _errores.Add("El precio del inmueble no puede estar vacío.");
-        if (inmueble.CantidadDeCamas == null)
-            _errores.Add("La cantidad de camas del inmueble no puede estar vacía.");
-        if (inmueble.Banios == null)
-            _errores.Add("La cantidad de baños del inmueble no puede estar vacía.");
     }
     private void ValoresSonValidos(Inmueble inmueble)
     {
         if (inmueble.Precio <= 0)
-            _errores.Add("El precio del inmueble debe ser mayor o igual a 0.");
-        if (inmueble.CantidadDeCamas <= 0)
+            _errores.Add("El precio del inmueble debe ser mayor a 0.");
+        if (inmueble.CantidadDeCamas < 0)
             _errores.Add("La cantidad de camas del inmueble debe ser mayor o igual a 0.");
-        if (inmueble.Banios <= 0)
+        if (inmueble.Banios < 0)
             _errores.Add("La cantidad de baños del inmueble debe ser mayor o igual a 0.");
     }
 
