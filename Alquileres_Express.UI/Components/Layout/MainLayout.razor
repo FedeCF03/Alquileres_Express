@@ -1,8 +1,14 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @using Microsoft.AspNetCore.Authentication
 @using Alquileres_Express.UI.Components.Pages;
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.WebUtilities
+@inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+@inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+
+
 @{
     var currentRoute = Nav.ToBaseRelativePath(Nav.Uri);
 }
@@ -20,10 +26,18 @@
         </div>
     </div>
 
-    <!-- Botones a la derecha -->
+    <!-- Botones a la derecha   /logout -->
     <div class="d-flex align-items-center gap-2">
         <AuthorizeView>
             <Authorized>
+                @if (personal !=null)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/Herramientas">
+                            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Herramientas
+                        </NavLink>
+                    </div>
+                }
                 @if (!string.Equals(currentRoute, "Perfil", StringComparison.OrdinalIgnoreCase))
                 {
                     <div class="nav-item px-3">
@@ -38,28 +52,39 @@
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="/Login">
-                            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Iniciar Sesion
+                            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Iniciar sesion
                         </NavLink>
                     </div>
                 }
             </NotAuthorized>
-                
-
         </AuthorizeView>
-        @if ((!string.Equals(currentRoute, "usuario", StringComparison.OrdinalIgnoreCase)) && (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase)))
-        {
+    
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/logout">
+                        <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Cerrar sesión
+                    </NavLink>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                 @if ((!string.Equals(currentRoute, "usuario", StringComparison.OrdinalIgnoreCase)) && (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase)))
+            {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/usuario">
                     <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Registrarse
                 </NavLink>
             </div>
-        }
+            }
+            </NotAuthorized>
+        </AuthorizeView>
+        
         
         <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/Contactos">
-                        <button class="btn btn-sm Contactanos">Contactanos</button>
-                    </NavLink>
-                </div>
+            <NavLink class="nav-link" href="/Contactos">
+                    <button class="btn btn-sm Contactanos">Contactanos</button>
+            </NavLink>
+        </div>
     </div>
 </div>
 <!-- Contenido principal con fondo personalizado -->
@@ -70,4 +95,22 @@
 
 @code {
     private string currentRoute => Nav.ToBaseRelativePath(Nav.Uri);
+
+    String correo { get; set; }
+    String rol { get; set; }
+    Cliente cliente { get; set; }
+    Personal personal { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            correo = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
+            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+        }
+    }
 }
