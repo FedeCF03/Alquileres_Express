@@ -3,7 +3,7 @@ using Alquileres_Express.Aplicacion.Interfaces;
 
 namespace Alquileres_Express.Aplicacion.CasosDeUso;
 
-public class CasoDeUsoListarCLiente(IRepositorioPersonal repositorio)// : CasoDeUsoCLiente(repositorio)
+public class CasoDeUsoListarCLiente(IRepositorioCliente repositorio) : CasoDeUsoCliente(repositorio)
 {
     public List<Usuario> Ejecutar()
     {
