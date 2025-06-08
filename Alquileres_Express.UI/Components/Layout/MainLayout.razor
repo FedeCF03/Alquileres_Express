@@ -20,7 +20,7 @@
         </div>
     </div>
 
-    <!-- Botones a la derecha -->
+    <!-- Botones a la derecha   /logout -->
     <div class="d-flex align-items-center gap-2">
         <AuthorizeView>
             <Authorized>
@@ -38,28 +38,39 @@
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="/Login">
-                            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Iniciar Sesion
+                            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Iniciar sesion
                         </NavLink>
                     </div>
                 }
             </NotAuthorized>
-                
-
         </AuthorizeView>
-        @if ((!string.Equals(currentRoute, "usuario", StringComparison.OrdinalIgnoreCase)) && (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase)))
-        {
+    
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/logout">
+                        <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Cerrar sesión
+                    </NavLink>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                 @if ((!string.Equals(currentRoute, "usuario", StringComparison.OrdinalIgnoreCase)) && (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase)))
+            {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/usuario">
                     <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Registrarse
                 </NavLink>
             </div>
-        }
+            }
+            </NotAuthorized>
+        </AuthorizeView>
+        
         
         <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/Contactos">
-                        <button class="btn btn-sm Contactanos">Contactanos</button>
-                    </NavLink>
-                </div>
+            <NavLink class="nav-link" href="/Contactos">
+                    <button class="btn btn-sm Contactanos">Contactanos</button>
+            </NavLink>
+        </div>
     </div>
 </div>
 <!-- Contenido principal con fondo personalizado -->

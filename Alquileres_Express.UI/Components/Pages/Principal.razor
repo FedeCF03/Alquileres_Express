@@ -2,17 +2,37 @@
 @inject IRepositorioFoto repositorioFotos
 @inject FiltroDeInmueblesService FiltroDeInmueblesService
 @inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
-@using Alquileres_Express.Aplicacion.Servicios;
-@rendermode InteractiveServer
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+@inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 @inject NavigationManager Navigation
+@using Alquileres_Express.Aplicacion.Servicios;
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.WebUtilities
+@rendermode InteractiveServer
 
 <PageTitle>Inmuebles</PageTitle>
 
 <PageTitle>Inmuebles</PageTitle>
 
-<h3>Mensaje: @Mensaje</h3>
+<!-- <h3>Mensaje: @Mensaje</h3> -->
 
+@if ((numVisitas == 0) && (cliente != null || personal != null))
+{
+    if(cliente != null)
+    {
+        <div class="toast-message">
+            ¡Hola @cliente.Nombre! Bienvenido/a.
+        </div>
+    }
+    else if (personal != null)
+    {
+        <div class="toast-message">
+            ¡Hola @personal.Nombre! Bienvenido/a.
+        </div>
+    }
+    numVisitas++;
+}
 
 <div class="contenedor-principal">
     <!-- COLUMNA IZQUIERDA: IMÁGENES -->
@@ -94,6 +114,10 @@
         FiltroDeInmueblesService.AgregarFiltro(filtroCantidadPersonas);
 
     }
+
+    
+
+
     private void Filtrar()
     {
         mensajeErrorPrecio = string.Empty;
@@ -111,8 +135,8 @@
         {
             mensajeErrorPrecio = "Los precios deben ser mayores o iguales a 0 y el precio mínimo no puede ser mayor que el máximo.";
         }
-        else 
-        if (filtroPrecio.Aplicar == true)
+#line default
+    if (filtroPrecio.Aplicar == true)
             filtroPrecio.Predicado = i => i.Precio >= precioMinimo && i.Precio <= precioMaximo;
 
         if (filtroCantidadPersonas.Aplicar == true && (cant == null || cant <= 0))
@@ -133,6 +157,27 @@
         inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(inmuebles);
         StateHasChanged();
 
+    }
+
+    int numVisitas = 0;
+
+    String correo { get; set; }
+    String rol { get; set; }
+    Cliente cliente { get; set; }
+    Personal personal { get; set; }
+    Boolean mostrarMensaje { get; set; } = false;
+
+     protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            correo = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
+            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+        }
     }
 
 }
