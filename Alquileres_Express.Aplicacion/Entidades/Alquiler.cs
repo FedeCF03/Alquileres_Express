@@ -12,28 +12,16 @@ public class Alquiler
     public int InmuebleId { get; set; }
     public string? NombreDePersonal { get; set; } 
     public string? ApellidoDePersonal { get; set; }
-    public RegistroDeLlave? Entrega { get; set; }
-    public RegistroDeLlave? Devolucion { get; set; }
-
+    public RegistroDeLlave? Registro { get; set; }
     public bool Pagado { get; set; } = false;
 
     public Alquiler() { }
 
-    public Alquiler(string correoCLiente, DateTime fechaDeInicio, DateTime fechaDeFin,  decimal precio,int idInmueble)
-    {
- 
-        CorreoCliente = correoCLiente;
-        InmuebleId = idInmueble;
-        FechaDeInicio = fechaDeInicio;
-        FechaDeFin = fechaDeFin;
-        Precio = precio;
-        //NombreDePersonal = nombreDePersonal;
-        //ApellidoDePersonal = apellidoDePersonal;
-        Entrega = null;
-        Devolucion = null; 
-        Cancelado = false;  // Por defecto, un alquiler recién creado no está cancelado.
-        Pagado = false; 
-    }
+    // public RegistroDeLlave? Entrega { get; set; }
+    // public RegistroDeLlave? Devolucion { get; set; }
+
+
+    
 
     public Alquiler(string correoCLiente, DateTime fechaInicio, DateTime fechaFin, decimal precio, int idInmueble, string nombreDePersonal, string apellidoDePersonal)
     {
@@ -50,8 +38,6 @@ public class Alquiler
     }
     public EstadoDeAlquiler GetEstadoDeAlquiler()
     {
-
-
         if (Cancelado)
             return EstadoDeAlquiler.Cancelado;
 

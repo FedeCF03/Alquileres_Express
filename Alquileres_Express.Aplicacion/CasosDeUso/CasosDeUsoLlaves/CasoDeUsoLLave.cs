@@ -1,9 +1,9 @@
 using System;
 using Alquileres_Express.Aplicacion.Interfaces;
 
-namespace Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoLlaves;
+namespace Alquileres_Express.Aplicacion.CasosDeUso;
 
-public abstract class CasoDeUsoLLave(IRepositorioLLave repositorio)
+public abstract class CasoDeUsoLLave(IRepositorioLlave repositorio)
 {
-    protected IRepositorioLLave Repositorio { get; } = repositorio; 
+    protected IRepositorioLlave Repositorio { get; } = repositorio; 
 }

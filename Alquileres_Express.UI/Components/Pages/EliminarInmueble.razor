@@ -1,0 +1,25 @@
+@page "/eliminar-inmueble/{id:int}"
+@rendermode InteractiveServer
+@inject CasoDeUsoEliminarInmueble CasoDeUsoEliminarInmueble
+@inject NavigationManager Navegador
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private string mensajeError = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            CasoDeUsoEliminarInmueble.Ejecutar(Id, out mensajeError);
+            Navegador.NavigateTo("/");
+            //falta implementar bien lo del mensaje de error
+        }
+        catch (Exception ex)
+        {
+            mensajeError = ex.Message;
+        }
+    }
+}

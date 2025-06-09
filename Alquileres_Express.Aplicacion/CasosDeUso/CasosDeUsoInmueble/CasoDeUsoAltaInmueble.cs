@@ -9,27 +9,31 @@ public class CasoDeUsoAltaInmueble(ValidadorInmueble validador, IRepositorioInmu
 {
     public ValidadorInmueble Validador { get; set; } = validador;
     public IRepositorioInmueble RepoInmueble { get; set; } = repoInmueble;
-    public int Ejecutar(Inmueble inmueble, RolUsuario rolUsuario, out string mensajeError)
+    public int Ejecutar(Inmueble inmueble, RolUsuario rolUsuario, out List<string> errores)
     {
-        mensajeError = string.Empty;
+        if (rolUsuario != RolUsuario.Gerente)
+        {
+            errores = [];
+            errores.Add("Solo los administradores o gerentes pueden agregar inmuebles.");
+            return -1;
+        }
+        errores = Validador.Ejecutar(inmueble);
+        if (errores.Count > 0)
+        {
+            return -1;
+        }
+        if (inmueble.Nombre != null && RepoInmueble.SeRepiteNombre(inmueble))
+        {
+            errores.Add("Ya existe un inmueble con el mismo nombre.");
+            return -1;
+        }
         try
         {
-            Validador.Ejecutar(inmueble);
-            if (RepoInmueble.SeRepiteNombre(inmueble))
-            {
-                mensajeError = "Ya existe un inmueble con el mismo nombre.";
-                return -1;
-            }
-            if (rolUsuario != RolUsuario.Gerente)
-            {
-                mensajeError = "Solo los administradores o gerentes pueden agregar inmuebles.";
-                return -1;
-            }
             return RepoInmueble.AgregarInmueble(inmueble);
         }
         catch (Exception ex)
         {
-            mensajeError = ex.Message;
+            errores.Add($"Error al agregar el inmueble: {ex.Message}");
             return -1;
         }
     }

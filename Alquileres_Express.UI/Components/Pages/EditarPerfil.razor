@@ -1,0 +1,197 @@
+@page "/editar-perfil"
+ @rendermode InteractiveServer
+ @inject NavigationManager Navegador;
+ @inject CasoDeUsoAltaCliente CasoDeUsoAltaCliente;
+ @inject CasoDeUsoAltaPersonal CasoDeUsoAltaPersonal;
+ @inject AuthenticationStateProvider AuthenticationStateProvider
+
+ @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+ @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+
+@* sdfdsf   faltan implemnetar metodos de editar *@
+@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsomodificarPersonal
+
+@inject CasoDeUsoEditarPerfil CasoDeUsomodificarCliente        
+    
+@using BlazorDateRangePicker
+@inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ServicioEnviarEmail servicioEnviarEmail
+
+            
+@if(cliente != null)
+ {
+    <div class="contenedor-edicion">
+        <h2 class="titulo">Bienvenido, @cliente.Nombre @cliente.Apellido</h2>
+        <p class="subtitulo">Aquí puede editar sus datos personales</p>
+        <div class="tablas-contenedor">
+            <div class="tabla-card">
+                <h3>Datos actuales</h3>
+                <table>
+                    <tr><th>Nombre</th><td>@cliente.Nombre</td></tr>
+                    <tr><th>Apellido</th><td>@cliente.Apellido</td></tr>
+                    <tr><th>DNI</th><td>@cliente.Dni</td></tr>
+                    <tr><th>Correo</th><td>@cliente.Correo</td></tr>
+                    <tr><th>Dirección</th><td>@cliente.Direccion</td></tr>
+                    <tr><th>Fecha de Nacimiento</th><td>@cliente.FechaNacimiento.ToString("dd/MM/yyyy")</td></tr>
+                </table>
+            </div>
+            <div class="tabla-card">
+                <h3>Editar datos</h3>
+                <div class="form-group">
+                    <input placeholder="Nombre" @bind="_cliente.Nombre" class="form-control" />
+                    <input placeholder="Apellido" @bind="_cliente.Apellido" class="form-control" />
+                    <input placeholder="DNI" @bind="_cliente.Dni" class="form-control" />
+                    <input placeholder="Correo" @bind="_cliente.Correo" class="form-control" />
+                    <input placeholder="Dirección" @bind="_cliente.Direccion" class="form-control" />
+                    <label class="mt-2">Fecha de Nacimiento</label>
+                    <div class="d-flex">
+                        <DateRangePicker 
+                            @bind-EndDate="selectedDate"
+                            MinDate="minDate"
+                            MaxDate="DateTime.Now"
+                            SingleDatePicker="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ }
+
+ @if(personal != null)
+ {
+     <div class="contenedor-edicion">
+        <h2 class="titulo">Bienvenido, @personal.Nombre @personal.Apellido</h2>
+        <p class="subtitulo">Aquí puede editar sus datos personales</p>
+        <div class="tablas-contenedor">
+            <div class="tabla-card">
+                <h3>Datos actuales</h3>
+                <table>
+                    <tr><th>Nombre</th><td>@personal.Nombre</td></tr>
+                    <tr><th>Apellido</th><td>@personal.Apellido</td></tr>
+                    <tr><th>DNI</th><td>@personal.Dni</td></tr>
+                    <tr><th>Correo</th><td>@personal.Correo</td></tr>
+                    <tr><th>Dirección</th><td>@personal.Direccion</td></tr>
+                    <tr><th>Fecha de Nacimiento</th><td>@personal.FechaNacimiento.ToString("dd/MM/yyyy")</td></tr>
+                </table>
+            </div>
+            <div class="tabla-card">
+                <h3>Editar datos</h3>
+                <div class="form-group">
+                    <input placeholder="Nombre" @bind="personal.Nombre" class="form-control" />
+                    <input placeholder="Apellido" @bind="personal.Apellido" class="form-control" />
+                    <input placeholder="DNI" @bind="personal.Dni" class="form-control" />
+                    <input placeholder="Correo" @bind="personal.Correo" class="form-control" />
+                    <input placeholder="Dirección" @bind="personal.Direccion" class="form-control" />
+                    <label class="mt-2">Fecha de Nacimiento</label>
+                    <div class="d-flex">
+                        <DateRangePicker 
+                            @bind-EndDate="selectedDate"
+                            MinDate="minDate"
+                            MaxDate="DateTime.Now"
+                            SingleDatePicker="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ }
+              
+ <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+
+ @code {
+   private string? ErrorMessage;
+   private DateTimeOffset? selectedDate;
+   private string? rol;
+   private DateTime minDate = new DateTime(DateTime.Now.Year - 100, 1, 1);
+   Cliente _cliente = new Cliente();
+   Personal _personal = new Personal();
+
+   void Aceptar()
+   {
+        if (cliente != null){
+            
+
+        if (selectedDate == null)
+        {
+            ErrorMessage = "Por favor, seleccioná una fecha de nacimiento.";
+            return;
+        }
+
+        try
+        {
+            _cliente.FechaNacimiento = selectedDate.Value.DateTime;
+
+            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+                _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
+
+            bool ok = casoDeUsoModificarCliente.Ejecutar(_cliente);                                                                 //aca va editar perfil
+            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+                servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", 
+                "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Contraseña);
+            if (ok)
+            {
+                Navegador.NavigateTo("/");
+            }
+            else
+            {
+                ErrorMessage = "No se pudo registrar el cliente. Por favor, intente nuevamente.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Ocurrió un error inesperado: " + ex.Message;
+        }
+
+        }
+        else if (personal != null)
+        {
+            if (selectedDate == null)
+            {
+                ErrorMessage = "Por favor, seleccioná una fecha de nacimiento.";
+                return;
+            }
+
+            try
+            {
+                _personal.FechaNacimiento = selectedDate.Value.DateTime;
+
+                if (rol != null && !String.Equals(rol, "Personal", StringComparison.OrdinalIgnoreCase))
+                    _personal.Contraseña = _personal.Dni; // Asigna el DNI como contraseña por defecto
+
+                bool ok = CasoDeUsoModificarPersonal.Ejecutar(_personal);                                                                    //aca va editar perfil
+                if (rol != null && !String.Equals(rol, "Personal", StringComparison.OrdinalIgnoreCase))
+                    servicioEnviarEmail.EnviarEmail(_personal.Correo, "Usuario registrado", 
+                    "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _personal.Contraseña);
+                if (ok)
+                {
+                    Navegador.NavigateTo("/");
+                }
+                else
+                {
+                    ErrorMessage = "No se pudo registrar el personal. Por favor, intente nuevamente.";
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "Ocurrió un error inesperado: " + ex.Message;
+            }
+        }
+    }
+   
+    String correo { get; set; }
+    Cliente cliente { get; set; }
+    Personal personal { get; set; }
+     protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            correo = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
+            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+        }
+    }
+ }

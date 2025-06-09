@@ -7,10 +7,12 @@ using Alquileres_Express.Repositorios.RepositoriosSQLite;
 using Alquileres_Express.Aplicacion.Validadores;
 using Alquileres_Express.Aplicacion.Servicios;
 using Alquileres_Express.Repositorio;
+
 using Microsoft.Extensions.FileProviders;
 using Alquileres_Express.Repositorios.RepositorioSQLite;
 using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
 using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoPagarEfectivo;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,8 +30,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 });
 
-builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
-    AddTransient<CasoDeUsoListarUsuario>()
+builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
+    .AddTransient<CasoDeUsoListarCLiente>()
+    
+    .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
+    .AddTransient<CasoDeUsoListarUsuarios>()
 
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
@@ -50,29 +55,35 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<CasoDeUsoBuscarPersonal>()
     .AddTransient<CasoDeUsoValidarCodigoDeSeguridad>()
     .AddTransient<CasoDeUsoRegistrarCliente>()
+    .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
+    .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
 
     .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
     .AddScoped<IRepositorioCliente, RepositorioCliente>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
     .AddScoped<IRepositorioFoto, RepositorioFoto>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
+    .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
+    .AddScoped<IRepositorioLlave, RepositorioLlave>()
 
 
-    .AddScoped<IRepositorioAlquiler,RepositorioAlquiler>()
+    .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
+    .AddTransient<CasoDeUsoRegistrarEntregaPresencial>()
+    .AddScoped<CasoDeUsoPagarEfectivo>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<CasoDeUsoPagarEfectivo>()
+    .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
     .AddTransient<ValidadorAlquiler>()
-
     .AddTransient<ServicioEnviarEmail>()
     .AddTransient<FiltroDeInmueblesService>()
-    .AddTransient<MercadoPagoService>()
     .AddTransient<ServicioGenerarCodigo>()
     .AddTransient<ValidadorInmueble>()
     .AddTransient<ValidadorUsuario>()
     .AddHttpContextAccessor()
     .AddCascadingAuthenticationState()
-    .AddTransient<ServicioFotos>();
-    
+    .AddTransient<ServicioFotos>()
+    .AddSingleton<ServicioVerificarPago>()
+    .AddSingleton<MercadoPagoService>();
 builder.WebHost.UseStaticWebAssets();
 
 var app = builder.Build();
@@ -83,9 +94,20 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
 
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseStaticFiles();
 
+app.UseRouting();
+
+app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();

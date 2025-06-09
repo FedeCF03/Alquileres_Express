@@ -1,0 +1,19 @@
+@page "/success"
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.WebUtilities
+@using Alquileres_Express.Aplicacion.Servicios;
+@inject ServicioVerificarPago servicioVerificarPago
+
+@code {
+    [SupplyParameterFromQuery]
+    public string Status { get; set; } = "";
+    [SupplyParameterFromQuery]
+
+    public string preference_id { get; set; } = "";
+
+    protected override void OnInitialized()
+    {
+        bool aprobado = servicioVerificarPago.VerificarPago(preference_id);
+        Navigation.NavigateTo($"/?mensaje=Pago aprobado");
+    }
+}

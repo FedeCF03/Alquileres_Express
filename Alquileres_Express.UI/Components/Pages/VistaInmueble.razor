@@ -6,6 +6,7 @@
 @inject MercadoPagoService MPService
 @inject NavigationManager NavigationManager
 @using BlazorDateRangePicker
+@inject ServicioVerificarPago _servicioVerificarPago
 
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -76,7 +77,11 @@
             allowfullscreen>
         </iframe>
     </div>
+
 </div>
+
+
+
 @code {
     [Parameter]
     public int Id { get; set; }
@@ -95,7 +100,7 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        if (user.Identity.IsAuthenticated)
+        if (user.Identity != null && user.Identity.IsAuthenticated)
         {
             correo = user.Identity.Name;
             rol = user.FindFirst(ClaimTypes.Role)?.Value;
@@ -135,22 +140,29 @@
     private async Task IniciarCompra()
     {
         decimal precio = calcularPrecio();
-        Alquiler alquiler = new Alquiler(correo, StartDate.Value.Date, EndDate.Value.Date, precio, inmueble.Id);
-        var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre,alquiler);
+
+        Alquiler alquiler = new Alquiler { CorreoCliente = correo, 
+        FechaDeInicio = StartDate!.Value.Date, 
+        FechaDeFin = EndDate!.Value.Date,
+        Precio = precio,
+        InmuebleId = inmueble.Id};
+        var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre, alquiler);
+
         NavigationManager.NavigateTo(url, forceLoad: true); // redirige al checkout de MP
     }
 
     private void CrearRangosDeFechaReservados(List<Alquiler> alquileres)
     {
         FechasReservadas.Clear();
-        alquileres.ForEach(alquiler =>
+        alquileres.Where(a => !a.Cancelado &&
+        !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado) && a.Pagado).ToList().ForEach(alquiler =>
         {
             FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin));
         });
     }
     private bool NoEsHabil(DateTimeOffset date)
     {
-        return FechasReservadas.Any(rango => rango.Contains(date.Date));
+        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date < DateTime.Today;
     }
 
     private void VerificarFechas()
@@ -167,7 +179,6 @@
             {
                 mensajeError = $"La fecha {date.ToShortDateString()} ya está reservada.";
                 podesPagar = false;
-                Console.WriteLine("hola");
                 return;
             }
         }
@@ -179,10 +190,10 @@
 
     private decimal calcularPrecio()
     {
-        if ((StartDate != null && EndDate != null) && inmueble.Precio != null)
+        if (StartDate != null && EndDate != null)
         {
-            int dias =  (int) (EndDate.Value - StartDate.Value).TotalDays;
-            return dias * inmueble.Precio.Value;
+            int dias = (int)(EndDate.Value - StartDate.Value).TotalDays + 1;
+            return dias * inmueble.Precio;
         }
         return 0;
     }

@@ -56,11 +56,12 @@
     {
         user.Correo = "tomicarp12@gmail.com";
         user.Rol = RolUsuario.Gerente;
-        await guardarEnCookie();
+        await guardarEnCookie("jorge");
 
     }
     private async Task IniciarSesion()
     {
+        Cliente? cliente = null;
         Personal? personal = casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
         if (personal != null)
         {
@@ -68,52 +69,54 @@
             if (personal.Rol == RolUsuario.Gerente || personal.Rol == RolUsuario.Administrador)
             {
                 String codigo = servicioGenerarCodigo.GenerarCodigoAleatorio();
-                servicioEnviarEmail.EnviarEmail(personal.Correo,"Codigo de autenticacion" ,"Su codigo de autenticacion es : " ,codigo);
+                servicioEnviarEmail.EnviarEmail(personal.Correo, "Codigo de autenticacion", "Su codigo de autenticacion es : ", codigo);
                 casoDeUsoActualizarEstadoDobleAutenticacion.Ejecutar(personal.Id, codigo);
                 NavigationManager.NavigateTo("/verificacion-doble-autenticacion");
             }
 
             else
             {
-                guardarEnCookie();
-                NavigationManager.NavigateTo("/");
+                guardarEnCookie(personal.Nombre);
+                NavigationManager.NavigateTo("/?justLogged=true");
             }
 
         }
         else
         {
-            Cliente? cliente = casoDeUsoBuscarCliente.Ejecutar(user.Correo, user.Contraseña);
+            cliente = casoDeUsoBuscarCliente.Ejecutar(user.Correo, user.Contraseña);
             if (cliente != null)
             {
                 user.Rol = cliente.Rol;
-                await guardarEnCookie();
+                await guardarEnCookie(cliente.Nombre);
             }
             else
             {
+                cliente = null;
                 ErrorMessage = true;
             }
         }
 
+
     }
 
-    private async Task guardarEnCookie()
+    private async Task guardarEnCookie(string nombre)
     {
 
         var claims = new List<Claim> {
-new Claim(ClaimTypes.Name, user.Correo),
-new Claim(ClaimTypes.Role, user.Rol.ToString())
-};
+        new Claim(ClaimTypes.Name, user.Correo),
+        new Claim(ClaimTypes.Role, user.Rol.ToString())
+    };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         await HttpContext.SignInAsync(principal);
-        NavigationManager.NavigateTo("/");
-    
+        NavigationManager.NavigateTo($"/?mensaje=¡Hola {nombre} Bienvenido/a.");
+
     }
     public class LoginModel
     {
-        public string Contraseña { get; set; }
+        public string? Contraseña { get; set; }
         public RolUsuario Rol { get; set; }
-        public string Correo { get; set; }
+        public string? Correo { get; set; }
     }
 
 

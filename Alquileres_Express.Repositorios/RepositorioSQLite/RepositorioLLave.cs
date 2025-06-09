@@ -1,9 +1,10 @@
 using Alquileres_Express.Aplicacion.Entidades;
+using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Repositorios.Context;
 
-namespace Alquileres_Express.Repositorios.RepositoriosSQLite;
+namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
-public class RepositorioLLave
+public class RepositorioLlave : IRepositorioLlave
 {
     readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
 

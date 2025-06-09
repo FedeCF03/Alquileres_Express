@@ -13,8 +13,11 @@ public class FiltroDeInmueblesService(IRepositorioInmueble repositorioInmueble)
     }
     public List<Inmueble> FiltrarInmuebles(List<Inmueble> inmuebles)
     {
-        var inmueblesFiltrados = repositorioInmueble.ObtenerTodosLosInmuebles();
-        filtros.ForEach(filtro => inmuebles.AddRange(filtro.Filtrar(inmueblesFiltrados)));
+        List<Inmueble> inmueblesFiltrados = inmuebles;
+        foreach (var filtro in filtros)
+        {
+                inmueblesFiltrados = filtro.Filtrar(inmueblesFiltrados);
+        }
         return [.. inmueblesFiltrados.Distinct()];
     }
 
