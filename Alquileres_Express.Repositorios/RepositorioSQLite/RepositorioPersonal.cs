@@ -87,20 +87,29 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     }
 
-     public void ModificarPersonal(Personal personal)
+     public Boolean ModificarPersonal(Personal personal)
     {
 
-        //lo del nombre se checke en el caso de uso, no es necesario hacerlo aquí
-        using var _context = new Alquileres_ExpressContext();
-        Personal personalExistente = _context.Personal.Find(personal.Id)
-        ?? throw new KeyNotFoundException($"No se encontró un personal con el ID {personal.Id}");
+       var personalExistente = ObtenerPersonalPorMail(personal.Correo);
+        Boolean ok = true;
+        if (personalExistente == null)
+        {
+            ok = false;
+            throw new KeyNotFoundException($"No se encontró un personal con el correo {personal.Correo}");
+        }
+
 
         personalExistente.Nombre = personal.Nombre;
-        personalExistente.Direccion = personal.Direccion;
-        personalExistente.FechaNacimiento = personal.FechaNacimiento;
         personalExistente.Apellido = personal.Apellido;
+        bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == personal.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == personal.Correo.ToLower()) && personalExistente.Correo.ToLower() != personal.Correo.ToLower();
+        if (existe)
+            throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
         personalExistente.Correo = personal.Correo;
+        personalExistente.Direccion = personal.Direccion;
         personalExistente.Dni = personal.Dni;
+        personalExistente.FechaNacimiento = personal.FechaNacimiento;
+
         _context.SaveChanges();
+        return ok;
     }
 }

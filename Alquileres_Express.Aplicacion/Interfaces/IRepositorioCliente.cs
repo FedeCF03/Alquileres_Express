@@ -4,7 +4,7 @@ namespace Alquileres_Express.Aplicacion.Interfaces;
 public interface IRepositorioCliente
 {
     public void AgregarCliente(Cliente c);
-    public void ModificarCliente(Cliente c);
+    public Boolean ModificarCliente(Cliente c);
     public void EliminarCliente(Cliente c);
     public Cliente ObtenerClientePorId(int id);
     public Cliente ObtenerClientePorDNI(string dni);

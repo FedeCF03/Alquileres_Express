@@ -32,13 +32,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<CasoDeUsoListarCLiente>()
-    
+
     .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
     .AddTransient<CasoDeUsoListarUsuarios>()
 
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
-
+    .AddTransient<CasoDeUsoModificarCliente>()
     .AddTransient<CasoDeUsoBajaInmueble>()
     .AddTransient<CasoDeUsoListarInmuebles>()
     .AddTransient<CasoDeUsoEditarInmueble>()
@@ -51,6 +51,7 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<CasoDeUsoVerInmueble>()
 
     .AddTransient<CasoDeUsoAltaPersonal>()
+    .AddTransient<CasoDeUsoModificarPersonal>()
     .AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>()
     .AddTransient<CasoDeUsoBuscarPersonal>()
     .AddTransient<CasoDeUsoValidarCodigoDeSeguridad>()

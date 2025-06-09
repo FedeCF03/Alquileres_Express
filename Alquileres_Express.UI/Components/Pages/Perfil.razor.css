@@ -1,50 +1,92 @@
 .perfil-contenedor {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 2rem;
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 20px 30px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
 }
 
 .titulo {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #333;
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #222;
 }
 
 .perfil-card {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 500px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    font-size: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 1.1rem;
+  line-height: 1.5;
 }
 
 .perfil-card div strong {
-    color: #444;
-    margin-right: 0.5rem;
+  color: #555;
+  width: 140px;
+  display: inline-block;
 }
 
 .botones {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1.5rem;
+  margin-top: 20px;
+  display: flex;
+  gap: 16px;
 }
 
+.btn-navlink {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FF385C; /* Airbnb pink */
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 6px rgba(255,56,92,0.4);
+}
+
+.btn-navlink:hover {
+  background-color: #e0324f;
+  box-shadow: 0 4px 12px rgba(224,50,79,0.6);
+}
+
+.btn-navlink span {
+  margin-right: 8px;
+  font-size: 1.3rem;
+}
+
+/* Botón secundario para cambiar contraseña */
 .btn-editar {
-    padding: 0.6rem 1.2rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .btn-editar:hover {
-    background-color: #0056b3;
+  background-color: #dcdcdc;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-editar span {
+  margin-right: 8px;
+  font-size: 1.3rem;
 }

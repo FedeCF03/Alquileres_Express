@@ -8,7 +8,6 @@
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 
-
 @if(cliente != null){
 <div class="perfil-contenedor">
         <h2 class="titulo">Hola @cliente?.Nombre</h2>
@@ -21,7 +20,9 @@
             <div><strong>Fecha de Nacimiento:</strong> @cliente.FechaNacimiento.ToString("dd/MM/yyyy")</div>
 
             <div class="botones">
-                <button class="btn-editar" @onclick="EditarPerfil">Editar perfil</button>
+                <button class="btn-navlink" @onclick="@(() => NavigationManager.NavigateTo("/editar-perfil"))">
+                    <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Editar perfil
+                </button>
                 <button class="btn-editar" @onclick="CambiarContraseña">Cambiar contraseña</button>
             </div>
         </div>
