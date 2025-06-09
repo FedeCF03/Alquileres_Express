@@ -1,38 +1,76 @@
 @page "/listadoUsuario"
-@rendermode InteractiveServer 
-@inject CasoDeUsoListarUsuarios casoDeUsoListarUsuarios;
+@rendermode InteractiveServer  
+@inject CasoDeUsoListarUsuarios casoDeUsoListarUsuarios
+@inject CasoDeUsoListarRestringido casoDeUsoListarRestringido
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
+<h2>Listado de Usuarios</h2>
 
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>NOMBRE</th>
-            <th>APELLIDO</th>
-            <th>CORREO</th>
-            <th>FECHA DE NACIMIENTO</th>
-            <th>ROL</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var cli in _lista)
-        {
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+else if (_lista == null || _lista.Count == 0)
+{
+    <p>No se encontraron usuarios.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
             <tr>
-                <td>@cli.Nombre</td>
-                <td>@cli.Apellido</td>
-                <td>@cli.Correo</td>
-                <td>@cli.FechaNacimiento.ToShortDateString()</td>
-                <td>@cli.Rol</td>
+                <th>NOMBRE</th>
+                <th>APELLIDO</th>
+                <th>CORREO</th>
+                <th>FECHA DE NACIMIENTO</th>
+                <th>ROL</th>
             </tr>
-        }
-    </tbody>
-</table>
-
+        </thead>
+        <tbody>
+            @foreach (var usuario in _lista)
+            {
+                <tr>
+                    <td>@usuario.Nombre</td>
+                    <td>@usuario.Apellido</td>
+                    <td>@usuario.Correo</td>
+                    <td>@usuario.FechaNacimiento.ToShortDateString()</td>
+                    <td>@usuario.Rol</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
     List<Usuario> _lista = new List<Usuario>();
-    protected override void OnInitialized()
+    string? ErrorMessage;
+
+    protected override async Task OnInitializedAsync()
     {
-        _lista = casoDeUsoListarUsuarios.Ejecutar();
+        // Obtengo el estado de autenticación para saber qué roles tiene el usuario
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            if (user.IsInRole("Administrador") || user.IsInRole("Gerente"))
+            {
+                // Caso de uso para Admin y Gerente
+                _lista = casoDeUsoListarUsuarios.Ejecutar();
+            }
+            else if (user.IsInRole("Empleado"))
+            {
+                // Caso de uso restringido para Empleado
+                _lista = casoDeUsoListarRestringido.Ejecutar();
+            }
+            else
+            {
+                ErrorMessage = "No tiene permisos para acceder a esta funcionalidad.";
+            }
+        }
+        else
+        {
+            ErrorMessage = "Debe iniciar sesión para acceder a esta funcionalidad.";
+        }
     }
-} 
+}

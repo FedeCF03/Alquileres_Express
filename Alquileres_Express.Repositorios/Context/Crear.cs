@@ -23,6 +23,18 @@ public class Crear
                 FechaNacimiento = new DateTime(1990, 1, 1),
                 Rol = Aplicacion.Enumerativo.RolUsuario.Administrador,
             });
+            context.SaveChanges();
+            context.Add(new Personal
+            {
+                Nombre = "Pablo",
+                Apellido = "Torres",
+                Correo = "Pablo@gmail.com",
+                Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
+                Direccion = "Calle Falsa 123",
+                FechaNacimiento = new DateTime(1990, 1, 1),
+                Rol = Aplicacion.Enumerativo.RolUsuario.Empleado,
+            });
+            context.SaveChanges();
             context.Add(new Inmueble
             {
                 Nombre = "Departamento en la playa",

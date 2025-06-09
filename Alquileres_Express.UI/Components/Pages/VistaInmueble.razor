@@ -48,23 +48,31 @@
             <div class="text-danger">@mensajeError</div>
         }
 
-        <AuthorizeView Roles="Gerente">
-            @if (!podesPagar)
-            {
-                <button class="btn btn-primary mt-3" disabled>Reservar</button>
-            }
-            else
-            {
-                <div class="text-success">Precio total: $@calcularPrecio().ToString("F2")</div>
-                <button class="btn btn-primary mt-3" @onclick="IniciarCompra">Reservar</button>
-            }
-        </AuthorizeView>
+    <AuthorizeView Roles="Gerente">
+        @if (!podesPagar)
+        {
+            <button class="btn btn-primary mt-3" disabled>Reservar</button>
+        }
+        else
+        {
+            <div class="text-success">Precio total: $@calcularPrecio().ToString("F2")</div>
+            <button class="btn btn-primary mt-3" @onclick="IniciarCompra">Reservar</button>
+        }
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
-                <button class="btn btn-sm btn-primary">Alquilar Presencial</button>
-            </NavLink>
-        </div>
+    </AuthorizeView>
+    <AuthorizeView>
+        <Authorized Context="authState">
+            @if (authState.User.IsInRole("Empleado") || authState.User.IsInRole("Gerente") || authState.User.IsInRole("Administrativo"))
+            {
+                <div class="nav-item px-3">
+                <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
+                    <button class="btn btn-sm btn-primary">Alquilar Presencial</button>
+                </NavLink>
+                </div>
+            }
+        </Authorized>
+    </AuthorizeView>
+        
     </div>
 </div>
 
