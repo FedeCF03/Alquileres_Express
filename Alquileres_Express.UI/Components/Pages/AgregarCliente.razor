@@ -27,7 +27,7 @@
 
     <div class="mb-2">
         <label>DNI</label>
-        <input @bind="_cliente.Dni" class="form-control" />
+        <input type="number" @bind="_cliente.Dni" class="form-control" />
     </div>
 
     <div class="mb-2">
@@ -99,18 +99,20 @@
         {
             _cliente.FechaNacimiento = selectedDate.Value.DateTime;
 
-            if (!String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
                 _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
 
             bool ok = casoDeUsoAltaCliente.Ejecutar(_cliente);
-            if (!String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
                 servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", 
                 "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Contraseña);
             if (ok)
             {
-                _cliente = new Cliente();
-                selectedDate = null;
-                ErrorMessage = "Se registró un nuevo cliente correctamente.";
+                Navegador.NavigateTo("/");
+            }
+            else
+            {
+                ErrorMessage = "No se pudo registrar el cliente. Por favor, intente nuevamente.";
             }
         }
         catch (InvalidOperationException ex)

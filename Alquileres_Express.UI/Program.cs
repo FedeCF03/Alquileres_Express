@@ -31,7 +31,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 });
 
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
-    //AddTransient<CasoDeUsoListarCliente>()
+    .AddTransient<CasoDeUsoListarCLiente>()
+    
+    .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
+    .AddTransient<CasoDeUsoListarUsuarios>()
 
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()

@@ -18,11 +18,6 @@ public class RepositorioPersonal : IRepositorioPersonal
         _context.SaveChanges();
     }
 
-    public void ModificarPersonal(Personal c)
-    {
-
-    }
-
     public void EliminarPersonal(Personal c)
     {
 
@@ -88,7 +83,24 @@ public class RepositorioPersonal : IRepositorioPersonal
             _context.SaveChanges();
             // Resetear el código de seguridad después de la validación
         }
-        return personal ?? null;
+        return personal;
 
+    }
+
+     public void ModificarPersonal(Personal personal)
+    {
+
+        //lo del nombre se checke en el caso de uso, no es necesario hacerlo aquí
+        using var _context = new Alquileres_ExpressContext();
+        Personal personalExistente = _context.Personal.Find(personal.Id)
+        ?? throw new KeyNotFoundException($"No se encontró un personal con el ID {personal.Id}");
+
+        personalExistente.Nombre = personal.Nombre;
+        personalExistente.Direccion = personal.Direccion;
+        personalExistente.FechaNacimiento = personal.FechaNacimiento;
+        personalExistente.Apellido = personal.Apellido;
+        personalExistente.Correo = personal.Correo;
+        personalExistente.Dni = personal.Dni;
+        _context.SaveChanges();
     }
 }

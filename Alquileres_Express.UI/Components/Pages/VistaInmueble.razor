@@ -142,8 +142,8 @@
         decimal precio = calcularPrecio();
 
         Alquiler alquiler = new Alquiler { CorreoCliente = correo, 
-        FechaDeInicio = StartDate.Value.Date, 
-        FechaDeFin = EndDate.Value.Date,
+        FechaDeInicio = StartDate!.Value.Date, 
+        FechaDeFin = EndDate!.Value.Date,
         Precio = precio,
         InmuebleId = inmueble.Id};
         var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre, alquiler);

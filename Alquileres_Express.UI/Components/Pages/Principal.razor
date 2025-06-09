@@ -15,9 +15,15 @@
 
 <PageTitle>Inmuebles</PageTitle>
 
-<!-- <h3>Mensaje: @Mensaje</h3> -->
+@if (!String.IsNullOrEmpty(Mensaje))
+{
 
-@if ((numVisitas == 0) && (cliente != null || personal != null))
+    <div class="toast-message">
+        @Mensaje
+    </div>
+}
+
+@* @if ((numVisitas == 0) && (cliente != null || personal != null))
 {
     if(cliente != null)
     {
@@ -32,7 +38,7 @@
         </div>
     }
     numVisitas++;
-}
+} *@
 
 <div class="contenedor-principal">
     <!-- COLUMNA IZQUIERDA: IMÁGENES -->

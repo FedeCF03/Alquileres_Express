@@ -1,25 +1,28 @@
 @page "/listadoUsuario"
-@rendermode InteractiveServer
-@inject CasoDeUsoListarCliente CasoDeUsoListarUsuario
+@rendermode InteractiveServer 
+@inject CasoDeUsoListarUsuarios casoDeUsoListarUsuarios;
+
+
 
 <table class="table">
     <thead>
         <tr>
-            <th>ID</th>
             <th>NOMBRE</th>
             <th>APELLIDO</th>
+            <th>CORREO</th>
+            <th>FECHA DE NACIMIENTO</th>
+            <th>ROL</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var cli in _lista)
         {
             <tr>
-                <td>@cli.Id</td>
                 <td>@cli.Nombre</td>
                 <td>@cli.Apellido</td>
                 <td>@cli.Correo</td>
-                <td>@cli.FechaNacimiento</td>
-
+                <td>@cli.FechaNacimiento.ToShortDateString()</td>
+                <td>@cli.Rol</td>
             </tr>
         }
     </tbody>
@@ -27,9 +30,9 @@
 
 
 @code {
-    List<Cliente> _lista = new List<Cliente>();
+    List<Usuario> _lista = new List<Usuario>();
     protected override void OnInitialized()
     {
-        //_lista = CasoDeUsoListarUsuario.Ejecutar();
+        _lista = casoDeUsoListarUsuarios.Ejecutar();
     }
-}
+} 

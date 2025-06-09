@@ -163,7 +163,7 @@
         }   
         if (erroresDeFotos.Count == 0 && CasoDeUsoAltaInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out errores) != -1){
             ServicioFotos.PersistirFotos(fotos, inmueble.Id);
-            Nav.NavigateTo("/");
+            Nav.NavigateTo("/?mensaje=Inmueble cargado correctamente");
         }
         else
         {

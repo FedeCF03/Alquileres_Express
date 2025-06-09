@@ -105,14 +105,14 @@
 <button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
 
 @if (errores.Count > 0)
-    {
-        <div class="alert alert-danger">
-            @foreach (var error in errores)
-            {
-                <p>@error</p>
-            }
-        </div>
-    }
+{
+    <div class="alert alert-danger">
+        @foreach (var error in errores)
+        {
+            <p>@error</p>
+        }
+    </div>
+}
 
 
 
@@ -216,7 +216,7 @@
             ServicioFotos.EliminarFotosPorInmueble(inmueble.Id);
             ServicioFotos.EliminarFotosDelDirectorio(fotosEliminadas);
             ServicioFotos.PersistirFotos(fotos, inmueble.Id);
-            Nav.NavigateTo("/");
+            Nav.NavigateTo("/?mensaje=Inmueble editado correctamente");
         }
     }
 
@@ -306,7 +306,7 @@
     }
 
 }
-}
+
 <style>
     .image-list {
     display: flex;
