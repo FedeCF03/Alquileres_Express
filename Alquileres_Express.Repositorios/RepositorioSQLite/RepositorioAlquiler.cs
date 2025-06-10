@@ -1,5 +1,6 @@
 using System;
 using Alquileres_Express.Aplicacion.Entidades;
+using Alquileres_Express.Aplicacion.Enumerativo;
 using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Aplicacion.Validadores;
 using Alquileres_Express.Repositorios.Context;
@@ -21,8 +22,8 @@ public class RepositorioAlquiler : IRepositorioAlquiler
             throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
         if (inmueble == null)
             throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
-        
-        
+
+
     }
 
     private decimal calcularPrecio(DateTime fechaInicio, DateTime fechaFin, decimal? monto)
@@ -52,17 +53,17 @@ public class RepositorioAlquiler : IRepositorioAlquiler
 
     public void RegistrarPagoEnEfectivo(Alquiler alquiler)
     {
-        
+
         alquiler.Pagado = true;
         _context.Alquileres.Add(alquiler);
         guardarAlquilerEnBaseDeDatos(alquiler);
-        
+
     }
 
     private void guardarAlquilerEnBaseDeDatos(Alquiler alquiler)
     {
         Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == alquiler.InmuebleId);//x2
-        
+
 
         // RegistroDeLlave registro = generarRegistroDeLlave(inmueble, personal, cliente.Id, alquiler.Id);
         // alquiler.Registro = registro; 
@@ -83,16 +84,60 @@ public class RepositorioAlquiler : IRepositorioAlquiler
 
     public void pagarAlquilerMercadoPago(Alquiler alquiler)
     {
-        alquiler.Pagado = true; 
+        alquiler.Pagado = true;
         _context.Alquileres.Add(alquiler);
         _context.SaveChanges();
 
     }
     public void RegistrarAlquilerVirtual(Alquiler alquiler)
     {
-        alquiler.Pagado = true; 
+        alquiler.Pagado = true;
         _context.Alquileres.Add(alquiler);
         _context.SaveChanges();
 
     }
+
+    public List<Alquiler> ObtenerAlquileresPorCorreo(string correo)
+    {
+        return [.. _context.Alquileres.Where(a => a.CorreoCliente == correo)];
+    }
+    public List<Alquiler> ObtenerTodosLosAlquileres()
+    {
+        return [.. _context.Alquileres.ToList()];
+    }
+
+    public EstadoDeAlquiler GetEstadoDeAlquiler(int idAlquiler)
+    {
+        Alquiler? alquiler = _context.Alquileres.FirstOrDefault(a => a.Id == idAlquiler);
+
+        if (alquiler.FechaDeFin < DateTime.Now)
+        {
+            return EstadoDeAlquiler.Terminado;
+        }
+        else if (alquiler.FechaDeInicio > DateTime.Now)
+        {
+            return EstadoDeAlquiler.Vigente;
+
+        }
+
+        return EstadoDeAlquiler.EnProceso;
+    }
+
+    public void cancelarAlquiler(int idAlquiler)
+    {
+        Alquiler? alquiler = _context.Alquileres.FirstOrDefault(a => a.Id == idAlquiler);
+        if (alquiler == null)
+            throw new InvalidOperationException("El alquiler no existe.");
+
+        alquiler.Cancelado = true;
+        _context.Entry(alquiler).State = EntityState.Modified;
+        _context.SaveChanges();
+    }
+
+    public List<Alquiler> ObtenerAlquilerPorId(int idAlquiler)
+    {
+        return [.. _context.Alquileres.Where(a => a.Id == idAlquiler)];
+    }
 }
+
+

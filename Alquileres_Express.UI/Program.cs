@@ -29,14 +29,18 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.LoginPath = "/";
 
 });
+builder.Services.AddAuthorization();
+
 
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<CasoDeUsoListarCLiente>()
-
     .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
     .AddTransient<CasoDeUsoListarUsuarios>()
+<<<<<<< HEAD
     .AddTransient<CasoDeUsoListarRestringido>()
 
+=======
+>>>>>>> federamatodoanda2
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
     .AddTransient<CasoDeUsoModificarCliente>()
@@ -57,6 +61,11 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<CasoDeUsoBuscarPersonal>()
     .AddTransient<CasoDeUsoValidarCodigoDeSeguridad>()
     .AddTransient<CasoDeUsoRegistrarCliente>()
+    .AddTransient<CasoDeUsoObtenerTodosLosAlquileres>()
+    .AddTransient<CasoDeUsoObtenerAlquileresPorCorreo>()
+    .AddTransient<CasoDeUsoAlquilerGetEstadoDeAlquiler>()
+
+
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
     .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
 
@@ -72,6 +81,7 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<CasoDeUsoRegistrarEntregaPresencial>()
     .AddScoped<CasoDeUsoPagarEfectivo>()
+    .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<CasoDeUsoPagarEfectivo>()
     .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
@@ -81,9 +91,11 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<ServicioGenerarCodigo>()
     .AddTransient<ValidadorInmueble>()
     .AddTransient<ValidadorUsuario>()
+    .AddTransient<CasoDeUsoObtenerAlquilerPorId>()
     .AddHttpContextAccessor()
     .AddCascadingAuthenticationState()
     .AddTransient<ServicioFotos>()
+    .AddTransient<CasoDeUsoAlquilerCancelarAlquiler>()
     .AddSingleton<ServicioVerificarPago>()
     .AddSingleton<MercadoPagoService>();
 builder.WebHost.UseStaticWebAssets();
@@ -109,17 +121,13 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-builder.Services.AddAuthorization();
 
 Crear.Inicializar();
 app.Run();

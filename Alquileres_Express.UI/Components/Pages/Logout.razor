@@ -6,12 +6,14 @@
 @code {
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         if (HttpContext.User.Identity.IsAuthenticated)
         {
             await HttpContext.SignOutAsync();
+<<<<<<< HEAD
             Navigation.NavigateTo("/", forceLoad: true);
 
         }
@@ -20,5 +22,11 @@
             Navigation.NavigateTo("/", forceLoad: true);
         }
 
+=======
+        }
+        Navigation.NavigateTo("/", true);
+>>>>>>> federamatodoanda2
     }
+
+
 }

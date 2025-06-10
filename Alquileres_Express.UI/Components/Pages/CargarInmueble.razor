@@ -11,6 +11,8 @@
 @inject IHttpContextAccessor HttpContextAccessor
 @inject ServicioFotos ServicioFotos
 @inject ValidadorInmueble ValidadorInmueble
+
+@attribute [Authorize (Roles = "Administrador, Gerente")]
 @inject IJSRuntime JS
 @attribute [Authorize(Roles = "Gerente,Administrador")]
 
