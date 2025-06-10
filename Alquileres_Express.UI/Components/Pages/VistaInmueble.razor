@@ -195,6 +195,18 @@
                                 <p class="no-charge-text">No se realizará ningún cargo por ahora</p>
                             </div>
                         </AuthorizeView>
+                        <AuthorizeView Roles="Empleado,Gerente,Administrativo">
+                            <Authorized>
+                                <div class="booking-actions mt-3">
+                                    <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-user-check"></i> Registrar alquiler presencial
+                                        </button>
+                                    </NavLink>
+                                </div>
+                            </Authorized>
+                        </AuthorizeView>
+
                     </div>
                 </div>
             </div>

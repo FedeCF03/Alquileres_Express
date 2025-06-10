@@ -8,6 +8,7 @@
 @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
 @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 
+
 @{
     var currentRoute = Nav.ToBaseRelativePath(Nav.Uri);
 }
@@ -46,7 +47,6 @@
                     </div>
                 }
             </Authorized>
-            
             <NotAuthorized>
                 @if (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase))
                 {
@@ -60,26 +60,11 @@
         </AuthorizeView>
 
         <AuthorizeView>
-            <Authorized Context="authState">
-                @{
-                    var user = authState.User;
-                }
-                @if (user.IsInRole("Empleado") || user.IsInRole("Gerente") || user.IsInRole("Administrativo"))
-                {
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/listadoUsuario">
-                            <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Listado Usuarios
-                        </NavLink>
-                    </div>
-                }
-            </Authorized>
-        </AuthorizeView>
-    
-        <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">
-                <button class="btn btn-sm btn-primary" @onclick="Logout">Cerrar sesión</button>
-
+                    <NavLink class="nav-link" href="/logout">
+                        <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Cerrar sesión
+                    </NavLink>
                 </div>
             </Authorized>
             <NotAuthorized>
@@ -92,11 +77,6 @@
                         </NavLink>
                     </div>
                 }
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/listadoUsuario">
-                        <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Listado Usuarios
-                    </NavLink>
-                </div>
             </NotAuthorized>
         </AuthorizeView>
 
@@ -134,9 +114,5 @@
             cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
             personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
         }
-    }
-    private void Logout()
-    {
-     Nav.NavigateTo("/logout", true);
     }
 }

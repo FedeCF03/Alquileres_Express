@@ -62,7 +62,7 @@
         <h2 class="titulo">Bienvenido/a, @personal.Nombre @personal.Apellido</h2>
         <p class="subtitulo">Aquí puede editar sus datos personales</p>
         <div class="tablas-contenedor">
-            <div class="tablapersonal
+            <div class="tablapersonal">
                 <h3>Datos actuales</h3>
                 <table>
                     <tr><th>Nombre</th><td>@personal.Nombre</td></tr>
@@ -95,6 +95,10 @@
         </div>
     </div>
 }            
+@if (ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
 
 
  @code {
@@ -121,11 +125,14 @@
             if (cliente != null)
             {
                 _cliente = new Cliente{Nombre = cliente.Nombre,
+                    Id = cliente.Id,
                     Apellido = cliente.Apellido,
                     Dni = cliente.Dni,
                     Correo = cliente.Correo,
                     Direccion = cliente.Direccion,
-                    FechaNacimiento = cliente.FechaNacimiento
+                    FechaNacimiento = cliente.FechaNacimiento,
+                    Contraseña = cliente.Contraseña,
+                    Rol = cliente.Rol
                 };
 
                 selectedDate = cliente.FechaNacimiento;
@@ -134,12 +141,18 @@
             {
                 _personal = new Personal
                 {
+                    Id = personal.Id,
                     Nombre = personal.Nombre,
                     Apellido = personal.Apellido,
                     Dni = personal.Dni,
                     Correo = personal.Correo,
                     Direccion = personal.Direccion,
-                    FechaNacimiento = personal.FechaNacimiento
+                    FechaNacimiento = personal.FechaNacimiento,
+                    Contraseña = personal.Contraseña,
+                    Rol = personal.Rol,
+                    CodigoDeSeguridad = personal.CodigoDeSeguridad
+
+
                 };
                 selectedDate = personal.FechaNacimiento;
             }
