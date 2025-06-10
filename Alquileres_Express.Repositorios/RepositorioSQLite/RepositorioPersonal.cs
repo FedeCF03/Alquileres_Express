@@ -13,6 +13,9 @@ public class RepositorioPersonal : IRepositorioPersonal
         bool existe = (_context.Clientes.Any(x => x.Correo.ToLower() == p.Correo.ToLower())) || (_context.Personal.Any(x => x.Correo.ToLower() == p.Correo.ToLower()));
         if (existe)
             throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
+            bool dniExiste = _context.Clientes.Any(x => x.Dni == p.Dni) || _context.Personal.Any(x => x.Dni == p.Dni);
+        if (dniExiste)
+            throw new InvalidOperationException("El DNI ya está registrado por otro usuario."); 
         p.Contraseña = BCrypt.Net.BCrypt.HashPassword(p.Contraseña.Trim());
         p.Rol = Aplicacion.Enumerativo.RolUsuario.Empleado;
         _context.Personal.Add(p);

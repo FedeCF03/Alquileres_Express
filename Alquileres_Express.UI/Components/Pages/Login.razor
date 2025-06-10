@@ -18,7 +18,7 @@
     <div class="login-card">
         <h3 class="login-title">Iniciar Sesión</h3>
 
-        <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
+        <EditForm Model="@user" OnValidSubmit="IniciarSesionComoGerenteFake" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -33,7 +33,7 @@
                     placeholder="Ingrese su contraseña" />
             </div>
             <div class="login-links">
-                <a href="/forgot-password" class="link-secondary">¿Olvidaste tu contraseña?</a>
+                @*<a disabled="true" href="/forgot-password" class="link-secondary">¿Olvidaste tu contraseña?</a>*@
                 <a href="/usuario" class="link-secondary">Regístrarse</a>
             </div>
             <button type="submit" class="btn-primary">Ingresar</button>
@@ -56,8 +56,8 @@
 
     private async Task IniciarSesionComoGerenteFake()
     {
-        user.Correo = "tomicarp12@gmail.com";
-        user.Rol = RolUsuario.Gerente;
+        user.Correo = "marfacucosas@gmail.com";
+        user.Rol = RolUsuario.Administrador;
         await guardarEnCookie("jorge");
 
     }

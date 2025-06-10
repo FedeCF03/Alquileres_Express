@@ -15,6 +15,9 @@ public class RepositorioCliente : IRepositorioCliente
         bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == c.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == c.Correo.ToLower());
         if (existe)
             throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
+            bool dniExiste = _context.Clientes.Any(x => x.Dni == c.Dni) || _context.Personal.Any(x => x.Dni == c.Dni);
+        if (dniExiste)
+            throw new InvalidOperationException("El DNI ya está registrado por otro usuario.");
         c.Contraseña = BCrypt.Net.BCrypt.HashPassword(c.Contraseña.Trim());//.trim() elimina espacios en blanco
         _context.Clientes.Add(c);
         _context.SaveChanges();
@@ -35,14 +38,9 @@ public class RepositorioCliente : IRepositorioCliente
         return _context.Clientes.ToList();
     }
 
-    public void RegistrarCliente(Cliente c)
-    {
-        throw new NotImplementedException();
-    }
-
     public Cliente ObtenerClientePorDNI(string dni)
     {
-        throw new NotImplementedException();
+        return _context.Clientes.FirstOrDefault(p => p.Dni == dni) ?? throw new KeyNotFoundException($"No existe el cliente con DNI {dni}. Por favor, intente de nuevo o pruebe otro cliente.");
     }
 
     public Cliente? ObtenerClientePorMail(string mail)

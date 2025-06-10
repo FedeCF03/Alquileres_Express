@@ -27,7 +27,7 @@ public class ValidadorUsuario
         if (string.IsNullOrWhiteSpace(u.Correo))
             throw new InvalidOperationException("El correo no puede estar vacío.");
         u.Correo = u.Correo.ToLower();//Paso el correo todo a minuscula
-        if (!u.Correo.Contains("@") || !u.Correo.Contains(".com"))
+        if (!u.Correo.Contains('@'))
             throw new InvalidOperationException("El correo ingresado no es válido.");
         if (string.IsNullOrWhiteSpace(u.Contraseña))
             throw new InvalidOperationException("La contraseña no puede estar vacía.");

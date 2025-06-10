@@ -6,8 +6,9 @@
 @using Alquileres_Express.Aplicacion.Interfaces
 @using Alquileres_Express.Repositorios.RepositorioSQLite
 @inject CasoDeUsoValidarCodigoDeSeguridad casoDeUsoValidarCodigoDeSeguridad
-<h3>Verificación</h3>
+<PageTitle>Verificación de Doble Autenticación</PageTitle>
 
+<h3>Verificación</h3>
 <AuthorizeView>
     <Authorized Context="auth">
         @if (auth.User.IsInRole("Gerente"))
@@ -57,6 +58,16 @@
     IRepositorioPersonal repositorioPersonal = new RepositorioPersonal();
     private async Task ProcesarVerificacion()
     {
+        if (modelo.Codigo.Equals(""))
+        {
+            mensaje = "Por favor, ingrese un código válido.";
+            return;
+        }
+        if (string.IsNullOrEmpty(modelo.Correo))
+        {
+            mensaje = "Por favor, ingrese un correo electrónico válido.";
+            return;
+        }
         if (modelo.Codigo != "0")
 
         {

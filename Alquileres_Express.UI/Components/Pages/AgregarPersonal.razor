@@ -36,14 +36,11 @@
         <input @bind="nuevoPersonal.Correo" class="form-control" />
     </div>
 
-    <AuthorizeView>
-        <NotAuthorized>
-            <div class="mb-2">
-                <label>Contraseña</label>
-                <input @bind="nuevoPersonal.Contraseña" type="password" class="form-control" />
-            </div>
-        </NotAuthorized>
-    </AuthorizeView>
+    
+        <div class="mb-2">
+            <label>Contraseña</label>
+            <input @bind="nuevoPersonal.Contraseña" type="password" class="form-control" />
+        </div>
 
     <div class="mb-2">
         <label>Dirección</label>
@@ -72,6 +69,9 @@
     @mensajeExito
 </div>
 
+<button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+
+
 @code {
     [SupplyParameterFromForm]
     private Personal nuevoPersonal { get; set; } = new();
@@ -82,21 +82,17 @@
     private int? selectedDay;
     private int? selectedMonth;
     private int? selectedYear;
-    private void GuardarPersonal()
+    private void Aceptar()
     {
-        if (selectedDay == null || selectedMonth == null || selectedYear == null)
+        if (selectedDate == null)
         {
-            mensajeError = "Por favor, seleccioná día, mes y año de nacimiento.";
+            mensajeError = "Por favor, seleccioná una fecha de nacimiento.";
             return;
         }
 
         try
         {
-            nuevoPersonal.FechaNacimiento = new DateTime(
-            selectedYear.Value,
-            selectedMonth.Value,
-            selectedDay.Value
-            );
+            nuevoPersonal.FechaNacimiento = selectedDate.Value.DateTime;
             casoDeUsoAltaPersonal.Ejecutar(nuevoPersonal);
             mensajeExito = "Personal agregado correctamente.";
         }
