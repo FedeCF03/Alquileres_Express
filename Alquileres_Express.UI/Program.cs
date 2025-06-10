@@ -7,9 +7,12 @@ using Alquileres_Express.Repositorios.RepositoriosSQLite;
 using Alquileres_Express.Aplicacion.Validadores;
 using Alquileres_Express.Aplicacion.Servicios;
 using Alquileres_Express.Repositorio;
+
 using Microsoft.Extensions.FileProviders;
 using Alquileres_Express.Repositorios.RepositorioSQLite;
 using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
+using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoPagarEfectivo;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,12 +32,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 
-builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
-    AddTransient<CasoDeUsoListarUsuario>()
-
+builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
+    .AddTransient<CasoDeUsoListarCLiente>()
+    .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
+    .AddTransient<CasoDeUsoListarUsuarios>()
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
-
+    .AddTransient<CasoDeUsoModificarCliente>()
     .AddTransient<CasoDeUsoBajaInmueble>()
     .AddTransient<CasoDeUsoListarInmuebles>()
     .AddTransient<CasoDeUsoEditarInmueble>()
@@ -47,6 +51,7 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<CasoDeUsoVerInmueble>()
 
     .AddTransient<CasoDeUsoAltaPersonal>()
+    .AddTransient<CasoDeUsoModificarPersonal>()
     .AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>()
     .AddTransient<CasoDeUsoBuscarPersonal>()
     .AddTransient<CasoDeUsoValidarCodigoDeSeguridad>()
@@ -56,17 +61,25 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<CasoDeUsoAlquilerGetEstadoDeAlquiler>()
 
 
+    .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
+    .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
 
     .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
     .AddScoped<IRepositorioCliente, RepositorioCliente>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
     .AddScoped<IRepositorioFoto, RepositorioFoto>()
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
-
-
     .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
+    .AddScoped<IRepositorioLlave, RepositorioLlave>()
+
+
+    .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
+    .AddTransient<CasoDeUsoRegistrarEntregaPresencial>()
+    .AddScoped<CasoDeUsoPagarEfectivo>()
     .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
+    .AddTransient<CasoDeUsoPagarEfectivo>()
+    .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
     .AddTransient<ValidadorAlquiler>()
     .AddTransient<ServicioEnviarEmail>()
     .AddTransient<FiltroDeInmueblesService>()
@@ -77,9 +90,9 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddHttpContextAccessor()
     .AddCascadingAuthenticationState()
     .AddTransient<ServicioFotos>()
-    .AddTransient<CasoDeUsoAlquilerCancelarAlquiler>();
-builder.Services.AddSingleton<ServicioVerificarPago>();
-builder.Services.AddSingleton<MercadoPagoService>();
+    .AddTransient<CasoDeUsoAlquilerCancelarAlquiler>()
+    .AddSingleton<ServicioVerificarPago>()
+    .AddSingleton<MercadoPagoService>();
 builder.WebHost.UseStaticWebAssets();
 
 var app = builder.Build();

@@ -23,9 +23,6 @@ public class RepositorioAlquiler : IRepositorioAlquiler
         if (inmueble == null)
             throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
 
-        // Registrar alquiler despues de pagar
-
-        decimal precio = calcularPrecio(fechaInicio, fechaFin, inmueble.Precio);
 
     }
 
@@ -54,19 +51,19 @@ public class RepositorioAlquiler : IRepositorioAlquiler
     //     return registro;
     // }
 
-    public void RegistrarPagoEnEfectivo(String correo, int idInmueble, DateTime fechaInicio, DateTime fechaFin, Personal personal, decimal precio)
+    public void RegistrarPagoEnEfectivo(Alquiler alquiler)
     {
-        Alquiler alquiler = new Alquiler(correo, idInmueble, fechaInicio, fechaFin, precio, personal.Nombre, personal.Apellido);
+
         alquiler.Pagado = true;
         _context.Alquileres.Add(alquiler);
-        guardarAlquilerEnBaseDeDatos(correo, idInmueble, personal, alquiler);
+        guardarAlquilerEnBaseDeDatos(alquiler);
 
     }
 
-    private void guardarAlquilerEnBaseDeDatos(String correo, int idInmueble, Personal personal, Alquiler alquiler)
+    private void guardarAlquilerEnBaseDeDatos(Alquiler alquiler)
     {
-        Cliente? cliente = _context.Clientes.FirstOrDefault(c => c.Correo.ToLower() == correo.ToLower());//Tiene que estar
-        Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == idInmueble);//x2
+        Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == alquiler.InmuebleId);//x2
+
 
         // RegistroDeLlave registro = generarRegistroDeLlave(inmueble, personal, cliente.Id, alquiler.Id);
         // alquiler.Registro = registro; 

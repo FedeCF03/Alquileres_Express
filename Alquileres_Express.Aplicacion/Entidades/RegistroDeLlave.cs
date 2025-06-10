@@ -6,5 +6,5 @@ public class RegistroDeLlave
     public int PersonalId { get; set; }
     public DateTime FechayHoraRegistro { get; set; }
     public int ClienteId { get; set; }
-    public bool EsEntega { get; set; }
+    public bool EsEntrega { get; set; }
 }

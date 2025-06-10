@@ -3,7 +3,7 @@ using Alquileres_Express.Aplicacion.Entidades;
 using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Repositorios.Context;
 
-namespace Alquileres_Express.Repositorios.RepositoriosSQLite;
+namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
 public class RepositorioPersonal : IRepositorioPersonal
 {
@@ -16,11 +16,6 @@ public class RepositorioPersonal : IRepositorioPersonal
         p.Contraseña = BCrypt.Net.BCrypt.HashPassword(p.Contraseña.Trim());
         _context.Personal.Add(p);
         _context.SaveChanges();
-    }
-
-    public void ModificarPersonal(Personal c)
-    {
-
     }
 
     public void EliminarPersonal(Personal c)
@@ -47,7 +42,13 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     public Personal ObtenerPersonalPorMail(string mail)
     {
-        throw new NotImplementedException();
+        var per = _context.Personal.FirstOrDefault(p => p.Correo == mail);
+        if (per != null)
+        {
+            return per;
+        }
+        return null;
+    
     }
 
     public Personal? ObtenerPersonalPorMailYContraseña(string mail, string contraseña)
@@ -60,6 +61,7 @@ public class RepositorioPersonal : IRepositorioPersonal
         }
         return null;
     }
+    
 
     public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad)
     {
@@ -81,7 +83,33 @@ public class RepositorioPersonal : IRepositorioPersonal
             _context.SaveChanges();
             // Resetear el código de seguridad después de la validación
         }
-        return personal ?? null;
+        return personal;
 
+    }
+
+     public Boolean ModificarPersonal(Personal personal)
+    {
+
+       var personalExistente = ObtenerPersonalPorMail(personal.Correo);
+        Boolean ok = true;
+        if (personalExistente == null)
+        {
+            ok = false;
+            throw new KeyNotFoundException($"No se encontró un personal con el correo {personal.Correo}");
+        }
+
+
+        personalExistente.Nombre = personal.Nombre;
+        personalExistente.Apellido = personal.Apellido;
+        bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == personal.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == personal.Correo.ToLower()) && personalExistente.Correo.ToLower() != personal.Correo.ToLower();
+        if (existe)
+            throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
+        personalExistente.Correo = personal.Correo;
+        personalExistente.Direccion = personal.Direccion;
+        personalExistente.Dni = personal.Dni;
+        personalExistente.FechaNacimiento = personal.FechaNacimiento;
+
+        _context.SaveChanges();
+        return ok;
     }
 }

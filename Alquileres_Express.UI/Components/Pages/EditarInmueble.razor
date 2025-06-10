@@ -6,37 +6,23 @@
 @inject ServicioFotos ServicioFotos
 @inject IJSRuntime JS
 @inject NavigationManager Nav
-
+@inject ValidadorInmueble ValidadorInmueble
 
 <div class="contenedor">
-
-
     <main class="contenido">
         <section class="info-propiedad">
-                <h1>Nombre</h1>
+            <div class="mt-2"
+                <h1 class="form-label">Nombre</h1>
                 <input placeholder="@inmueble.Nombre" type="text" @bind="inmuebleAuxiliar.Nombre" class="form-control mb-2" />
-
-                <h2>Direccion</h2>
+            </div>
+            <div class="mt-2">
+                <h1 class="form-label">Direccion</h1>
                 <input type="text" @bind="inmuebleAuxiliar.Direccion" class="form-control mb-2" />
- 
-            <div class="precio">
-                <input type="number" @bind="inmueble.Precio" class="form-control mb-2" />
             </div>
-        </section>
-
-        <section class="galeria">
-            <InputFile @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
-            <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
-            <div class="image-list">
-                @foreach (var foto in fotos)
-                {
-                    <div class="image-card">
-                        <img src="@foto.Url" />
-                        <button @onclick="()=>EliminarFoto(foto)">Eliminar</button>
-                    </div>
-                }
+            <div class=" mt-2">
+                <h1 class="form-label">Precio</h1>
+                <input type="number" @bind="inmuebleAuxiliar.Precio" class="form-control mb-2" />
             </div>
-
         </section>
         <section class="detalles">
             <h4>Detalles</h4>
@@ -48,11 +34,37 @@
                 <li><strong>Otras características:</strong> Cocina - Balcón</li>
             </ul>
         </section>
-    
+        <section class="galeria">
+            <InputFile @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
+            <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
+            <div class="image-list">
+                @foreach (var foto in fotos)
+                {
+                    <div class="image-card">
+                        <img src="@foto.Url" class="foto" />
+                        <button @onclick="()=>EliminarFoto(foto)">Eliminar</button>
+                    </div>
+                }
+            </div>
+            @if (errorPorFaltaDeFotos != string.Empty)
+                {
+                    <div class="alert alert-danger">
+                        <p>@errorPorFaltaDeFotos</p>
+                    </div>
+                }
+            @if (erroresDeFotos.Count > 0)
+                {
+                    <div class="alert alert-danger">
+                        @foreach (var error in erroresDeFotos)
+                        {
+                            <p>@error</p>
+                        }
+                    </div>
+                }
+        </section>
    
 
 
- <img src="/images/fotosInmuebles/oxouzdoi.png" alt="Foto propiedad" class="foto" />
 <div id="map" style="height: 400px; width: 80%;">
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initializeMap" async
     defer></script>
@@ -85,32 +97,22 @@
     }
 </script>
 </div>
+
 </main>
+
 </div>
 <button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
 <button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
-@if (errores.Count > 0)
-    {
-        <div class="alert alert-danger">
-            @foreach (var error in errores)
-            {
-                <p>@error</p>
-            }
-        </div>
-    }
-@if (errorPorFaltaDeFotos != string.Empty)
-    {
-        <div class="alert alert-danger">
-            <p>@errorPorFaltaDeFotos</p>
-        </div>
-    }
 
-@if (mensajeError != string.Empty)
-    {
-        <div class="alert alert-danger">
-            <p>@mensajeError</p>
-        </div>
-    }
+@if (errores.Count > 0)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in errores)
+        {
+            <p>@error</p>
+        }
+    </div>
+}
 
 
 
@@ -125,9 +127,11 @@
     private long maxFileSize = 1024 * 1024 * 5; // 5 MB
     private int maxAllowedFiles = 30;
     private List<String> errores = new();
+    private List<String> erroresDeFotos = new();
     private string errorPorFaltaDeFotos = string.Empty;
     private List<Foto> fotos = [];
     private List<Foto> fotosEliminadas = [];
+   
     private Guid inputFileId = Guid.NewGuid();
     private InputFileChangeEventArgs? browser;
 
@@ -200,18 +204,19 @@
         inmueble.TipoInmueble = inmuebleAuxiliar.TipoInmueble;
         inmueble.Banios = inmuebleAuxiliar.Banios;
         inmueble.CantidadDeCamas = inmuebleAuxiliar.CantidadDeCamas;
-
+        errores.Clear();
         if (fotos.Count == 0)
         {
             errorPorFaltaDeFotos = "Debe cargar al menos una foto del inmueble.";
+            errores = ValidadorInmueble.Ejecutar(inmueble);
             StateHasChanged();
             return;
-        }   
-        if (errores.Count == 0 & casoDeUsoEditarInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out mensajeError)){
+        }
+        if (erroresDeFotos.Count == 0 & casoDeUsoEditarInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out errores)){
             ServicioFotos.EliminarFotosPorInmueble(inmueble.Id);
             ServicioFotos.EliminarFotosDelDirectorio(fotosEliminadas);
             ServicioFotos.PersistirFotos(fotos, inmueble.Id);
-            Nav.NavigateTo("/inmuebles");
+            Nav.NavigateTo("/?mensaje=Inmueble editado correctamente");
         }
     }
 
@@ -219,23 +224,27 @@
     {
         fotos.Remove(foto);
         fotosEliminadas.Add(foto);
+        if (fotos.Count == 0)
+        {
+            browser = null;
+        }
     }
     
     private async Task GuardarFotos()
     {
         try
         {
-            errores.Clear();
+            erroresDeFotos.Clear();
             if (browser == null || browser.FileCount == 0)
             {
-                errores.Add("No se ha seleccionado ningún archivo.");
+                erroresDeFotos.Add("No se ha seleccionado ningún archivo.");
                 return;
             }
             errorPorFaltaDeFotos = string.Empty;
 
             if (browser.FileCount > maxAllowedFiles)
             {
-                errores.Add($"No se pueden cargar más de {maxAllowedFiles} archivos.");
+                erroresDeFotos.Add($"No se pueden cargar más de {maxAllowedFiles} archivos.");
                 return;
             }   
             foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))
@@ -243,9 +252,11 @@
                 try{
                     if (file.Size > maxFileSize)
                     {
-                        errores.Add($"El archivo {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
+                        erroresDeFotos.Add($"El archivo {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
                         return;
+
                     }
+
                     else
                     {
                         crearArchivo(file);
@@ -254,7 +265,7 @@
                 }
                 catch (Exception ex)
                 {
-                    errores.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
+                    erroresDeFotos.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
                 }
             }
         }
@@ -295,7 +306,7 @@
     }
 
 }
-}
+
 <style>
     .image-list {
     display: flex;

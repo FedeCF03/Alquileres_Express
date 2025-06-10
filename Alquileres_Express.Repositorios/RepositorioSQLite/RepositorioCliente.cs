@@ -25,11 +25,6 @@ public class RepositorioCliente : IRepositorioCliente
 
     }
 
-    public void ModificarCliente(Cliente c)
-    {
-        throw new NotImplementedException();
-    }
-
     public Cliente ObtenerClientePorId(int id)
     {
         var cliente = _context.Clientes.FirstOrDefault(x => x.Id == id);
@@ -54,9 +49,14 @@ public class RepositorioCliente : IRepositorioCliente
         throw new NotImplementedException();
     }
 
-    public Cliente ObtenerClientePorMail(string mail)
+    public Cliente? ObtenerClientePorMail(string mail)
     {
-        throw new NotImplementedException();
+        var cli = _context.Clientes.FirstOrDefault(p => p.Correo == mail);
+        if (cli != null)
+        {
+            return cli;
+        }
+        return null;
     }
 
     public Cliente? ObtenerClientePorMailYContraseña(string mail, string contraseña)
@@ -71,5 +71,31 @@ public class RepositorioCliente : IRepositorioCliente
         return null;
 
     }
+
+    public Boolean ModificarCliente(Cliente cliente)
+    {
+        var clienteExistente = ObtenerClientePorMail(cliente.Correo);
+        Boolean ok = true;
+        if (clienteExistente == null)
+        {
+            ok = false;
+            throw new KeyNotFoundException($"No se encontró un cliente con el correo {cliente.Correo}");
+        }
+
+
+        clienteExistente.Nombre = cliente.Nombre;
+        clienteExistente.Apellido = cliente.Apellido;
+        bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) && clienteExistente.Correo.ToLower() != cliente.Correo.ToLower();
+        if (existe)
+            throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
+        clienteExistente.Correo = cliente.Correo;
+        clienteExistente.Direccion = cliente.Direccion;
+        clienteExistente.Dni = cliente.Dni;
+        clienteExistente.FechaNacimiento = cliente.FechaNacimiento;
+
+        _context.SaveChanges();
+        return ok;
+    }
+
 
 }

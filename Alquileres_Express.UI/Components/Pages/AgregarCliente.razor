@@ -2,82 +2,71 @@
 @rendermode InteractiveServer
 @inject NavigationManager Navegador
 @inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
-@using BlazorDateRangePicker
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ServicioEnviarEmail servicioEnviarEmail
+@using BlazorDateRangePicker
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
-    <div 
-        class="alert alert-danger">@ErrorMessage
-    </div>
+    <div class="alert alert-danger">@ErrorMessage</div>
 }
 
-    <div class="login-card">
-        <h3 class="login-title">Registrate</h3>
+<div class="login-card">
+    <h3 class="login-title">Registrate</h3>
 
-        <div class="mb-2">
-            <label>Nombre</label>
-            <input @bind="_cliente.Nombre" class="form-control" />
-        </div>
+    <div class="mb-2">
+        <label>Nombre</label>
+        <input @bind="_cliente.Nombre" class="form-control" />
+    </div>
 
-        <div class="mb-2">
-            <label>Apellido</label>
-            <input @bind="_cliente.Apellido" class="form-control" />
-        </div>
+    <div class="mb-2">
+        <label>Apellido</label>
+        <input @bind="_cliente.Apellido" class="form-control" />
+    </div>
 
-        <div class="mb-2">
-            <label>DNI</label>
-            <input @bind="_cliente.Dni" class="form-control" />
-        </div>
+    <div class="mb-2">
+        <label>DNI</label>
+        <input type="number" @bind="_cliente.Dni" class="form-control" />
+    </div>
 
-        <div class="mb-2">
-            <label>Correo</label>
-            <input @bind="_cliente.Correo" class="form-control" />
-        </div>
+    <div class="mb-2">
+        <label>Correo</label>
+        <input @bind="_cliente.Correo" class="form-control" />
+    </div>
 
-        <AuthorizeView>
-            <NotAuthorized>
-                <div class="mb-2">
-                    <label>Contraseña</label>
-                    <input @bind="_cliente.Contraseña" type="password" class="form-control" />
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-        <div class="mb-2">
-            <label>Dirección</label>
-            <input @bind="_cliente.Direccion" class="form-control" />
-        </div>
-
-        <div class="mb-2">
-            <label>Fecha de Nacimiento</label>
-            <div class="d-flex">
-                <DateRangePicker 
-                @bind-Value="date" 
-                         Placeholder="Selecciona tu fecha de nacimiento"  
-                         SingleDatePicker="true"
-                         MaxDate="@DateTime.Now"
-                         MinDate="@fechaMinima"
-                         class="form-control form-control-sm"/>
+    <AuthorizeView>
+        <NotAuthorized>
+            <div class="mb-2">
+                <label>Contraseña</label>
+                <input @bind="_cliente.Contraseña" type="password" class="form-control" />
             </div>
+        </NotAuthorized>
+    </AuthorizeView>
+
+    <div class="mb-2">
+        <label>Dirección</label>
+        <input @bind="_cliente.Direccion" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Fecha de Nacimiento</label>
+        <div class="d-flex">
+           <DateRangePicker @bind-EndDate="selectedDate" 
+           MinDate="minDate"
+           MaxDate ="DateTime.Now"
+           SingleDatePicker="true"/>
         </div>
     </div>
+</div>
 
 <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
 
 @code {
-    DateTimeOffset? date;
-    private DateTime fechaMinima = new DateTime(1900, 1, 1);
     private Cliente _cliente = new Cliente();
     private string? ErrorMessage;
-    [CascadingParameter]
-
-    public HttpContext? HttpContext { get; set; }
-
-    private int? selectedDay;
-    private int? selectedMonth;
-    private int? selectedYear;
+    private DateTimeOffset? selectedDate;
+    private DateTime minDate = new DateTime(DateTime.Now.Year - 100, 1, 1);
     private string? rol;
     private string? correoDelUsuarioEjecutando;
 
@@ -85,7 +74,7 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        if (user.Identity != null && HttpContext.User.Identity.IsAuthenticated)
+        if (user.Identity != null && user.Identity.IsAuthenticated)
         {
             correoDelUsuarioEjecutando = user.Identity.Name;
             rol = user.FindFirst(ClaimTypes.Role)?.Value;
@@ -100,28 +89,30 @@
     {
         ErrorMessage = null;
 
-        if (selectedDay == null || selectedMonth == null || selectedYear == null)
+        if (selectedDate == null)
         {
-            ErrorMessage = "Por favor, seleccioná día, mes y año de nacimiento.";
+            ErrorMessage = "Por favor, seleccioná una fecha de nacimiento.";
             return;
         }
 
         try
         {
-            _cliente.FechaNacimiento = new DateTime(
-            selectedYear.Value,
-            selectedMonth.Value,    
-            selectedDay.Value);
-            if (!String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
-                _cliente.Contraseña= _cliente.Dni; // Asignar DNI como contraseña}
+            _cliente.FechaNacimiento = selectedDate.Value.DateTime;
+
+            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+                _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
+
             bool ok = casoDeUsoAltaCliente.Ejecutar(_cliente);
-            if (!String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
-                servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", "Su usuario ha sido registrado correctamente. por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Contraseña);
+            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+                servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", 
+                "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Contraseña);
             if (ok)
             {
-                _cliente = new Cliente();
-                selectedDay = selectedMonth = selectedYear = null;
-                ErrorMessage = "Se registró un nuevo cliente correctamente.";
+                Navegador.NavigateTo("/");
+            }
+            else
+            {
+                ErrorMessage = "No se pudo registrar el cliente. Por favor, intente nuevamente.";
             }
         }
         catch (InvalidOperationException ex)

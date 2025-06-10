@@ -1,0 +1,129 @@
+.contenedor-edicion {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px 40px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222222; /* texto oscuro para buena legibilidad */
+}
+
+.titulo {
+  font-weight: 700;
+  font-size: 2.2rem;
+  margin-bottom: 0.3rem;
+  color: #222222;
+}
+
+.subtitulo {
+  font-weight: 500;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  color: #555555;
+}
+
+.tablas-contenedor {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.tabla-card, .tablapersonal {
+  flex: 1 1 420px;
+  background-color: #fafafa;
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+}
+
+.tabla-card h3, .tablapersonal h3 {
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+  color: #222222;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 1rem;
+  border-bottom: 1px solid #e2e2e2;
+  color: #333333;
+}
+
+th {
+  width: 150px;
+  color: #444444;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+input.form-control {
+  padding: 12px 15px;
+  border: 1.8px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  color: #222222;
+  background-color: #fff;
+}
+
+input.form-control:focus {
+  outline: none;
+  border-color: #FF385C;
+  box-shadow: 0 0 8px rgba(255, 56, 92, 0.4);
+}
+
+label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #444444;
+  margin-bottom: 6px;
+}
+
+.d-flex {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Botón principal */
+.btn-primary {
+  background-color: #FF385C;
+  color: white;
+  padding: 12px 30px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 56, 92, 0.45);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+}
+
+.btn-primary:hover {
+  background-color: #e0324f;
+  box-shadow: 0 6px 20px rgba(224, 50, 79, 0.6);
+}
+
+/* Responsive para que las tablas apilen en pantallas chicas */
+@media (max-width: 768px) {
+  .tablas-contenedor {
+    flex-direction: column;
+  }
+  .tabla-card, .tablapersonal {
+    flex: 1 1 100%;
+  }
+}

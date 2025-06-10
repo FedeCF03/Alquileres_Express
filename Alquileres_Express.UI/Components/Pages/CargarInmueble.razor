@@ -10,14 +10,18 @@
 @inject IConfiguration config
 @inject IHttpContextAccessor HttpContextAccessor
 @inject ServicioFotos ServicioFotos
-@attribute [Authorize (Roles ="Administrador,Gerente")]
+@inject ValidadorInmueble ValidadorInmueble
+
+@attribute [Authorize (Roles = "Administrador, Gerente")]
 @inject IJSRuntime JS
 
 
 <PageTitle>Cargar inmueble</PageTitle>
 
-<label class="form-label">Cargar Inmueble</label>
+<h1 class="form-label">Cargar Inmueble</h1>
+
 <label class="form-label">Por favor, complete los siguientes campos:</label>
+
 <label class="form-label">Nombre del Inmueble</label>
 <input required=true type="text" @bind="inmueble.Nombre" placeholder="Nombre del Inmueble" class="form-control mb-2" />
 <label class="form-label">Ciudad del Inmueble</label>
@@ -29,20 +33,32 @@
 <input required=true type="number" @bind="inmueble.Precio" placeholder="Precio del Inmueble" class="form-control mb-2" />
 <label class="form-label">Cantidad de camas del Inmueble</label>
 <input required=true type="number" @bind="inmueble.CantidadDeCamas" placeholder="Cantidad de camas" class="form-control mb-2" />
+<label class="form-label">Cantidad de habitaciones del Inmueble</label>
+<input required=true type="number" @bind="inmueble.CantidadDeHabitaciones" placeholder="Cantidad de camas" class="form-control mb-2" />
 <label class="form-label">Cantidad de baños del Inmueble</label>
 <input required=true type="number" @bind="inmueble.Banios" placeholder="Cantidad de baños" class="form-control mb-2" />
-<label for="type">Elija un tipo de inmueble:</label>
 
-<select @bind=inmueble.TipoInmueble required=true name="cars" id="cars">
-<option value=@TipoDeInmueble.Vivienda >Vivienda</option>
-<option value="@TipoDeInmueble.Negocio">Negocio</option>
-<option value="@TipoDeInmueble.Garaje">Garaje</option>
-</select>
+<div class="mt-4">
+    <label for="type">Elija un tipo de inmueble:</label>
+    <p>Por defecto estará seleccionada la opción "Vivienda"</p>
+    <select  @bind=inmueble.TipoInmueble>
+    <option value="@TipoDeInmueble.Vivienda" selected>Vivienda</option>
+    <option value="@TipoDeInmueble.Negocio">Negocio</option>
+    <option value="@TipoDeInmueble.Garaje">Garaje</option>
+    </select>
+</div>
 
-
-
+<div class="mt-4">
+    <label for="type">Elija una política de cancelación:</label>
+    <p>Por defecto estará seleccionada la opción "Sin costo"</p>
+    <select  @bind=inmueble.PoliticaDeCancelacion>
+    <option value="@PoliticaDeCancelacion.SinCosto" >Sin costo</option>
+    <option value="@PoliticaDeCancelacion.VeintePorcientoDeReembolso">Con 20% de reembolso</option>
+    <option value="@PoliticaDeCancelacion.NoReembolsable">No reembolsable</option>
+    </select>
+</div>
 <p> Por favor, elija una ubicación en el mapa para el Inmueble con el marcador</p> 
- <div id="map" style="height: 400px; width: 80%;">
+ <div id="map" class="my-4" style="height: 400px; width: 80%;">
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initializeMap" async
     defer></script>
@@ -77,7 +93,8 @@
 
 </script>
 </div> 
-<InputFile @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
+
+<InputFile accept=".jpg,.png,.jpeg" id="input" @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
 <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
 
 <button class="btn btn-primary" @onclick="() => Cargar()">Cargar Inmueble</button>
@@ -96,7 +113,17 @@
 @if (errores.Count > 0)
     {
         <div class="alert alert-danger">
+            ERROR:
             @foreach (var error in errores)
+            {
+                <p>@error</p>
+            }
+        </div>
+    }
+@if (erroresDeFotos.Count > 0)
+    {
+        <div class="alert alert-danger">
+            @foreach (var error in erroresDeFotos)
             {
                 <p>@error</p>
             }
@@ -109,17 +136,9 @@
         </div>
     }
 
-@if (mensajeError != string.Empty)
-    {
-        <div class="alert alert-danger">
-            <p>@mensajeError</p>
-        </div>
-    }
-
 @code {
     Inmueble inmueble = new();
     public HttpContext? HttpContext { get; set; }
-
     private double Latitud { get; set; }
     private double Longitud { get; set; }
     private string mensajeError = string.Empty;
@@ -127,6 +146,7 @@
     private int maxAllowedFiles = 30;
     private List<String> errores = new();
     private string errorPorFaltaDeFotos = string.Empty;
+    private List<string> erroresDeFotos = [];
     private List<Foto> fotos = new();
     private Guid inputFileId = Guid.NewGuid();
     private InputFileChangeEventArgs? browser;
@@ -135,17 +155,24 @@
         inmueble.CoordLat = Latitud;
         inmueble.CoordLong = Longitud;
         inmueble.Disponible = true;
+        errores.Clear();
         if (fotos.Count == 0)
         {
             errorPorFaltaDeFotos = "Debe cargar al menos una foto del inmueble.";
+            errores = ValidadorInmueble.Ejecutar(inmueble);
             StateHasChanged();
             return;
         }   
-        if (errores.Count == 0 & CasoDeUsoAltaInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out mensajeError) != -1){
+        if (erroresDeFotos.Count == 0 && CasoDeUsoAltaInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out errores) != -1){
             ServicioFotos.PersistirFotos(fotos, inmueble.Id);
-            Nav.NavigateTo("/");
+            Nav.NavigateTo("/?mensaje=Inmueble cargado correctamente");
+        }
+        else
+        {
+            StateHasChanged();
         }
     }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -178,23 +205,27 @@
             File.Delete(Path.Combine(ServicioFotos.DevolverPathDelDirectorio(), nombre));
             StateHasChanged();
         }
+        if (fotos.Count == 0)
+        {
+            browser = null;
+        }
     }
     
     private async Task GuardarFotos()
     {
         try
         {
-            errores.Clear();
+            erroresDeFotos.Clear();
             if (browser == null || browser.FileCount == 0)
             {
-                errores.Add("No se ha seleccionado ningún archivo.");
+                erroresDeFotos.Add("No se ha seleccionado ningún archivo.");
                 return;
             }
             errorPorFaltaDeFotos = string.Empty;
 
             if (browser.FileCount > maxAllowedFiles)
             {
-                errores.Add($"No se pueden cargar más de {maxAllowedFiles} archivos.");
+                erroresDeFotos.Add($"El número de máximo de fotos que puede cargar es {maxAllowedFiles}. Por favor, intente de nuevo con menos fotos");
                 return;
             }   
             foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))
@@ -202,7 +233,7 @@
                 try{
                     if (file.Size > maxFileSize)
                     {
-                        errores.Add($"El archivo {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
+                        erroresDeFotos.Add($"La foto {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
                         return;
 
                     }
@@ -215,7 +246,7 @@
                 }
                 catch (Exception ex)
                 {
-                    errores.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
+                    erroresDeFotos.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
                 }
             }
         }
@@ -269,5 +300,36 @@
     padding: 1rem;
     border-radius: 8px;
     text-align: center;
+}
+.custom-file-input {
+  color: transparent;
+}
+.custom-file-input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+.custom-file-input::before {
+  content: 'Select some files';
+  color: black;
+  display: inline-block;
+  background: -webkit-linear-gradient(top, #f9f9f9, #e3e3e3);
+  border: 1px solid #999;
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  text-shadow: 1px 1px #fff;
+  font-weight: 700;
+  font-size: 10pt;
+}
+.custom-file-input:hover::before {
+  border-color: black;
+}
+.custom-file-input:active {
+  outline: 0;
+}
+.custom-file-input:active::before {
+  background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9); 
 }
 </style>

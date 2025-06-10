@@ -93,6 +93,9 @@
             </div>
         </div>
     </div>
+</div>
+
+    </div>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -218,7 +221,7 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        if (user.Identity.IsAuthenticated)
+        if (user.Identity != null && user.Identity.IsAuthenticated)
         {
             correo = user.Identity.Name;
             rol = user.FindFirst(ClaimTypes.Role)?.Value;
@@ -260,7 +263,12 @@
     private async Task IniciarCompra()
     {
         decimal precio = calcularPrecio();
-        Alquiler alquiler = new Alquiler(correo, StartDate.Value.Date, EndDate.Value.Date, precio, inmueble.Id);
+
+        Alquiler alquiler = new Alquiler { CorreoCliente = correo, 
+        FechaDeInicio = StartDate!.Value.Date, 
+        FechaDeFin = EndDate!.Value.Date,
+        Precio = precio,
+        InmuebleId = inmueble.Id};
         var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre, alquiler);
         NavigationManager.NavigateTo(url, forceLoad: true);
     }
@@ -269,7 +277,7 @@
     {
         FechasReservadas.Clear();
         alquileres.Where(a => !a.Cancelado &&
-        !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado)).ToList().ForEach(alquiler =>
+        !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado) && a.Pagado).ToList().ForEach(alquiler =>
         {
             FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin));
         });
@@ -303,10 +311,10 @@
 
     private decimal calcularPrecio()
     {
-        if ((StartDate != null && EndDate != null) && inmueble.Precio != null)
+        if (StartDate != null && EndDate != null)
         {
             int dias = (int)(EndDate.Value - StartDate.Value).TotalDays + 1;
-            return dias * inmueble.Precio.Value;
+            return dias * inmueble.Precio;
         }
         return 0;
     }

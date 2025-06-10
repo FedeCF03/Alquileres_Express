@@ -36,7 +36,7 @@ public class Alquiler
         Pagado = false;
     }
 
-    public Alquiler(string correoCLiente, int idInmueble, DateTime fechaInicio, DateTime fechaFin, decimal precio, string nombreDePersonal, string apellidoDePersonal)
+    public Alquiler(string correoCLiente, DateTime fechaInicio, DateTime fechaFin, decimal precio, int idInmueble, string nombreDePersonal, string apellidoDePersonal)
     {
 
         CorreoCliente = correoCLiente;
@@ -46,7 +46,6 @@ public class Alquiler
         Precio = precio;
         NombreDePersonal = nombreDePersonal;
         ApellidoDePersonal = apellidoDePersonal;
-        Registro = null;//Lo creo en null y despues lo agrego
         Cancelado = false;  // Por defecto, un alquiler recién creado no está cancelado.
         Pagado = false;
     }

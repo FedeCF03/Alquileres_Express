@@ -3,6 +3,8 @@
 @inject IHttpContextAccessor HttpContextAccessor
 @inject NavigationManager NavigationManager
 @using System.ComponentModel.DataAnnotations
+@using Alquileres_Express.Aplicacion.Interfaces
+@using Alquileres_Express.Repositorios.RepositorioSQLite
 <h3>Verificación</h3>
 
 <AuthorizeView>
@@ -51,7 +53,7 @@
     [SupplyParameterFromForm]
     private VerificacionModel modelo { get; set; } = new();
     private string? mensaje;
-    RepositorioPersonal repositorioPersonal = new RepositorioPersonal();
+    IRepositorioPersonal repositorioPersonal = new RepositorioPersonal();
     CasoDeUsoValidarCodigoDeSeguridad casoDeUsoValidarCodigoDeSeguridad = new CasoDeUsoValidarCodigoDeSeguridad(new
     RepositorioPersonal());
     private async Task ProcesarVerificacion()

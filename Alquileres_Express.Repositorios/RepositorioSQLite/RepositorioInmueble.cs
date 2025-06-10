@@ -21,7 +21,7 @@ public class RepositorioInmueble : IRepositorioInmueble
     public void EliminarInmueble(int id)
     {
         using var _context = new Alquileres_ExpressContext();
-        Inmueble inmueble = _context.Inmuebles.Find(id) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {id}");
+        Inmueble inmueble = _context.Inmuebles.Find(id) ?? throw new KeyNotFoundException($"No existe el inmueble que está intentando borrar. Por favor reinicie la página.");
         _context.Inmuebles.Remove(inmueble);
         _context.SaveChanges();
     }

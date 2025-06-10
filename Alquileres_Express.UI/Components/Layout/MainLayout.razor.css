@@ -15,6 +15,12 @@
     width: 100vw;
 }
 
+.main-content-Perfil {
+    background-color: #3f5048;
+    min-height: 100vh;
+    width: 100vw;
+}
+
 /* Barra superior toda blanca */
 .top-bar {
     background-color: white;
