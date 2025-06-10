@@ -93,9 +93,6 @@
             </div>
         </div>
     </div>
-</div>
-
-    </div>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -221,7 +218,7 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        if (user.Identity != null && user.Identity.IsAuthenticated)
+        if (user.Identity.IsAuthenticated)
         {
             correo = user.Identity.Name;
             rol = user.FindFirst(ClaimTypes.Role)?.Value;
@@ -263,12 +260,7 @@
     private async Task IniciarCompra()
     {
         decimal precio = calcularPrecio();
-
-        Alquiler alquiler = new Alquiler { CorreoCliente = correo, 
-        FechaDeInicio = StartDate!.Value.Date, 
-        FechaDeFin = EndDate!.Value.Date,
-        Precio = precio,
-        InmuebleId = inmueble.Id};
+        Alquiler alquiler = new Alquiler(correo, StartDate.Value.Date, EndDate.Value.Date, precio, inmueble.Id);
         var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre, alquiler);
         NavigationManager.NavigateTo(url, forceLoad: true);
     }
@@ -277,7 +269,7 @@
     {
         FechasReservadas.Clear();
         alquileres.Where(a => !a.Cancelado &&
-        !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado) && a.Pagado).ToList().ForEach(alquiler =>
+        !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado)).ToList().ForEach(alquiler =>
         {
             FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin));
         });
@@ -311,7 +303,7 @@
 
     private decimal calcularPrecio()
     {
-        if (StartDate != null && EndDate != null)
+        if ((StartDate != null && EndDate != null) && inmueble.Precio != null)
         {
             int dias = (int)(EndDate.Value - StartDate.Value).TotalDays + 1;
             return dias * inmueble.Precio;
@@ -322,45 +314,6 @@
 }
 
 <style>
-    .hotel-booking-picker {
-        position: relative;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background: white;
-        cursor: pointer;
-    }
-
-    .booking-fields {
-        display: flex;
-        align-items: center;
-        padding: 12px;
-    }
-
-    .booking-field {
-        flex: 1;
-    }
-
-    .booking-label {
-        display: block;
-        font-size: 11px;
-        font-weight: bold;
-        color: #666;
-        text-transform: uppercase;
-        margin-bottom: 2px;
-    }
-
-    .booking-date {
-        font-size: 14px;
-        color: #333;
-        font-weight: 500;
-    }
-
-    .booking-separator {
-        margin: 0 15px;
-        color: #ddd;
-        font-size: 18px;
-    }
-
     .hidden-picker {
         position: absolute;
         top: 0;

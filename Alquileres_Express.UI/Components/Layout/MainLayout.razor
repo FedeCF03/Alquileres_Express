@@ -30,7 +30,7 @@
     <div class="d-flex align-items-center gap-2">
         <AuthorizeView>
             <Authorized>
-                @if (personal !=null)
+                @if (personal != null)
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="/Herramientas">
@@ -58,7 +58,7 @@
                 }
             </NotAuthorized>
         </AuthorizeView>
-    
+
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">
@@ -68,33 +68,35 @@
                 </div>
             </Authorized>
             <NotAuthorized>
-                 @if ((!string.Equals(currentRoute, "usuario", StringComparison.OrdinalIgnoreCase)) && (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase)))
+                @if ((!string.Equals(currentRoute, "usuario", StringComparison.OrdinalIgnoreCase)) &&
+                                (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase)))
                 {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/usuario">
+                            <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Registrarse
+                        </NavLink>
+                    </div>
+                }
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/usuario">
-                        <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Registrarse
+                    <NavLink class="nav-link" href="/listadoUsuario">
+                        <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Listado Usuarios
                     </NavLink>
                 </div>
-                }
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/listadoUsuario">
-                    <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Listado Usuarios
-                </NavLink>
-            </div>
             </NotAuthorized>
         </AuthorizeView>
-        
-        
+
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/Contactos">
-                    <button class="btn btn-sm Contactanos">Contactanos</button>
+                <button class="btn btn-sm Contactanos">Contactanos</button>
             </NavLink>
         </div>
     </div>
 </div>
 <!-- Contenido principal con fondo personalizado -->
 
-<main class="@(currentRoute == "Contactos" ? "main-content-contactos" : @currentRoute == "Perfil" ? "main-content-Perfil" : "main-content") text-white py-4 px-3">
+<main
+    class="@(currentRoute == "Contactos" ? "main-content-contactos" : @currentRoute == "Perfil" ? "main-content-Perfil" : "main-content") text-white py-4 px-3">
     @Body
 </main>
 

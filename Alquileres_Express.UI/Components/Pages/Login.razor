@@ -5,6 +5,8 @@
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Net.Mail
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 @using System.Security.Claims
 @inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
 @inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
@@ -16,7 +18,7 @@
     <div class="login-card">
         <h3 class="login-title">Iniciar Sesión</h3>
 
-        <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
+        <EditForm Model="@user" OnValidSubmit="IniciarSesionComoGerenteFake" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -34,8 +36,8 @@
                 <a href="/forgot-password" class="link-secondary">¿Olvidaste tu contraseña?</a>
                 <a href="/usuario" class="link-secondary">Regístrarse</a>
             </div>
-
             <button type="submit" class="btn-primary">Ingresar</button>
+
         </EditForm>
         @if (ErrorMessage)
         {
@@ -119,6 +121,14 @@ new Claim(ClaimTypes.Role, user.Rol.ToString())
         public string? Correo { get; set; }
     }
 
-
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
 
 }
