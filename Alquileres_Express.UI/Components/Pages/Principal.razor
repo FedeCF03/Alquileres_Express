@@ -54,7 +54,7 @@
                 @foreach (var inmueble in inmuebles)
                 {
                     <div class="tarjeta-inmueble">
-                        <NavLink class="imagen-link" href="@($"/inmueble/{inmueble.Id}")">
+                        <NavLink class="imagen-link" href="" @onclick="() => irInmueble(inmueble.Id)">
                             <img src="@inmueble.Fotos[0].Url" alt="Foto propiedad" class="foto" />
                         </NavLink>
                         <div class="info-inmueble">
@@ -79,8 +79,8 @@
         }
         <p>Precio</p>
         <input type="checkbox" @bind="filtroPrecio.Aplicar" />
-        <input type="number"  @bind="precioMinimo" class="form-control" placeholder="Precio mínimo" />
-        <input type="number"  @bind="precioMaximo" class="form-control" placeholder="Precio máximo" />
+        <input type="number" @bind="precioMinimo" class="form-control" placeholder="Precio mínimo" />
+        <input type="number" @bind="precioMaximo" class="form-control" placeholder="Precio máximo" />
         @if (mensajeErrorPrecio != string.Empty)
         {
             <p class="text-danger">@mensajeErrorPrecio</p>
@@ -121,7 +121,7 @@
 
     }
 
-    
+
 
 
     private void Filtrar()
@@ -129,11 +129,11 @@
         mensajeErrorPrecio = string.Empty;
         mensajeErrorLocalidad = string.Empty;
         mensajeErrorCantidadPersonas = string.Empty;
-         if (filtroCiudad.Aplicar == true && string.IsNullOrWhiteSpace(ciudad))
+        if (filtroCiudad.Aplicar == true && string.IsNullOrWhiteSpace(ciudad))
         {
             mensajeErrorLocalidad = "La ciudad no puede estar vacía.";
         }
-        else 
+        else
         if (filtroCiudad.Aplicar == true)
             filtroCiudad.Predicado = i => i.Ciudad!.Contains(ciudad, StringComparison.OrdinalIgnoreCase);
 
@@ -142,7 +142,7 @@
             mensajeErrorPrecio = "Los precios deben ser mayores o iguales a 0 y el precio mínimo no puede ser mayor que el máximo.";
         }
 #line default
-    if (filtroPrecio.Aplicar == true)
+        if (filtroPrecio.Aplicar == true)
             filtroPrecio.Predicado = i => i.Precio >= precioMinimo && i.Precio <= precioMaximo;
 
         if (filtroCantidadPersonas.Aplicar == true && (cant == null || cant <= 0))
@@ -150,15 +150,16 @@
             mensajeErrorCantidadPersonas = "La cantidad de personas debe ser mayor a 0.";
             return;
         }
-        else 
+        else
         if (filtroCantidadPersonas.Aplicar == true)
             filtroCantidadPersonas.Predicado = i => i.CantidadDeCamas > cant; // Aquí puedes ajustar la lógica según tus necesidades
 
-        
-        if (mensajeErrorPrecio != string.Empty || mensajeErrorLocalidad != string.Empty || mensajeErrorCantidadPersonas != string.Empty)
+
+        if (mensajeErrorPrecio != string.Empty || mensajeErrorLocalidad != string.Empty || mensajeErrorCantidadPersonas !=
+        string.Empty)
         {
-            StateHasChanged(); 
-            return; 
+            StateHasChanged();
+            return;
         }
         if (filtroPrecio.Aplicar || filtroCiudad.Aplicar || filtroCantidadPersonas.Aplicar)
         {
@@ -180,7 +181,7 @@
     Personal personal { get; set; }
     Boolean mostrarMensaje { get; set; } = false;
 
-     protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
@@ -193,5 +194,9 @@
         }
     }
 
-}
+    private async Task irInmueble(int id)
+    {
+        Navigation.NavigateTo($"/inmueble/{id}", true);
+    }
 
+}
