@@ -32,8 +32,6 @@ public class RepositorioInmueble : IRepositorioInmueble
         //lo del nombre se checke en el caso de uso, no es necesario hacerlo aquí
         using var _context = new Alquileres_ExpressContext();
         Inmueble inmuebleExistente = _context.Inmuebles
-        .Include(i => i.Alquileres)
-        .Include(i => i.Fotos)
         .FirstOrDefault(i => i.Id == inmueble.Id)
         ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
 

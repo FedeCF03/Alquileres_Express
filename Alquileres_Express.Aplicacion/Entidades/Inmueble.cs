@@ -14,7 +14,7 @@ namespace Alquileres_Express.Aplicacion.Entidades
         public int CantidadDeCamas { get; set; }//Se refiere a cantidad de personas 
         public int CantidadDeHabitaciones { get; set; }
         public int Banios { get; set; }
-        public TipoDeInmueble TipoInmueble { get; set; }
+        public TipoDeInmueble TipoInmueble { get; set; } = TipoDeInmueble.Vivienda;
         public PoliticaDeCancelacion PoliticaDeCancelacion { get; set; } = PoliticaDeCancelacion.SinCosto;
         public bool Disponible { get; set; }
         public List<Foto>? Fotos { get; set; } = [];
@@ -38,5 +38,8 @@ namespace Alquileres_Express.Aplicacion.Entidades
         public Inmueble()
         {
         }
+
+
+    
     }
 } 

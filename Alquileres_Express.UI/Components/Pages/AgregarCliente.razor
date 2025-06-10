@@ -105,7 +105,7 @@
             bool ok = casoDeUsoAltaCliente.Ejecutar(_cliente);
             if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
                 servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", 
-                "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Contraseña);
+                "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Dni);
             if (ok)
             {
                 Navegador.NavigateTo("/");

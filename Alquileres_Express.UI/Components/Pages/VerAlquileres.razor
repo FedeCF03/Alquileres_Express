@@ -194,7 +194,7 @@
     {
         try
         {
-            inmuebles = casoDeUsoListarInmuebles.Ejecutar();
+            inmuebles = casoDeUsoListarInmuebles.ListarDisponibles();
             // Filtrar solo los inmuebles que tienen alquileres
             inmuebles = inmuebles.FindAll(i => alquileres.Any(a => a.InmuebleId == i.Id));
         }

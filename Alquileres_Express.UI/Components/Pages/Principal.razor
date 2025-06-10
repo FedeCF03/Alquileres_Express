@@ -142,7 +142,7 @@
 
     protected override void OnInitialized()
     {
-        inmuebles = casoDeUsoListarInmuebles.Ejecutar();
+        inmuebles = casoDeUsoListarInmuebles.ListarDisponibles();
         FiltroDeInmueblesService.AgregarFiltro(filtroPrecio);
         FiltroDeInmueblesService.AgregarFiltro(filtroCiudad);
         FiltroDeInmueblesService.AgregarFiltro(filtroCantidadPersonas);
@@ -177,7 +177,7 @@
         }
         if (!filtroPrecio.Aplicar && !filtroCiudad.Aplicar && !filtroCantidadPersonas.Aplicar)
         {
-            inmuebles = casoDeUsoListarInmuebles.Ejecutar();
+            inmuebles = casoDeUsoListarInmuebles.ListarDisponibles();
             StateHasChanged();
             return;
         }
@@ -217,7 +217,7 @@
             return;
         }
 
-        inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(casoDeUsoListarInmuebles.Ejecutar());
+        inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(casoDeUsoListarInmuebles.ListarDisponibles());
 
 
         StateHasChanged();
