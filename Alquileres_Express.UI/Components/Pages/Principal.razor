@@ -64,8 +64,8 @@
                 @foreach (var inmueble in inmuebles)
                 {
                     <div class="tarjeta-inmueble">
-                        <NavLink class="imagen-link" href="@($"/inmueble/{inmueble.Id}")">
-                            <img src="@inmueble.Fotos![0].Url" alt="Foto propiedad" class="foto" />
+                        <NavLink class="imagen-link" href="" @onclick="() => irInmueble(inmueble.Id)">
+                            <img src="@inmueble.Fotos[0].Url" alt="Foto propiedad" class="foto" />
                         </NavLink>
                         <div class="info-inmueble">
                             <p class="nombre">@inmueble.Nombre</p>
@@ -89,8 +89,8 @@
         }
         <p>Precio</p>
         <input type="checkbox" @bind="filtroPrecio.Aplicar" />
-        <input type="number"  @bind="precioMinimo" class="form-control" placeholder="Precio mínimo" />
-        <input type="number"  @bind="precioMaximo" class="form-control" placeholder="Precio máximo" />
+        <input type="number" @bind="precioMinimo" class="form-control" placeholder="Precio mínimo" />
+        <input type="number" @bind="precioMaximo" class="form-control" placeholder="Precio máximo" />
         @if (mensajeErrorPrecio != string.Empty)
         {
             <p class="text-danger">@mensajeErrorPrecio</p>
@@ -149,7 +149,7 @@
 
     }
 
-    
+
 
 
     private void Filtrar()
@@ -185,11 +185,11 @@
         mensajeErrorPrecio = string.Empty;
         mensajeErrorLocalidad = string.Empty;
         mensajeErrorCantidadPersonas = string.Empty;
-         if (filtroCiudad.Aplicar == true && string.IsNullOrWhiteSpace(ciudad))
+        if (filtroCiudad.Aplicar == true && string.IsNullOrWhiteSpace(ciudad))
         {
             mensajeErrorLocalidad = "La ciudad no puede estar vacía.";
         }
-        else 
+        else
         if (filtroCiudad.Aplicar == true)
             filtroCiudad.Predicado = i => i.Ciudad!.Equals(ciudad, StringComparison.OrdinalIgnoreCase);
 
@@ -205,15 +205,16 @@
             mensajeErrorCantidadPersonas = "La cantidad de personas debe ser mayor a 0.";
             return;
         }
-        else 
+        else
         if (filtroCantidadPersonas.Aplicar == true)
             filtroCantidadPersonas.Predicado = i => i.CantidadDeCamas == cant; // Aquí puedes ajustar la lógica según tus necesidades
 
-        
-        if (mensajeErrorPrecio != string.Empty || mensajeErrorLocalidad != string.Empty || mensajeErrorCantidadPersonas != string.Empty)
+
+        if (mensajeErrorPrecio != string.Empty || mensajeErrorLocalidad != string.Empty || mensajeErrorCantidadPersonas !=
+        string.Empty)
         {
-            StateHasChanged(); 
-            return; 
+            StateHasChanged();
+            return;
         }
 
         inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(casoDeUsoListarInmuebles.Ejecutar());
@@ -231,7 +232,7 @@
     Personal? personal { get; set; }
     bool mostrarMensaje { get; set; } = false;
 
-     protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
@@ -244,5 +245,9 @@
         }
     }
 
-}
+    private async Task irInmueble(int id)
+    {
+        Navigation.NavigateTo($"/inmueble/{id}", true);
+    }
 
+}
