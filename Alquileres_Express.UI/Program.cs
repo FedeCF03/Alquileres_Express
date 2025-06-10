@@ -26,6 +26,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.LoginPath = "/";
 
 });
+builder.Services.AddAuthorization();
+
 
 builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     AddTransient<CasoDeUsoListarUsuario>()
@@ -49,6 +51,11 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<CasoDeUsoBuscarPersonal>()
     .AddTransient<CasoDeUsoValidarCodigoDeSeguridad>()
     .AddTransient<CasoDeUsoRegistrarCliente>()
+    .AddTransient<CasoDeUsoObtenerTodosLosAlquileres>()
+    .AddTransient<CasoDeUsoObtenerAlquileresPorCorreo>()
+    .AddTransient<CasoDeUsoAlquilerGetEstadoDeAlquiler>()
+
+
 
     .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
     .AddScoped<IRepositorioCliente, RepositorioCliente>()
@@ -58,7 +65,7 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
 
 
     .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
-    .AddTransient<CasoDeUsoRegistrarAlquilerOnline>()
+    .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<ValidadorAlquiler>()
     .AddTransient<ServicioEnviarEmail>()
@@ -66,9 +73,11 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>().
     .AddTransient<ServicioGenerarCodigo>()
     .AddTransient<ValidadorInmueble>()
     .AddTransient<ValidadorUsuario>()
+    .AddTransient<CasoDeUsoObtenerAlquilerPorId>()
     .AddHttpContextAccessor()
     .AddCascadingAuthenticationState()
-    .AddTransient<ServicioFotos>();
+    .AddTransient<ServicioFotos>()
+    .AddTransient<CasoDeUsoAlquilerCancelarAlquiler>();
 builder.Services.AddSingleton<ServicioVerificarPago>();
 builder.Services.AddSingleton<MercadoPagoService>();
 builder.WebHost.UseStaticWebAssets();
@@ -94,17 +103,13 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-builder.Services.AddAuthorization();
 
 Crear.Inicializar();
 app.Run();

@@ -100,8 +100,9 @@
     {
 
         var claims = new List<Claim> {
-new Claim(ClaimTypes.Name, user.Correo),
-new Claim(ClaimTypes.Role, user.Rol.ToString())
+new Claim(ClaimTypes.Name,"tomicarp12@gmail.com"),
+new Claim(ClaimTypes.Role, RolUsuario.Gerente.ToString()),
+
 };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
