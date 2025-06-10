@@ -36,11 +36,8 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<CasoDeUsoListarCLiente>()
     .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
     .AddTransient<CasoDeUsoListarUsuarios>()
-<<<<<<< HEAD
     .AddTransient<CasoDeUsoListarRestringido>()
 
-=======
->>>>>>> federamatodoanda2
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
     .AddTransient<CasoDeUsoModificarCliente>()

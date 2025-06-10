@@ -8,7 +8,6 @@
 @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
 @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 
-
 @{
     var currentRoute = Nav.ToBaseRelativePath(Nav.Uri);
 }
@@ -60,7 +59,6 @@
             </NotAuthorized>
         </AuthorizeView>
 
-<<<<<<< HEAD
         <AuthorizeView>
             <Authorized Context="authState">
                 @{
@@ -77,14 +75,11 @@
             </Authorized>
         </AuthorizeView>
     
-=======
->>>>>>> federamatodoanda2
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/logout">
-                        <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Cerrar sesión
-                    </NavLink>
+                <button class="btn btn-sm btn-primary" @onclick="Logout">Cerrar sesión</button>
+
                 </div>
             </Authorized>
             <NotAuthorized>
@@ -102,10 +97,6 @@
                         <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Listado Usuarios
                     </NavLink>
                 </div>
-<<<<<<< HEAD
-                }
-=======
->>>>>>> federamatodoanda2
             </NotAuthorized>
         </AuthorizeView>
 
@@ -143,5 +134,9 @@
             cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
             personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
         }
+    }
+    private void Logout()
+    {
+     Nav.NavigateTo("/logout", true);
     }
 }

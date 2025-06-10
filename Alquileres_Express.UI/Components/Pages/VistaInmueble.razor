@@ -11,19 +11,12 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Alquileres_Express.Aplicacion.Enumerativo
 @inject AuthenticationStateProvider AuthenticationStateProvider
-
-<<<<<<< HEAD
 @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 
-<div class="container">
-    <h1>@inmueble.Nombre</h1>
-    <p class="text-muted">@inmueble.Direccion - @inmueble.Ciudad</p>
-=======
 <div class="property-page">
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="hero-overlay"></div>
->>>>>>> federamatodoanda2
 
         <!-- Gallery Section -->
         <div class="gallery-container">
@@ -119,30 +112,6 @@
                         </div>
                     </div>
 
-<<<<<<< HEAD
-        @if (rol != null)
-        {
-        <AuthorizeView Roles="Gerente">
-            @if (!podesPagar)
-            {
-                <button class="btn btn-primary mt-3" disabled>Reservar</button>
-            }
-            else
-            {
-                <div class="text-success">Precio total: $@calcularPrecio().ToString("F2")</div>
-                <button class="btn btn-primary mt-3" @onclick="IniciarCompra">Reservar</button>
-            }
-        </AuthorizeView>
-        @if((personal !=null)&&(personal.Rol == RolUsuario.Administrador || personal.Rol == RolUsuario.Gerente))
-                {
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
-                            <button class="btn btn-sm btn-primary">Alquilar Presencial</button>
-                        </NavLink>
-                    </div>
-                }
-        }
-=======
                     <!-- Map Section -->
                     <div class="map-section">
                         <h3>Ubicación</h3>
@@ -230,7 +199,6 @@
                 </div>
             </div>
         </div>
->>>>>>> federamatodoanda2
     </div>
 </div>
 

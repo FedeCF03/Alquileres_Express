@@ -16,7 +16,6 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject ServicioEnviarEmail servicioEnviarEmail
 
-            
 @if (cliente != null)
 {
     <div class="contenedor-edicion">
@@ -63,7 +62,7 @@
         <h2 class="titulo">Bienvenido/a, @personal.Nombre @personal.Apellido</h2>
         <p class="subtitulo">Aquí puede editar sus datos personales</p>
         <div class="tablas-contenedor">
-            <div class="tablapersonal">
+            <div class="tablapersonal
                 <h3>Datos actuales</h3>
                 <table>
                     <tr><th>Nombre</th><td>@personal.Nombre</td></tr>
@@ -95,7 +94,8 @@
             </div>
         </div>
     </div>
-}
+}            
+
 
  @code {
    private string? ErrorMessage;

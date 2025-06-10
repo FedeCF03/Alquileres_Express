@@ -14,6 +14,7 @@ public class RepositorioPersonal : IRepositorioPersonal
         if (existe)
             throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
         p.Contraseña = BCrypt.Net.BCrypt.HashPassword(p.Contraseña.Trim());
+        p.Rol = Aplicacion.Enumerativo.RolUsuario.Empleado;
         _context.Personal.Add(p);
         _context.SaveChanges();
     }

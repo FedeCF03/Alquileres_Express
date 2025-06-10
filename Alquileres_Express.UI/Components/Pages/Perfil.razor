@@ -25,6 +25,7 @@
                     <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Editar perfil
                 </button>
                 <button class="btn-editar" @onclick="CambiarContraseña">Cambiar contraseña</button>
+                <button class="btn-navlink" @onclick="@(() => NavigationManager.NavigateTo("/logout"))">Cerrar sesión</button>
             </div>
         </div>
     </div>
@@ -49,7 +50,8 @@
                 <button class="btn-editar" @onclick="CambiarContraseña">Cambiar contraseña</button>
                 <button class="btn btn-dark" @onclick="@(() => NavigationManager.NavigateTo("/mis-alquileres"))">Mis
                     alquileres</button>
-
+                <button class="btn-navlink" @onclick="@(() => NavigationManager.NavigateTo("/logout"))">Cerrar sesión</button>
+            
             </div>
         </div>
     </div>

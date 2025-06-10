@@ -13,19 +13,9 @@
         if (HttpContext.User.Identity.IsAuthenticated)
         {
             await HttpContext.SignOutAsync();
-<<<<<<< HEAD
-            Navigation.NavigateTo("/", forceLoad: true);
+        }
+        Navigation.NavigateTo("/", forceLoad: true);
 
-        }
-        else
-        {
-            Navigation.NavigateTo("/", forceLoad: true);
-        }
-
-=======
-        }
-        Navigation.NavigateTo("/", true);
->>>>>>> federamatodoanda2
     }
 
 
