@@ -2,6 +2,82 @@
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 
-<NavLink class="nav-link" href="/agregar-personal">
-            <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Agregar personal
-</NavLink>
+    <div class="decorative-elements">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+
+    <div class="container">
+        <h1 class="title">Operaciones Disponibles</h1>
+        
+        <div class="buttons-grid">
+            <button class="operation-btn entrega" onclick="registrarEntrega()">
+                <span class="btn-icon">🔑</span>
+                Registrar Entrega de Llaves
+            </button>
+            
+            <button class="operation-btn devolucion" onclick="registrarDevolucion()">
+                <span class="btn-icon">🔄</span>
+                Registrar Devolución de Llaves
+            </button>
+
+            <a class="operation-btn empleado" href="/agregar-personal">
+                <span class="btn-icon">👷‍♂️</span>
+                Agregar empleado
+            </a>
+
+            <button class="operation-btn historial" onclick="verHistorial()">
+                <span class="btn-icon">📋</span>
+                Ver Historial de Llaves
+            </button>
+            
+            <button class="operation-btn listar" onclick="listarUsuarios()">
+                <span class="btn-icon">👥</span>
+                Listar Usuarios
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Funciones para cada operación
+        function registrarEntrega() {
+            // Lógica para registrar entrega de llaves
+            alert('Función: Registrar Entrega de Llaves');
+            console.log('Ejecutando: Registrar Entrega de Llaves');
+        }
+
+        function registrarDevolucion() {
+            // Lógica para registrar devolución de llaves
+            alert('Función: Registrar Devolución de Llaves');
+            console.log('Ejecutando: Registrar Devolución de Llaves');
+        }
+
+        function registrarEmpleado() {
+            // Lógica para registrar empleado
+            alert('Función: Registrar Empleado');
+            console.log('Ejecutando: Registrar Empleado');
+        }
+
+        function verHistorial() {
+            // Lógica para ver historial de llaves
+            alert('Función: Ver Historial de Llaves');
+            console.log('Ejecutando: Ver Historial de Llaves');
+        }
+
+        function listarUsuarios() {
+            // Lógica para listar usuarios
+            alert('Función: Listar Usuarios');
+            console.log('Ejecutando: Listar Usuarios');
+        }
+
+        // Efecto de entrada para los botones
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.operation-btn');
+            buttons.forEach((button, index) => {
+                button.style.animationDelay = `${index * 0.1}s`;
+                button.style.animation = 'fadeInUp 0.6s ease-out forwards';
+            });
+        });
+    </script>
+
