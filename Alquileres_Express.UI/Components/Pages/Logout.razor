@@ -12,11 +12,12 @@
         if (HttpContext.User.Identity.IsAuthenticated)
         {
             await HttpContext.SignOutAsync();
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/", forceLoad: true);
+
         }
         else
         {
-            Navigation.NavigateTo("/counter");
+            Navigation.NavigateTo("/", forceLoad: true);
         }
 
     }

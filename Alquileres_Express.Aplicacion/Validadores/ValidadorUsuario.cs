@@ -43,8 +43,10 @@ public class ValidadorUsuario
 
     private void ValidarEdad(DateTime fechaNacimiento)
     {
-        TimeSpan diferencia = DateTime.Now - fechaNacimiento;
-        if (diferencia.TotalDays < 6570) // 6570 días = 18 años
+        int edad = DateTime.Today.Year - fechaNacimiento.Year;
+        if (fechaNacimiento > DateTime.Today.AddYears(-edad))
+            edad--;
+        if (edad < 18)
             throw new InvalidOperationException("El usuario debe ser mayor de edad.");
     }
 

@@ -2,7 +2,6 @@
 @rendermode InteractiveServer
 @inject CasoDeUsoEliminarInmueble CasoDeUsoEliminarInmueble
 @inject NavigationManager Navegador
-
 @code {
     [Parameter]
     public int Id { get; set; }
@@ -11,15 +10,12 @@
 
     protected override void OnInitialized()
     {
-        try
-        {
-            CasoDeUsoEliminarInmueble.Ejecutar(Id, out mensajeError);
-            Navegador.NavigateTo("/");
+        if (!CasoDeUsoEliminarInmueble.Ejecutar(Id, out mensajeError))
+            Navegador.NavigateTo($"/?mensaje={mensajeError}&esMensajeDeError=true", true);
+        
+        Navegador.NavigateTo("/?mensaje=Inmueble eliminado correctamente.&esMensajeDeError=false", true);
+
             //falta implementar bien lo del mensaje de error
-        }
-        catch (Exception ex)
-        {
-            mensajeError = ex.Message;
-        }
+        
     }
 }

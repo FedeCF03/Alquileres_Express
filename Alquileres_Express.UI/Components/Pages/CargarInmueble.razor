@@ -12,6 +12,7 @@
 @inject ServicioFotos ServicioFotos
 @inject ValidadorInmueble ValidadorInmueble
 @inject IJSRuntime JS
+@attribute [Authorize(Roles = "Gerente,Administrador")]
 
 
 <PageTitle>Cargar inmueble</PageTitle>
@@ -254,7 +255,7 @@
             StateHasChanged();
         }
     }
-    private async Task CaptureFiles(InputFileChangeEventArgs e)
+    private void CaptureFiles(InputFileChangeEventArgs e)
     {
         browser = e;
     }

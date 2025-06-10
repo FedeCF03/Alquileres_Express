@@ -7,8 +7,6 @@
 
  @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
  @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
-
-@* sdfdsf   faltan implemnetar metodos de editar *@
 @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoModificarPersonal CasoDeUsoModificarPersonal;
 
 @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoModificarCliente casoDeUsoModificarCliente;        
@@ -65,7 +63,7 @@
         <h2 class="titulo">Bienvenido/a, @personal.Nombre @personal.Apellido</h2>
         <p class="subtitulo">Aquí puede editar sus datos personales</p>
         <div class="tablas-contenedor">
-            <div class="tablapersonal
+            <div class="tablapersonal">
                 <h3>Datos actuales</h3>
                 <table>
                     <tr><th>Nombre</th><td>@personal.Nombre</td></tr>
@@ -107,9 +105,9 @@
    Cliente _cliente = new Cliente();
    Personal _personal = new Personal();
 
-    String correo { get; set; }
-    Cliente cliente { get; set; }
-    Personal personal { get; set; }
+    String? correo { get; set; }
+    Cliente? cliente { get; set; }
+    Personal? personal { get; set; }
      protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -122,13 +120,28 @@
             personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
             if (cliente != null)
             {
-                _cliente = cliente;
-                selectedDate = _cliente.FechaNacimiento;
+                _cliente = new Cliente{Nombre = cliente.Nombre,
+                    Apellido = cliente.Apellido,
+                    Dni = cliente.Dni,
+                    Correo = cliente.Correo,
+                    Direccion = cliente.Direccion,
+                    FechaNacimiento = cliente.FechaNacimiento
+                };
+
+                selectedDate = cliente.FechaNacimiento;
             }
             else if (personal != null)
             {
-                _personal = personal;
-                selectedDate = _personal.FechaNacimiento;
+                _personal = new Personal
+                {
+                    Nombre = personal.Nombre,
+                    Apellido = personal.Apellido,
+                    Dni = personal.Dni,
+                    Correo = personal.Correo,
+                    Direccion = personal.Direccion,
+                    FechaNacimiento = personal.FechaNacimiento
+                };
+                selectedDate = personal.FechaNacimiento;
             }
 
         }
@@ -136,7 +149,7 @@
 
    void Aceptar()
    {
-        if (_cliente != null)
+        if (cliente != null)
         {
             if (selectedDate == null)
             {
@@ -148,14 +161,8 @@
             {
                 _cliente.FechaNacimiento = selectedDate.Value.DateTime;
 
-            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
-                _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
-
             bool ok = casoDeUsoModificarCliente.Ejecutar(_cliente);                                                                 //aca va editar perfil
-            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
-                servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", 
-                "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Contraseña);
-            if (ok)
+             if (ok)
             {
                 Navegador.NavigateTo("/Perfil");
             }
@@ -170,7 +177,7 @@
         }
 
         }
-        else if (_personal != null)
+        else if (personal != null)
         {
             if (selectedDate == null)
             {
@@ -181,14 +188,8 @@
             try
             {
                 _personal.FechaNacimiento = selectedDate.Value.DateTime;
-
-                if (rol != null && !String.Equals(rol, "Personal", StringComparison.OrdinalIgnoreCase))
-                    _personal.Contraseña = _personal.Dni; // Asigna el DNI como contraseña por defecto
-
-                bool ok = CasoDeUsoModificarPersonal.Ejecutar(_personal);                                                                    //aca va editar perfil
-                if (rol != null && !String.Equals(rol, "Personal", StringComparison.OrdinalIgnoreCase))
-                    servicioEnviarEmail.EnviarEmail(_personal.Correo, "Usuario registrado", 
-                    "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _personal.Contraseña);
+                bool ok = CasoDeUsoModificarPersonal.Ejecutar(_personal);     
+                                                                               //aca va editar perfil
                 if (ok)
                 {
                     Navegador.NavigateTo("/Perfil");

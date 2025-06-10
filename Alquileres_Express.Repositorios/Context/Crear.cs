@@ -18,6 +18,7 @@ public class Crear
                 Nombre = "María",
                 Apellido = "Torres",
                 Correo = "tomicarp12@gmail.com",
+                Dni = "12345678",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Falsa 123",
                 FechaNacimiento = new DateTime(1990, 1, 1),

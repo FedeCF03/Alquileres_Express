@@ -9,7 +9,10 @@
 @inject ServicioVerificarPago _servicioVerificarPago
 
 @using Microsoft.AspNetCore.Components.Authorization
+@using Alquileres_Express.Aplicacion.Enumerativo
 @inject AuthenticationStateProvider AuthenticationStateProvider
+
+@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 
 <div class="container">
     <h1>@inmueble.Nombre</h1>
@@ -48,6 +51,8 @@
             <div class="text-danger">@mensajeError</div>
         }
 
+        @if (rol != null)
+        {
         <AuthorizeView Roles="Gerente">
             @if (!podesPagar)
             {
@@ -59,12 +64,15 @@
                 <button class="btn btn-primary mt-3" @onclick="IniciarCompra">Reservar</button>
             }
         </AuthorizeView>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
-                <button class="btn btn-sm btn-primary">Alquilar Presencial</button>
-            </NavLink>
-        </div>
+        @if((personal !=null)&&(personal.Rol == RolUsuario.Administrador || personal.Rol == RolUsuario.Gerente))
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
+                            <button class="btn btn-sm btn-primary">Alquilar Presencial</button>
+                        </NavLink>
+                    </div>
+                }
+        }
     </div>
 </div>
 
@@ -94,7 +102,11 @@
     private string[] imagenes { get; set; } = new string[0];
     String? correo { get; set; }
     String? rol { get; set; }
+    Personal personal { get; set; }
+
     private List<RangoDeFechas> FechasReservadas { get; set; } = [];
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,6 +116,7 @@
         {
             correo = user.Identity.Name;
             rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
         }
     }
 

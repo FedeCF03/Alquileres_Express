@@ -24,7 +24,7 @@ public class RepositorioPersonal : IRepositorioPersonal
     }
     public Personal ObtenerPersonalPorId(int id)
     {
-        return null;
+        return _context.Personal.Find(id) ?? throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
     }
     public List<Personal> ObtenerTodosElPersonal()
     {
@@ -87,23 +87,23 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     }
 
-     public Boolean ModificarPersonal(Personal personal)
+     public bool ModificarPersonal(Personal personal)
     {
 
-       var personalExistente = ObtenerPersonalPorMail(personal.Correo);
-        Boolean ok = true;
+        var personalExistente = ObtenerPersonalPorId(personal.Id);
+        bool ok = true;
         if (personalExistente == null)
         {
             ok = false;
             throw new KeyNotFoundException($"No se encontró un personal con el correo {personal.Correo}");
         }
 
-
-        personalExistente.Nombre = personal.Nombre;
-        personalExistente.Apellido = personal.Apellido;
         bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == personal.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == personal.Correo.ToLower()) && personalExistente.Correo.ToLower() != personal.Correo.ToLower();
         if (existe)
             throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
+        personalExistente.Nombre = personal.Nombre;
+        personalExistente.Apellido = personal.Apellido;
+        
         personalExistente.Correo = personal.Correo;
         personalExistente.Direccion = personal.Direccion;
         personalExistente.Dni = personal.Dni;

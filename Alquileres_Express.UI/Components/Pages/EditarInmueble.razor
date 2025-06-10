@@ -171,9 +171,9 @@
 
            fotos = inmueble.Fotos ?? [];
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Nav.NavigateTo("/");
+            Nav.NavigateTo($"/?mensaje={ex.Message}&esMensajeDeError=true", true);
         }
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)

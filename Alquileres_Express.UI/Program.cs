@@ -35,6 +35,7 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
 
     .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
     .AddTransient<CasoDeUsoListarUsuarios>()
+    .AddTransient<CasoDeUsoListarRestringido>()
 
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
