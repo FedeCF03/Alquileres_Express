@@ -17,16 +17,18 @@ public class Crear
             {
                 Nombre = "María",
                 Apellido = "Torres",
-                Correo = "tomicarp12@gmail.com",
+                Correo = "marfacucosas@gmail.com",
                 Dni = "12345678",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Falsa 123",
                 FechaNacimiento = new DateTime(1990, 1, 1),
                 Rol = Aplicacion.Enumerativo.RolUsuario.Administrador,
             });
+
+            /*
             context.Add(new Inmueble
             {
-                Nombre = "Departamento en la playa",
+                Nombre = "Departamento en la playa",                    //para probar sin inmuebles
                 Direccion = "Avenida del Mar 123",
                 CoordLat = -34.6037,
                 CoordLong = -58.3816,
@@ -68,9 +70,10 @@ public class Crear
                 InmuebleId = 2
             });
 
-
+        */
             context.SaveChanges();
         }
+        
         var connection = context.Database.GetDbConnection();
         connection.Open();
         using var command = connection.CreateCommand();
