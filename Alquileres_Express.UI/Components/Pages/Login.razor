@@ -76,7 +76,7 @@
 
             else
             {
-                guardarEnCookie(personal.Nombre);
+                await guardarEnCookie(personal.Nombre);
                 NavigationManager.NavigateTo("/?justLogged=true");
             }
 
