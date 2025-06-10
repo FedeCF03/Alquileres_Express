@@ -210,12 +210,21 @@
             StateHasChanged();
             return;
         }
-        if (erroresDeFotos.Count == 0 & casoDeUsoEditarInmueble.Ejecutar(inmuebleAuxiliar,RolUsuario.Gerente, out errores)){
-            ServicioFotos.EliminarFotosPorInmueble(inmueble.Id);
-            ServicioFotos.EliminarFotosDelDirectorio(fotosEliminadas);
-            ServicioFotos.PersistirFotos(fotos, inmueble.Id);
-            Nav.NavigateTo("/?mensaje=Inmueble editado correctamente");
+        try
+        {
+            if (erroresDeFotos.Count == 0 & casoDeUsoEditarInmueble.Ejecutar(inmuebleAuxiliar,RolUsuario.Gerente, out errores)){
+                ServicioFotos.EliminarFotosPorInmueble(inmueble.Id);
+                ServicioFotos.EliminarFotosDelDirectorio(fotosEliminadas);
+                ServicioFotos.PersistirFotos(fotos, inmueble.Id);
+                Nav.NavigateTo("/?mensaje=Inmueble editado correctamente");
+            }
         }
+        catch (KeyNotFoundException ex)
+        {
+            Nav.NavigateTo($"/?mensaje={ex.Message}&esMensajeDeError=true", true);
+        }
+        
+
     }
 
     private void EliminarFoto(Foto foto)
