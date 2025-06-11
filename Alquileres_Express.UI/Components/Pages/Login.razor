@@ -1,6 +1,4 @@
 @page "/login"
-@inject IHttpContextAccessor HttpContextAccessor
-
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Components.Authorization
@@ -53,7 +51,6 @@
     [SupplyParameterFromForm]
     private LoginModel user { get; set; } = new();
     private bool ErrorMessage { get; set; } = false;
-
     private async Task IniciarSesionComoGerenteFake()
     {
         user.Correo = "marfacucosas@gmail.com";

@@ -6,9 +6,21 @@ namespace Alquileres_Express.Aplicacion.CasosDeUso;
 
     public class CasoDeUsoModificarCliente(ValidadorUsuario validador, IRepositorioCliente repo)
     {
-        public Boolean Ejecutar(Cliente c)
+        public bool Ejecutar(Cliente p, out List<string> errores)
+    {
+        errores = validador.Ejecutar(p);
+        if (errores.Count > 0)
         {
-            validador.Ejecutar(c);
-            return repo.ModificarCliente(c);
+            return false; // Si hay errores de validación, retorna false
         }
+        try
+        {
+            return repo.ModificarCliente(p);
+        }
+        catch (Exception ex)
+        {
+            errores.Add(ex.Message);
+            return false;
+        }
+    }
     }
