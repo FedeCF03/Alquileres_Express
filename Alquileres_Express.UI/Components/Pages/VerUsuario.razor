@@ -1,0 +1,86 @@
+@page "/verUsuario/"
+@using BlazorDateRangePicker
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
+@inject CasoDeUsoBuscarPersonalPorId casoDeUsoBuscarPersonalPorId
+@attribute [Authorize (Roles = "Administrador, Gerente, Empleado")]
+
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+
+@if (usuario != null && rol != null)
+{
+<div class="perfil-contenedor">
+    <h2 class="titulo">Hola @usuario.Nombre</h2>
+
+    <div class="perfil-card">
+        <div><strong>Apellido:</strong> @usuario.Apellido</div>
+        <div><strong>DNI:</strong> @usuario.Dni</div>
+        <div><strong>Correo:</strong> @usuario.Correo</div>
+        <div><strong>Dirección:</strong> @usuario.Direccion</div>
+        <div><strong>Fecha de Nacimiento:</strong> @usuario.FechaNacimiento.ToString("dd/MM/yyyy")</div>
+        <div><strong>Rol:</strong> @usuario.Rol</div>
+        @if (usuario.Rol == RolUsuario.Cliente)
+        {
+            <div class="botones">
+                @* <button class="btn-editar" @onclick="CambiarContraseña">Cambiar contraseña</button>*@
+                <button class="btn-navlink">
+                    <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Ver alquileres
+                </button>
+            </div>
+        }
+        else if (usuario.Rol == RolUsuario.Gerente && rol.Equals("Administrador"))
+        {
+            //descender gerente
+        }
+        else if (usuario.Rol == RolUsuario.Empleado && ((rol.Equals("Administrador") || rol.Equals("Gerente"))))
+        {
+            // ascender empleado 
+            //eliminar empleado
+        }
+        
+    </div>
+</div>
+
+}
+
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? PersonalId { get; set; }
+    [SupplyParameterFromQuery]
+    public int? ClienteId { get; set; }
+    String? correo { get; set; }
+    String? rol { get; set; }
+    Usuario? usuario { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (PersonalId != null && ClienteId != null)
+        {
+            NavigationManager.NavigateTo($"/?mensaje=Parámetros no válidos&EsMensajeDeError=true");
+            return;
+        }
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            correo = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            usuario ??= PersonalId != null ? casoDeUsoBuscarPersonalPorId.Ejecutar(PersonalId.Value) : null;
+            usuario ??= ClienteId != null ? casoDeUsoBuscarClientePorId.Ejecutar(ClienteId.Value) : null;
+            if (usuario == null)
+            {
+                NavigationManager.NavigateTo($"/?mensaje=Usuario no encontrado&EsMensajeDeError=true");
+            }
+            if (rol!.Equals("Empleado") && usuario!.Rol.Equals(RolUsuario.Administrador) || usuario.Rol.Equals(RolUsuario.Gerente))
+            {
+                NavigationManager.NavigateTo($"/?mensaje=No tienes permiso para ver este usuario&EsMensajeDeError=true");
+            }
+        }
+        
+    }
+
+}

@@ -2,6 +2,7 @@ using Alquileres_Express.Aplicacion;
 using Alquileres_Express.Aplicacion.Entidades;
 using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Repositorios.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
@@ -28,25 +29,30 @@ public class RepositorioPersonal : IRepositorioPersonal
     }
     public Personal ObtenerPersonalPorId(int id)
     {
-        return _context.Personal.Find(id) ?? throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
+        return _context.Personal.Include(c=>c.RegistrosDeLlave).FirstOrDefault(p=>p.Id == id) ?? throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
     }
     public List<Personal> ObtenerTodosElPersonal()
     {
-        return null;
+        return _context.Personal.Include(c => c.RegistrosDeLlave).ToList();
     }
     public List<Personal> ObtenerPersonalPorNombre(string nombre)
-    {
-        return null;
-    }
-
-    public Personal ObtenerPersonalPorDNI(string dni)
     {
         throw new NotImplementedException();
     }
 
+    public Personal ObtenerPersonalPorDNI(string dni)
+    {
+        var per = _context.Personal.Include(p=>p.RegistrosDeLlave).FirstOrDefault(p => p.Dni == dni);
+        if (per != null)
+        {
+            return per;
+        }
+        throw new KeyNotFoundException($"No existe el personal con DNI {dni}. Por favor, intente de nuevo o pruebe otro personal.");
+    }
+
     public Personal ObtenerPersonalPorMail(string mail)
     {
-        var per = _context.Personal.FirstOrDefault(p => p.Correo == mail);
+        var per = _context.Personal.Include(c=>c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
         if (per != null)
         {
             return per;
@@ -58,7 +64,7 @@ public class RepositorioPersonal : IRepositorioPersonal
     public Personal? ObtenerPersonalPorMailYContraseña(string mail, string contraseña)
     {
 
-        var per = _context.Personal.FirstOrDefault(p => p.Correo == mail);
+        var per = _context.Personal.Include(c=>c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
         if (per != null && BCrypt.Net.BCrypt.Verify(contraseña, per.Contraseña))
         {
             return per;
@@ -102,7 +108,7 @@ public class RepositorioPersonal : IRepositorioPersonal
             throw new KeyNotFoundException($"No se encontró un personal con el correo {personal.Correo}");
         }
 
-        bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == personal.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == personal.Correo.ToLower()) && personalExistente.Correo.ToLower() != personal.Correo.ToLower();
+        bool existe = _context.Clientes.Include(c=>c.RegistrosDeLlave).Any(x => x.Correo.ToLower() == personal.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == personal.Correo.ToLower()) && personalExistente.Correo.ToLower() != personal.Correo.ToLower();
         if (existe)
             throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
         personalExistente.Nombre = personal.Nombre;

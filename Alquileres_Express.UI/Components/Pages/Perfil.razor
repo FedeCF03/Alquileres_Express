@@ -4,7 +4,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
 @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
-
+@attribute [Authorize]
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 
@@ -19,7 +19,7 @@
             <div><strong>Correo:</strong> @cliente.Correo</div>
             <div><strong>Dirección:</strong> @cliente.Direccion</div>
             <div><strong>Fecha de Nacimiento:</strong> @cliente.FechaNacimiento.ToString("dd/MM/yyyy")</div>
-
+            <div><strong>Rol:</strong> @cliente.Rol</div>
             <div class="botones">
                 <button class="btn-navlink" @onclick="@(() => NavigationManager.NavigateTo("/editar-perfil"))">
                     <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Editar perfil
@@ -42,7 +42,7 @@
             <div><strong>Correo:</strong> @personal.Correo</div>
             <div><strong>Dirección:</strong> @personal.Direccion</div>
             <div><strong>Fecha de Nacimiento:</strong> @personal.FechaNacimiento.ToString("dd/MM/yyyy")</div>
-
+            <div><strong>Rol:</strong> @personal.Rol</div>
             <div class="botones">
                 <NavLink class="nav-link" href="/editar-perfil">
                     <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Editar perfil

@@ -1,14 +1,18 @@
 using Alquileres_Express.Aplicacion.Enumerativo;
+using System.ComponentModel.DataAnnotations;
 
-namespace Alquileres_Express.Aplicacion.Entidades
-{
+namespace Alquileres_Express.Aplicacion.Entidades;
+
     public class Inmueble
     {
         public int Id { get; set; }
+
         public string? Nombre { get; set; }
+
         public string? Direccion { get; set; }
         public double CoordLong { get; set; }
         public double CoordLat { get; set; }
+
         public string? Ciudad { get; set; }
         public decimal Precio { get; set; }
         public int CantidadDeCamas { get; set; }//Se refiere a cantidad de personas 
@@ -42,4 +46,3 @@ namespace Alquileres_Express.Aplicacion.Entidades
 
     
     }
-} 

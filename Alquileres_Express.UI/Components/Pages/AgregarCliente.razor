@@ -5,12 +5,8 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ServicioEnviarEmail servicioEnviarEmail
+@inject ValidadorUsuario validadorUsuario
 @using BlazorDateRangePicker
-
-@if (!string.IsNullOrEmpty(ErrorMessage))
-{
-    <div class="alert alert-danger">@ErrorMessage</div>
-}
 
 <div class="login-card">
     <h3 class="login-title">Registrate</h3>
@@ -59,8 +55,13 @@
         </div>
     </div>
 </div>
-
 <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+@foreach (var error in errores)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+
 
 @code {
     private Cliente _cliente = new Cliente();
@@ -69,6 +70,7 @@
     private DateTime minDate = new DateTime(DateTime.Now.Year - 100, 1, 1);
     private string? rol;
     private string? correoDelUsuarioEjecutando;
+    private List<string> errores = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -87,41 +89,31 @@
 
     private void Aceptar()
     {
-        ErrorMessage = null;
-
+        errores.Clear();
         if (selectedDate == null)
         {
-            ErrorMessage = "Por favor, seleccioná una fecha de nacimiento.";
+           errores = validadorUsuario.Ejecutar(_cliente);
+           errores.Add("Por favor, seleccioná una fecha de nacimiento.");
+           return;
+
+        }
+
+        _cliente.FechaNacimiento = selectedDate.Value.DateTime;
+
+
+        if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+            _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
+
+        bool ok = casoDeUsoAltaCliente.Ejecutar(_cliente, out errores);
+        if (!ok)
+        {
             return;
         }
+        if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+            servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", 
+            "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Dni);
+        Navegador.NavigateTo("/?mensaje=Cliente registrado correctamente");
 
-        try
-        {
-            _cliente.FechaNacimiento = selectedDate.Value.DateTime;
 
-            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
-                _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
-
-            bool ok = casoDeUsoAltaCliente.Ejecutar(_cliente);
-            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
-                servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", 
-                "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Dni);
-            if (ok)
-            {
-                Navegador.NavigateTo("/");
-            }
-            else
-            {
-                ErrorMessage = "No se pudo registrar el cliente. Por favor, intente nuevamente.";
-            }
-        }
-        catch (InvalidOperationException ex)
-        {
-            ErrorMessage = ex.Message;
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = "Ocurrió un error inesperado: " + ex.Message;
-        }
     }
 }

@@ -10,32 +10,41 @@
 
     <div class="container">
         <h1 class="title">Operaciones Disponibles</h1>
-        
         <div class="buttons-grid">
-            <button class="operation-btn entrega" onclick="registrarEntrega()">
+     <!-- 
+            <button class="operation-btn entrega" onclick="registrarEntrega()">                                     
                 <span class="btn-icon">🔑</span>
                 Registrar Entrega de Llaves
             </button>
-            
+         
             <button class="operation-btn devolucion" onclick="registrarDevolucion()">
                 <span class="btn-icon">🔄</span>
                 Registrar Devolución de Llaves
-            </button>
+            </button>  -->
 
-            <a class="operation-btn empleado" href="/agregar-personal">
-                <span class="btn-icon">👷‍♂️</span>
-                Agregar empleado
-            </a>
+            <AuthorizeView Roles="Gerente, Administrador">
+                <Authorized>
+                    <a class="operation-btn empleado" href="/agregar-personal">
+                        <span class="btn-icon">👷‍♂️</span>
+                        Agregar empleado
+                    </a>  
 
+                 <a class="operation-btn historial" href = "/cargar-inmueble">
+                    <span class="btn-icon">📋</span>
+                    Cargar Inmueble
+                </a>
+                </Authorized>  
+            </AuthorizeView>
+<!-- 
             <button class="operation-btn historial" onclick="verHistorial()">
                 <span class="btn-icon">📋</span>
                 Ver Historial de Llaves
             </button>
-            
-            <button class="operation-btn listar" onclick="listarUsuarios()">
-                <span class="btn-icon">👥</span>
+                                                                                -->     <!--                 LOS METODOS COMENTADOS SON PARA LA 2DA EMT O NO LOS TENEMOS IMPLEMENTADOS TODAVIA       -->
+            <a class="operation-btn listar" href = "/listadoUsuario">
+                  <span class="btn-icon">👥</span>
                 Listar Usuarios
-            </button>
+            </a>
         </div>
     </div>
 

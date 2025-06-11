@@ -3,6 +3,7 @@
 @inject CasoDeUsoListarUsuarios casoDeUsoListarUsuarios
 @inject CasoDeUsoListarRestringido casoDeUsoListarRestringido
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 <h2>Listado de Usuarios</h2>
 
@@ -35,6 +36,25 @@ else
                     <td>@usuario.Correo</td>
                     <td>@usuario.FechaNacimiento.ToShortDateString()</td>
                     <td>@usuario.Rol</td>
+                    <td>
+                    @if (usuario.Rol == RolUsuario.Empleado || usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Administrador)
+                    {
+
+                    <NavLink class="nav-link" href="@($"/verUsuario/?personalid={usuario.Id}")">
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-user-check"></i> Ver usuario
+                        </button>
+                    </NavLink>
+                    }
+                    else
+                    {
+                        <NavLink class="nav-link" href="@($"/verUsuario/?clienteid={usuario.Id}")">
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-user-check"></i> Ver usuario
+                        </button>
+                    </NavLink>
+                    }
+                </td>
                 </tr>
             }
         </tbody>

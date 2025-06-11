@@ -5,6 +5,7 @@ using Alquileres_Express.Aplicacion.Interfaces;
 using System.Collections.Generic;
 using Alquileres_Express.Repositorios.Context;
 using BCrypt;
+using Microsoft.EntityFrameworkCore;
 
 public class RepositorioCliente : IRepositorioCliente
 {
@@ -30,22 +31,22 @@ public class RepositorioCliente : IRepositorioCliente
 
     public Cliente ObtenerClientePorId(int id)
     {
-         return _context.Clientes.Find(id) ?? throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
+         return _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).FirstOrDefault(c=>c.Id == id) ?? throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
     }
 
     public List<Cliente> ObtenerClientes()
     {
-        return _context.Clientes.ToList();
+        return _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).ToList();
     }
 
     public Cliente ObtenerClientePorDNI(string dni)
     {
-        return _context.Clientes.FirstOrDefault(p => p.Dni == dni) ?? throw new KeyNotFoundException($"No existe el cliente con DNI {dni}. Por favor, intente de nuevo o pruebe otro cliente.");
+        return _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).FirstOrDefault(p => p.Dni == dni) ?? throw new KeyNotFoundException($"No existe el cliente con DNI {dni}. Por favor, intente de nuevo o pruebe otro cliente.");
     }
 
     public Cliente? ObtenerClientePorMail(string mail)
     {
-        var cli = _context.Clientes.FirstOrDefault(p => p.Correo == mail);
+        var cli = _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
         if (cli != null)
         {
             return cli;
@@ -57,7 +58,7 @@ public class RepositorioCliente : IRepositorioCliente
     {
         //bool esValida = BCrypt.Net.BCrypt.Verify(contraseñaIngresada, usuario.Contraseña);
 
-        var cli = _context.Clientes.FirstOrDefault(p => p.Correo == mail);
+        var cli = _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
         if (cli != null && BCrypt.Net.BCrypt.Verify(contraseña, cli.Contraseña))
         {
             return cli;
@@ -66,7 +67,7 @@ public class RepositorioCliente : IRepositorioCliente
 
     }
 
-    public Boolean ModificarCliente(Cliente cliente)
+    public bool ModificarCliente(Cliente cliente)
     {
        
         var clienteExistente = ObtenerClientePorId(cliente.Id);
@@ -77,7 +78,7 @@ public class RepositorioCliente : IRepositorioCliente
             throw new KeyNotFoundException($"No se encontró un personal con el correo {cliente.Correo}");
         }
 
-        bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) && clienteExistente.Correo.ToLower() != cliente.Correo.ToLower();
+        bool existe = _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) && clienteExistente.Correo.ToLower() != cliente.Correo.ToLower();
         if (existe)
             throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
         clienteExistente.Nombre = cliente.Nombre;

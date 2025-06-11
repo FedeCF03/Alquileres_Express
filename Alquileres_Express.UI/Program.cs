@@ -44,6 +44,7 @@ builder.Services
     .AddTransient<CasoDeUsoBajaInmueble>()
     .AddTransient<CasoDeUsoListarInmuebles>()
     .AddTransient<CasoDeUsoEditarInmueble>()
+    .AddTransient<CasoDeUsoBuscarClientePorId>()
 
     .AddTransient<CasoDeUsoModificarInmueble>()
     .AddTransient<CasoDeUsoAltaInmueble>()
@@ -61,10 +62,12 @@ builder.Services
     .AddTransient<CasoDeUsoObtenerTodosLosAlquileres>()
     .AddTransient<CasoDeUsoObtenerAlquileresPorCorreo>()
     .AddTransient<CasoDeUsoAlquilerGetEstadoDeAlquiler>()
+    .AddTransient<CasoDeUsoBuscarPersonalPorId>()
 
 
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
     .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
+
 
     .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
     .AddScoped<IRepositorioCliente, RepositorioCliente>()
