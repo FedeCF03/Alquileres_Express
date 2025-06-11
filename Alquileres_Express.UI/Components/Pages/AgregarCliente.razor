@@ -82,7 +82,7 @@
             rol = user.FindFirst(ClaimTypes.Role)?.Value;
             if (rol != null && rol.Equals("Cliente", StringComparison.OrdinalIgnoreCase))
             {
-                Navegador.NavigateTo("/");
+                Navegador.NavigateTo("/mensaje=No tenés permisos para acceder a esta página.&EsMensajeDeError=true");
             }
         }
     }
