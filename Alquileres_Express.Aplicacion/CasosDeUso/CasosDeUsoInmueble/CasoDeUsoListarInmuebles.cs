@@ -4,8 +4,12 @@ using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Aplicacion.Entidades;
 public class CasoDeUsoListarInmuebles(IRepositorioInmueble repo) : CasoDeUsoInmueble(repo)
 {
-    public List<Inmueble> Ejecutar()
+    public List<Inmueble> ListarDisponibles()
     {
         return repo.ObtenerInmueblesDisponibles();
+    }
+    public List<Inmueble> ListarTodos()
+    {
+        return repo.ObtenerTodosLosInmuebles();
     }
 }

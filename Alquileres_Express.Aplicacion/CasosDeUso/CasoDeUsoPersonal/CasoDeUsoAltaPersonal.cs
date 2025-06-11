@@ -6,10 +6,22 @@ namespace Alquileres_Express.Aplicacion.CasosDeUso
 {
     public class CasoDeUsoAltaPersonal(ValidadorUsuario validador, IRepositorioPersonal repo)
     {
-        public void Ejecutar(Personal p)
+        public bool Ejecutar(Personal p, out List<string> errores)
         {
-            validador.Ejecutar(p);
-            repo.AgregarPersonal(p);
+            errores = validador.Ejecutar(p);
+            if (errores.Count > 0)
+                return false;
+            try
+            {
+                validador.Ejecutar(p);
+                repo.AgregarPersonal(p);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                errores.Add(ex.Message);
+                return false;
+            }
         }
     }
 }

@@ -6,13 +6,21 @@ using Alquileres_Express.Aplicacion.Validadores;
 
 public class CasoDeUsoAltaCliente(ValidadorUsuario validador, IRepositorioCliente repo)
 {
-    public bool Ejecutar(Cliente c)
+    public bool Ejecutar(Cliente c, out List<string> errores)
     {
-        // Si algo está mal, lanza una excepción y se puede capturar en la UI
-        validador.Ejecutar(c);
-
-        repo.AgregarCliente(c);
-        return true;
+        errores = validador.Ejecutar(c);
+        if (errores.Count > 0)
+            return false;
+        try
+        {
+            repo.AgregarCliente(c);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            errores.Add(ex.Message);
+            return false;
+        }
     }
 }
 

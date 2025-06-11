@@ -24,16 +24,9 @@ public class CasoDeUsoEditarInmueble(IRepositorioInmueble RepoInmueble, Validado
             errores.Add("Ya existe un inmueble con el mismo nombre.");
             return false;
         }
-        try
-        {
             RepoInmueble.ModificarInmueble(inmueble);
             return true;
-        }
-        catch (Exception ex)
-        {
-            errores.Add($"Error al agregar el inmueble: {ex.Message}");
-            return false;
-        }
+ 
     }
 
 }

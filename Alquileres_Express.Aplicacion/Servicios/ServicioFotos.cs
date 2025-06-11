@@ -42,8 +42,12 @@ public class ServicioFotos(IRepositorioFoto repositorioFoto)
         RepositorioFoto.EliminarFotosPorInmueble(id);
     }
 
-    public void EliminarFotosDelDirectorio(List<Foto> fotos)
+    public void EliminarFotosDelDirectorio(List<Foto>? fotos)
     {
+    if (fotos == null)
+        {
+            return;
+        }
         foreach (var foto in fotos)
         {
             var path = Path.Combine(DevolverPathDelDirectorio(), foto.Nombre);

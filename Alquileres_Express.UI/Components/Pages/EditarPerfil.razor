@@ -16,7 +16,8 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject ServicioEnviarEmail servicioEnviarEmail
 
-@if (_cliente != null)
+
+@if (cliente != null)
 {
     <div class="contenedor-edicion">
         <h2 class="titulo">Bienvenido/a, @cliente.Nombre @cliente.Apellido</h2>
@@ -125,6 +126,10 @@
         </div>
     </div>
 }
+@if (ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
 
 
 @code {
@@ -135,9 +140,9 @@
     Cliente _cliente;
     Personal _personal;
 
-    String? correo { get; set; }
-    Cliente? cliente { get; set; }
-    Personal? personal { get; set; }
+    String correo { get; set; }
+    Cliente cliente { get; set; }
+    Personal personal { get; set; }
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -153,11 +158,14 @@
                 _cliente = new Cliente
                 {
                     Nombre = cliente.Nombre,
+                    Id = cliente.Id,
                     Apellido = cliente.Apellido,
                     Dni = cliente.Dni,
                     Correo = cliente.Correo,
                     Direccion = cliente.Direccion,
-                    FechaNacimiento = cliente.FechaNacimiento
+                    FechaNacimiento = cliente.FechaNacimiento,
+                    Contraseña = cliente.Contraseña,
+                    Rol = cliente.Rol
                 };
 
                 selectedDate = cliente.FechaNacimiento;
@@ -166,12 +174,18 @@
             {
                 _personal = new Personal
                 {
+                    Id = personal.Id,
                     Nombre = personal.Nombre,
                     Apellido = personal.Apellido,
                     Dni = personal.Dni,
                     Correo = personal.Correo,
                     Direccion = personal.Direccion,
-                    FechaNacimiento = personal.FechaNacimiento
+                    FechaNacimiento = personal.FechaNacimiento,
+                    Contraseña = personal.Contraseña,
+                    Rol = personal.Rol,
+                    CodigoDeSeguridad = personal.CodigoDeSeguridad
+
+
                 };
                 selectedDate = personal.FechaNacimiento;
             }
@@ -181,7 +195,7 @@
 
     void Aceptar()
     {
-        if (cliente != null)
+        if (_cliente != null)
         {
             if (selectedDate == null)
             {
@@ -193,7 +207,14 @@
             {
                 _cliente.FechaNacimiento = selectedDate.Value.DateTime;
 
+                if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+                    _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
+
                 bool ok = casoDeUsoModificarCliente.Ejecutar(_cliente); //aca va editar perfil
+                if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
+                    servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado",
+                    "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ",
+                    _cliente.Contraseña);
                 if (ok)
                 {
                     Navegador.NavigateTo("/Perfil");
@@ -220,15 +241,18 @@
             try
             {
                 _personal.FechaNacimiento = selectedDate.Value.DateTime;
-                bool ok = CasoDeUsoModificarPersonal.Ejecutar(_personal);
-                //aca va editar perfil
+
+                if (rol != null && !String.Equals(rol, "Personal", StringComparison.OrdinalIgnoreCase))
+                    _personal.Contraseña = _personal.Dni; // Asigna el DNI como contraseña por defecto
+
+                bool ok = CasoDeUsoModificarPersonal.Ejecutar(_personal); //aca va editar perfil
+                if (rol != null && !String.Equals(rol, "Personal", StringComparison.OrdinalIgnoreCase))
+                    servicioEnviarEmail.EnviarEmail(_personal.Correo, "Usuario registrado",
+                    "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ",
+                    _personal.Contraseña);
                 if (ok)
                 {
                     Navegador.NavigateTo("/Perfil");
-                }
-                else
-                {
-                    ErrorMessage = "No se pudo registrar el personal. Por favor, intente nuevamente.";
                 }
             }
             catch (Exception ex)

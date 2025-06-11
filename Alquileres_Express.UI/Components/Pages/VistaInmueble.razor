@@ -7,9 +7,12 @@
 @inject NavigationManager NavigationManager
 @using BlazorDateRangePicker
 @inject ServicioVerificarPago _servicioVerificarPago
+@inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
 
 @using Microsoft.AspNetCore.Components.Authorization
+@using Alquileres_Express.Aplicacion.Enumerativo
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 
 <div class="property-page">
     <!-- Hero Section -->
@@ -174,7 +177,7 @@
                             }
                         </div>
 
-                        <AuthorizeView Roles="Gerente">
+                        <AuthorizeView Roles="Cliente">
                             <div class="booking-actions">
                                 @if (!podesPagar)
                                 {
@@ -193,6 +196,23 @@
                                 <p class="no-charge-text">No se realizará ningún cargo por ahora</p>
                             </div>
                         </AuthorizeView>
+                        <AuthorizeView Roles="Empleado,Gerente,Administrador">
+                            <Authorized>
+                                <div class="booking-actions mt-3">
+                                    <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-user-check"></i> Registrar alquiler presencial
+                                        </button>
+                                    </NavLink>
+                                    <NavLink class="nav-link" href="@($"/editar-inmueble/{Id}")">
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-user-check"></i> Editar inmueble
+                                        </button>
+                                    </NavLink>
+                                </div>
+                            </Authorized>
+                        </AuthorizeView>
+
                     </div>
                 </div>
             </div>
@@ -212,7 +232,12 @@
     private string[] imagenes { get; set; } = new string[0];
     String? correo { get; set; }
     String? rol { get; set; }
+    Personal? personal { get; set; }
+    Cliente? cliente { get; set; }
+
     private List<RangoDeFechas> FechasReservadas { get; set; } = [];
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -222,6 +247,9 @@
         {
             correo = user.Identity.Name;
             rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+            cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
+        
         }
     }
 
@@ -260,7 +288,7 @@
     private async Task IniciarCompra()
     {
         decimal precio = calcularPrecio();
-        Alquiler alquiler = new Alquiler(correo, StartDate.Value.Date, EndDate.Value.Date, precio, inmueble.Id);
+        Alquiler alquiler = new Alquiler(correo, StartDate.Value.Date, EndDate.Value.Date, precio, inmueble.Id){ClienteId = cliente!.Id};
         var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre, alquiler);
         NavigationManager.NavigateTo(url, forceLoad: true);
     }

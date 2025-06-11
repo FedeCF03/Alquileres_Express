@@ -5,8 +5,10 @@
 @using System.ComponentModel.DataAnnotations
 @using Alquileres_Express.Aplicacion.Interfaces
 @using Alquileres_Express.Repositorios.RepositorioSQLite
-<h3>Verificación</h3>
+@inject CasoDeUsoValidarCodigoDeSeguridad casoDeUsoValidarCodigoDeSeguridad
+<PageTitle>Verificación de Doble Autenticación</PageTitle>
 
+<h3>Verificación</h3>
 <AuthorizeView>
     <Authorized Context="auth">
         @if (auth.User.IsInRole("Gerente"))
@@ -54,14 +56,22 @@
     private VerificacionModel modelo { get; set; } = new();
     private string? mensaje;
     IRepositorioPersonal repositorioPersonal = new RepositorioPersonal();
-    CasoDeUsoValidarCodigoDeSeguridad casoDeUsoValidarCodigoDeSeguridad = new CasoDeUsoValidarCodigoDeSeguridad(new
-    RepositorioPersonal());
     private async Task ProcesarVerificacion()
     {
+        if (modelo.Codigo.Equals(""))
+        {
+            mensaje = "Por favor, ingrese un código válido.";
+            return;
+        }
+        if (string.IsNullOrEmpty(modelo.Correo))
+        {
+            mensaje = "Por favor, ingrese un correo electrónico válido.";
+            return;
+        }
         if (modelo.Codigo != "0")
 
         {
-            Personal usuario = casoDeUsoValidarCodigoDeSeguridad.Ejecutar(modelo.Correo, modelo.Codigo);
+            Personal? usuario = casoDeUsoValidarCodigoDeSeguridad.Ejecutar(modelo.Correo, modelo.Codigo);
             if (usuario != null)
             {
                 mensaje = "¡Verificación exitosa!";

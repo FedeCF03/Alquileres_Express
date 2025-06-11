@@ -22,10 +22,6 @@ public class Alquileres_ExpressContext : DbContext
     {
         modelBuilder.Entity<RegistroDeLlave>()
             .HasKey(c => new { c.AlquilerId, c.EsEntrega });
-        modelBuilder.Entity<Cliente>()
-            .HasAlternateKey(p => p.Dni);
-        modelBuilder.Entity<Personal>()
-            .HasAlternateKey(p => p.Dni); 
 }
 
 }

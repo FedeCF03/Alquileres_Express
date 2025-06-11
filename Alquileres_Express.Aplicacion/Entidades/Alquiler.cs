@@ -1,11 +1,13 @@
 namespace Alquileres_Express.Aplicacion.Entidades;
 
 using Alquileres_Express.Aplicacion.Enumerativo;
+using Alquileres_Express.Aplicacion.CasosDeUso;
 
 public class Alquiler
 {
     public int Id { get; set; }
     public string CorreoCliente { get; set; } //Cambiar por id
+    public int ClienteId { get; set; } 
     public DateTime FechaDeInicio { get; set; }
     public DateTime FechaDeFin { get; set; }
     public decimal Precio { get; set; }
@@ -29,8 +31,6 @@ public class Alquiler
         FechaDeInicio = fechaDeInicio;
         FechaDeFin = fechaDeFin;
         Precio = precio;
-        //NombreDePersonal = nombreDePersonal;
-        //ApellidoDePersonal = apellidoDePersonal;
         Registro = null;//Lo creo en null y despues lo agrego
         Cancelado = false;  // Por defecto, un alquiler recién creado no está cancelado.
         Pagado = false;

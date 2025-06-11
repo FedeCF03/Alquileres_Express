@@ -7,8 +7,9 @@ namespace Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoPagarEfectivo;
 
 public class CasoDeUsoPagarEfectivo(IRepositorioAlquiler repositorio) : CasoDeUsoAlquiler(repositorio)
 {
-    public void PagarEfectivo(Alquiler alquiler)
+    public void PagarEfectivo(Alquiler alquiler, int idInmueble, DateTime fechaInicio, DateTime fechaFin)
+        
     {
-        Repositorio.RegistrarPagoEnEfectivo(alquiler);
+        Repositorio.RegistrarPagoEnEfectivo(alquiler, idInmueble, fechaInicio, fechaFin);
     }
 }

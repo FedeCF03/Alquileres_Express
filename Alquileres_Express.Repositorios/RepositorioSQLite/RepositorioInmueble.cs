@@ -21,7 +21,7 @@ public class RepositorioInmueble : IRepositorioInmueble
     public void EliminarInmueble(int id)
     {
         using var _context = new Alquileres_ExpressContext();
-        Inmueble inmueble = _context.Inmuebles.Find(id) ?? throw new KeyNotFoundException($"No existe el inmueble que está intentando borrar. Por favor reinicie la página.");
+        Inmueble inmueble = _context.Inmuebles.Find(id) ?? throw new KeyNotFoundException($"No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
         _context.Inmuebles.Remove(inmueble);
         _context.SaveChanges();
     }
@@ -32,10 +32,8 @@ public class RepositorioInmueble : IRepositorioInmueble
         //lo del nombre se checke en el caso de uso, no es necesario hacerlo aquí
         using var _context = new Alquileres_ExpressContext();
         Inmueble inmuebleExistente = _context.Inmuebles
-        .Include(i => i.Alquileres)
-        .Include(i => i.Fotos)
         .FirstOrDefault(i => i.Id == inmueble.Id)
-        ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {inmueble.Id}");
+        ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
 
         inmuebleExistente.Nombre = inmueble.Nombre;
         inmuebleExistente.Direccion = inmueble.Direccion;
@@ -53,14 +51,14 @@ public class RepositorioInmueble : IRepositorioInmueble
     public Inmueble ObtenerInmueblePorId(int id)
     {
         using var _context = new Alquileres_ExpressContext();
-        var inmueble = _context.Inmuebles.Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Id == id) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {id}");
+        var inmueble = _context.Inmuebles.Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Id == id) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
         return inmueble;
     }
 
     public Inmueble ObtenerInmueblePorNombre(string nombre)
     {
         using var _context = new Alquileres_ExpressContext();
-        var inmueble = _context.Inmuebles.Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Nombre!.Equals(nombre)) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el nombre {nombre}");
+        var inmueble = _context.Inmuebles.Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Nombre!.Equals(nombre)) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
         return inmueble;
     }
 

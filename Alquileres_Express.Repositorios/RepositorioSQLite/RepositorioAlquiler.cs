@@ -51,14 +51,38 @@ public class RepositorioAlquiler : IRepositorioAlquiler
     //     return registro;
     // }
 
-    public void RegistrarPagoEnEfectivo(Alquiler alquiler)
+    public void RegistrarPagoEnEfectivo(Alquiler alquiler, int idInmueble, DateTime fechaInicio, DateTime fechaFin)
     {
 
-        alquiler.Pagado = true;
-        _context.Alquileres.Add(alquiler);
-        guardarAlquilerEnBaseDeDatos(alquiler);
+        if (!EstaDisponible(idInmueble, fechaInicio, fechaFin))
+            throw new InvalidOperationException("El inmueble no está disponible para el período seleccionado.");
 
+        alquiler.FechaDeInicio = fechaInicio;
+        alquiler.FechaDeFin = fechaFin;
+        alquiler.Precio = calcularPrecio(fechaInicio, fechaFin, alquiler.Precio);
+        {
+
+            alquiler.Pagado = true;
+            //_context.Alquileres.Add(alquiler);
+            guardarAlquilerEnBaseDeDatos(alquiler);
+
+        }
     }
+
+    public bool EstaDisponible(int inmuebleId, DateTime fechaInicio, DateTime fechaFin)
+{
+    var alquileresDelInmueble = _context.Alquileres
+        .Where(a => a.InmuebleId == inmuebleId)
+        .ToList();
+
+    var fechasReservadas = alquileresDelInmueble
+        .Where(a => !a.Cancelado && a.Pagado && !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado))
+        .Select(a => new RangoDeFechas(a.FechaDeInicio, a.FechaDeFin))
+        .ToList();
+        
+    return !fechasReservadas.Any(rango => rango.Contains(fechaInicio) || rango.Contains(fechaFin));
+}
+
 
     private void guardarAlquilerEnBaseDeDatos(Alquiler alquiler)
     {

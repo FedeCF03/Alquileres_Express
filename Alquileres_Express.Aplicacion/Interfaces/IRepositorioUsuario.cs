@@ -3,5 +3,6 @@ using Alquileres_Express.Aplicacion.Entidades;
 
 public interface IRepositorioUsuario
 {
-    List<Usuario> ListarUsuarios();
+    public List<Usuario> ListarUsuarios();
+    public List<Usuario> ListarRestringido();
 }

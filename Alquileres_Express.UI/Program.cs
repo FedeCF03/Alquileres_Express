@@ -32,16 +32,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 
-builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
+builder.Services
     .AddTransient<CasoDeUsoListarCLiente>()
     .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
     .AddTransient<CasoDeUsoListarUsuarios>()
+    .AddTransient<CasoDeUsoListarRestringido>()
+
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
     .AddTransient<CasoDeUsoModificarCliente>()
     .AddTransient<CasoDeUsoBajaInmueble>()
     .AddTransient<CasoDeUsoListarInmuebles>()
     .AddTransient<CasoDeUsoEditarInmueble>()
+    .AddTransient<CasoDeUsoBuscarClientePorId>()
 
     .AddTransient<CasoDeUsoModificarInmueble>()
     .AddTransient<CasoDeUsoAltaInmueble>()
@@ -59,10 +62,12 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<CasoDeUsoObtenerTodosLosAlquileres>()
     .AddTransient<CasoDeUsoObtenerAlquileresPorCorreo>()
     .AddTransient<CasoDeUsoAlquilerGetEstadoDeAlquiler>()
+    .AddTransient<CasoDeUsoBuscarPersonalPorId>()
 
 
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
     .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
+
 
     .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
     .AddScoped<IRepositorioCliente, RepositorioCliente>()
