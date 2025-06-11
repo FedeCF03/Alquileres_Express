@@ -2,7 +2,7 @@ namespace Alquileres_Express.Aplicacion.Entidades;
 
 public class Cliente : Usuario
 {
-    public List<Alquiler>? Alquileres;
+    public List<Alquiler>? Alquileres {get; set;}
     // public List<Comentario>? Comentarios;
     // public List<Valoracion>? Valoraciones;
 

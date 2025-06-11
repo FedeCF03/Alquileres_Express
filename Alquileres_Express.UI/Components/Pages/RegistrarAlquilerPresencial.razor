@@ -120,19 +120,27 @@
                 return;
             }
             //validando
-            casoDeUsoRegistrarAlquiler.Ejecutar(correoCliente, Id, StartDate.Value.DateTime, EndDate.Value.DateTime, numeroPersonal);
+            
+            //casoDeUsoRegistrarAlquiler.Ejecutar(correoCliente, Id, StartDate.Value.DateTime, EndDate.Value.DateTime, numeroPersonal);
             
             Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
+            Cliente? cliente = _context.Clientes.FirstOrDefault(c => c.Correo.ToLower() == correoCliente.ToLower());
+            Personal? personal = _context.Personal.FirstOrDefault(p => p.Id == numeroPersonal);
+            Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == Id);
+            if (cliente == null)
+                throw new InvalidOperationException("El correo no esta vinculado a ningun cliente.");
+            if (personal == null)
+                throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
+            if (inmueble == null)
+                throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
             
             decimal precio = calcularPrecio(StartDate.Value.DateTime, EndDate.Value.DateTime, inmueble!.Precio);
-            Personal personal = _context.Personal.FirstOrDefault(p => p.Id == numeroPersonal)!;
-            Cliente cliente = _context.Clientes.FirstOrDefault(c => c.Correo == correoCliente)!;
-            Alquiler alquiler = new Alquiler(correoCliente, StartDate.Value.DateTime, EndDate.Value.DateTime, precio, Id, personal.Nombre, personal.Apellido);
+            Alquiler alquiler = new Alquiler(correoCliente, StartDate.Value.DateTime, EndDate.Value.DateTime, precio, Id, personal.Nombre, personal.Apellido){ClienteId = cliente.Id};
             //RegistroDeLlave registro = casoDeUsoRegistrarEntrega.Ejecutar(alquiler.Id, personal.Id, cliente.Id);
             //alquiler.Entrega = registro;
 
             // Llama al caso de uso para registrar el pago en efectivo
-            casoDeUsoPagarEfectivo.PagarEfectivo(alquiler);
+            casoDeUsoPagarEfectivo.PagarEfectivo(alquiler, inmueble.Id, StartDate.Value.DateTime, EndDate.Value.DateTime);
             ErrorMessage = "Alquiler registrado exitosamente.";
             Navegador.NavigateTo("/");
         }
@@ -175,8 +183,6 @@
         }
         mensajeError = string.Empty;
         podesPagar = true;
-
-
     }
 }
 

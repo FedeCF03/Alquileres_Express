@@ -86,6 +86,9 @@
     opacity: 0;
     animation: fadeInOut 4s forwards;
 }
+.red{
+    background-color: #dc3545; /* Rojo de error */
+}
 
 .left{
     right:auto;

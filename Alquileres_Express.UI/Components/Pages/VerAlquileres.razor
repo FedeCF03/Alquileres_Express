@@ -1,0 +1,236 @@
+@page "/mis-alquileres"
+@attribute [Authorize]
+
+@using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject CasoDeUsoObtenerAlquileresPorCorreo casoDeUsoObtenerAlquileresPorCorreo
+@inject CasoDeUsoObtenerTodosLosAlquileres casoDeUsoObtenerTodosLosAlquileres
+@inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
+@inject CasoDeUsoAlquilerCancelarAlquiler casoDeUsoAlquilerCancelarAlquiler
+@inject CasoDeUsoAlquilerGetEstadoDeAlquiler casoDeUsoAlquilerGetEstadoDeAlquiler
+@inject CasoDeUsoObtenerAlquilerPorId casoDeUsoObtenerAlquilerPorId
+
+@rendermode InteractiveServer
+
+<div class="page-header">
+    <h1><i class="fas fa-home"></i> Mis Alquileres</h1>
+    <p>Gestiona tus reservas de manera fácil y rápida</p>
+</div>
+
+<div class="rental-grid">
+    @if (alquileres != null && alquileres.Count > 0)
+    {
+        @foreach (var alquiler in alquileres)
+        {
+            var inmueble = GetInmuebleById(alquiler.InmuebleId);
+            @if (inmueble != null)
+            {
+                <div class="rental-card">
+                    <div class="rental-image">
+                        <NavLink href="@($"/inmueble/{alquiler.InmuebleId}")">
+                            <img src="@getImagenInmueble(alquiler.InmuebleId)" alt="@inmueble.Nombre" href />
+
+                        </NavLink>
+                        <div class="price-badge">
+    @if (alquiler.Precio > 0)
+    {
+        <i class="fas fa-dollar-sign"></i> @alquiler.Precio.ToString("N0")
+    }
+    else
+    {
+        <span style="color: red;">Sin precio</span>
+    }
+</div>
+                    </div>
+                    <div class="rental-content">
+                        <div class="rental-header">
+                            <h3>@inmueble.Nombre</h3>
+                        </div>
+                        <div class="rental-details">
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt detail-icon"></i>
+                                <span class="detail-label">Dirección:</span>
+                                <span class="detail-value">@inmueble.Direccion</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-check detail-icon"></i>
+                                <span class="detail-label">Check-in:</span>
+                                <span class="detail-value">@alquiler.FechaDeInicio.ToString("dd/MM/yyyy")</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-times detail-icon"></i>
+                                <span class="detail-label">Check-out:</span>
+                                <span class="detail-value">@alquiler.FechaDeFin.ToString("dd/MM/yyyy")</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-clock detail-icon"></i>
+                                <span class="detail-label">Duración:</span>
+                                <span class="detail-value duration-highlight">@((alquiler.FechaDeFin - alquiler.FechaDeInicio).Days)
+                                    Noches</span>
+                            </div>
+                        </div>
+
+                        <div class="rental-actions">
+                            @if (!alquiler.Cancelado)
+                            {
+                                EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
+
+                    <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
+                                <i class="fas fa-times"></i> Cancelar
+                        </button>
+
+                                @if (estado == EstadoDeAlquiler.Terminado)
+                                {
+                        <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
+                                        <i class="fas fa-star"></i> Dejar Reseña
+                                    </button>
+                                    <span class="status-label terminado">
+                                        <i class="fas fa-check"></i> Terminado
+                                    </span>
+                                }
+                                else if (estado == EstadoDeAlquiler.EnProceso)
+                                {
+                                    <span class="status-label en-proceso">
+                                        <i class="fas fa-spinner"></i> En Proceso
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-label pendiente">
+                                        <i class="fas fa-clock"></i> Pendiente
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="status-label" style="background: #e74c3c; color: white;">
+                                    <i class="fas fa-ban"></i> Cancelado
+                                </span>
+                                   <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
+                    <i class="fas fa-star"> Dejar Reseña</i>
+                                    </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+    else
+    {
+        <div class="no-rentals">
+            <div class="no-rentals-icon">
+                <i class="fas fa-home" style="font-size: 4rem; opacity: 0.7; margin-bottom: 1rem;"></i>
+            </div>
+            <h3>No tienes alquileres</h3>
+            <p>Aún no has realizado ninguna reserva.</p>
+        </div>
+    }
+</div> 
+@code {
+    private string correo = "";
+    private string rol = "";
+    private List<Alquiler> alquileres = new List<Alquiler>();
+    private List<Inmueble> inmuebles = new List<Inmueble>();
+
+    [SupplyParameterFromQuery]
+    private int id { get; set; } = 0;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            correo = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (rol == "Cliente")
+            {
+                try
+                {
+                    alquileres = casoDeUsoObtenerAlquileresPorCorreo.Ejecutar(correo);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al obtener los alquileres: {ex.Message}");
+                }
+            }
+            else if (rol == "Administrador" || rol == "Gerente" || rol == "Empleado")
+            {
+                try
+                {
+                    if( id != 0)
+                    {
+                        alquileres = casoDeUsoObtenerAlquilerPorId.Ejecutar(id);
+                    }
+                    else
+                    alquileres = casoDeUsoObtenerTodosLosAlquileres.Ejecutar();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al obtener los alquileres: {ex.Message}");
+                    NavigationManager.NavigateTo("/");
+
+                }
+            }
+
+            // IMPORTANTE: Cargar los inmuebles después de obtener los alquileres
+            if (alquileres.Count > 0)
+            {
+                getInmuebles();
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+
+    private void getInmuebles()
+    {
+        try
+        {
+            inmuebles = casoDeUsoListarInmuebles.ListarDisponibles();
+            // Filtrar solo los inmuebles que tienen alquileres
+            inmuebles = inmuebles.FindAll(i => alquileres.Any(a => a.InmuebleId == i.Id));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener los inmuebles: {ex.Message}");
+        }
+    }
+
+    private string getImagenInmueble(int inmuebleId)
+    {
+        var inmueble = inmuebles.FirstOrDefault(i => i.Id == inmuebleId);
+
+        // Verificar que el inmueble existe y tiene fotos
+        if (inmueble?.Fotos != null && inmueble.Fotos.Count > 0)
+        {
+            return inmueble.Fotos[0].Url;
+        }
+
+        // Retornar imagen por defecto si no hay foto
+        return "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+    }
+
+    private Inmueble GetInmuebleById(int inmuebleId)
+    {
+        return inmuebles.FirstOrDefault(i => i.Id == inmuebleId);
+    }
+
+    private void CancelarReserva(int id)
+    {
+        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(id);
+
+    }
+
+    private void DejarResena( int id)
+    {
+        NavigationManager.NavigateTo($"/inmueble/{id}");
+    }
+}

@@ -5,7 +5,7 @@ public interface IRepositorioPersonal
 {
     public void AgregarPersonal(Personal c);
 
-    public void ModificarPersonal(Personal c);
+    public Boolean ModificarPersonal(Personal c);
 
     public void EliminarPersonal(Personal c);
     public Personal ObtenerPersonalPorId(int id);

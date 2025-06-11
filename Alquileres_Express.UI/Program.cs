@@ -29,20 +29,22 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.LoginPath = "/";
 
 });
+builder.Services.AddAuthorization();
 
-builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
+
+builder.Services
     .AddTransient<CasoDeUsoListarCLiente>()
-
     .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
     .AddTransient<CasoDeUsoListarUsuarios>()
     .AddTransient<CasoDeUsoListarRestringido>()
 
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
-
+    .AddTransient<CasoDeUsoModificarCliente>()
     .AddTransient<CasoDeUsoBajaInmueble>()
     .AddTransient<CasoDeUsoListarInmuebles>()
     .AddTransient<CasoDeUsoEditarInmueble>()
+    .AddTransient<CasoDeUsoBuscarClientePorId>()
 
     .AddTransient<CasoDeUsoModificarInmueble>()
     .AddTransient<CasoDeUsoAltaInmueble>()
@@ -52,12 +54,20 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<CasoDeUsoVerInmueble>()
 
     .AddTransient<CasoDeUsoAltaPersonal>()
+    .AddTransient<CasoDeUsoModificarPersonal>()
     .AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>()
     .AddTransient<CasoDeUsoBuscarPersonal>()
     .AddTransient<CasoDeUsoValidarCodigoDeSeguridad>()
     .AddTransient<CasoDeUsoRegistrarCliente>()
+    .AddTransient<CasoDeUsoObtenerTodosLosAlquileres>()
+    .AddTransient<CasoDeUsoObtenerAlquileresPorCorreo>()
+    .AddTransient<CasoDeUsoAlquilerGetEstadoDeAlquiler>()
+    .AddTransient<CasoDeUsoBuscarPersonalPorId>()
+
+
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
     .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
+
 
     .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
     .AddScoped<IRepositorioCliente, RepositorioCliente>()
@@ -71,6 +81,7 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<CasoDeUsoRegistrarEntregaPresencial>()
     .AddScoped<CasoDeUsoPagarEfectivo>()
+    .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<CasoDeUsoPagarEfectivo>()
     .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
@@ -80,9 +91,11 @@ builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>()
     .AddTransient<ServicioGenerarCodigo>()
     .AddTransient<ValidadorInmueble>()
     .AddTransient<ValidadorUsuario>()
+    .AddTransient<CasoDeUsoObtenerAlquilerPorId>()
     .AddHttpContextAccessor()
     .AddCascadingAuthenticationState()
     .AddTransient<ServicioFotos>()
+    .AddTransient<CasoDeUsoAlquilerCancelarAlquiler>()
     .AddSingleton<ServicioVerificarPago>()
     .AddSingleton<MercadoPagoService>();
 builder.WebHost.UseStaticWebAssets();
@@ -108,17 +121,13 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-builder.Services.AddAuthorization();
 
 Crear.Inicializar();
 app.Run();

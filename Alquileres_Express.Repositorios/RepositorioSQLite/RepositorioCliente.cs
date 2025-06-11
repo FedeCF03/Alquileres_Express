@@ -5,16 +5,20 @@ using Alquileres_Express.Aplicacion.Interfaces;
 using System.Collections.Generic;
 using Alquileres_Express.Repositorios.Context;
 using BCrypt;
+using Microsoft.EntityFrameworkCore;
 
 public class RepositorioCliente : IRepositorioCliente
 {
     readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
     public void AgregarCliente(Cliente c)
     {
-        c.Rol = Aplicacion.Enumerativo.RolUsuario.Cliente;
+        c.Rol = Aplicacion.Enumerativo.RolUsuario.Cliente; 
         bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == c.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == c.Correo.ToLower());
         if (existe)
             throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
+            bool dniExiste = _context.Clientes.Any(x => x.Dni == c.Dni) || _context.Personal.Any(x => x.Dni == c.Dni);
+        if (dniExiste)
+            throw new InvalidOperationException("El DNI ya está registrado por otro usuario.");
         c.Contraseña = BCrypt.Net.BCrypt.HashPassword(c.Contraseña.Trim());//.trim() elimina espacios en blanco
         _context.Clientes.Add(c);
         _context.SaveChanges();
@@ -27,31 +31,22 @@ public class RepositorioCliente : IRepositorioCliente
 
     public Cliente ObtenerClientePorId(int id)
     {
-        var cliente = _context.Clientes.FirstOrDefault(x => x.Id == id);
-
-        if (cliente == null)
-            throw new InvalidOperationException("No se encontró un cliente con ese ID.");
-        return cliente;
+         return _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).FirstOrDefault(c=>c.Id == id) ?? throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
     }
 
     public List<Cliente> ObtenerClientes()
     {
-        return _context.Clientes.ToList();
-    }
-
-    public void RegistrarCliente(Cliente c)
-    {
-        throw new NotImplementedException();
+        return _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).ToList();
     }
 
     public Cliente ObtenerClientePorDNI(string dni)
     {
-        throw new NotImplementedException();
+        return _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).FirstOrDefault(p => p.Dni == dni) ?? throw new KeyNotFoundException($"No existe el cliente con DNI {dni}. Por favor, intente de nuevo o pruebe otro cliente.");
     }
 
     public Cliente? ObtenerClientePorMail(string mail)
     {
-        var cli = _context.Clientes.FirstOrDefault(p => p.Correo == mail);
+        var cli = _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
         if (cli != null)
         {
             return cli;
@@ -63,7 +58,7 @@ public class RepositorioCliente : IRepositorioCliente
     {
         //bool esValida = BCrypt.Net.BCrypt.Verify(contraseñaIngresada, usuario.Contraseña);
 
-        var cli = _context.Clientes.FirstOrDefault(p => p.Correo == mail);
+        var cli = _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
         if (cli != null && BCrypt.Net.BCrypt.Verify(contraseña, cli.Contraseña))
         {
             return cli;
@@ -72,25 +67,32 @@ public class RepositorioCliente : IRepositorioCliente
 
     }
 
-    public void ModificarCliente(Cliente cliente)
+    public bool ModificarCliente(Cliente cliente)
     {
-        var clienteExistente = ObtenerClientePorMail(cliente.Correo);
+       
+        var clienteExistente = ObtenerClientePorId(cliente.Id);
+        bool ok = true;
         if (clienteExistente == null)
         {
-            throw new KeyNotFoundException($"No se encontró un cliente con el correo {cliente.Correo}");
+            ok = false;
+            throw new KeyNotFoundException($"No se encontró un personal con el correo {cliente.Correo}");
         }
 
-        clienteExistente.Nombre = cliente.Nombre;
-        clienteExistente.Apellido = cliente.Apellido; 
-        bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) && clienteExistente.Correo.ToLower() != cliente.Correo.ToLower();
+        bool existe = _context.Clientes.Include(c=>c.Alquileres).Include(c=>c.RegistrosDeLlave).Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) && clienteExistente.Correo.ToLower() != cliente.Correo.ToLower();
         if (existe)
             throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
-        clienteExistente.Correo = cliente.Correo; 
+        clienteExistente.Nombre = cliente.Nombre;
+        clienteExistente.Apellido = cliente.Apellido;
+        
+        clienteExistente.Correo = cliente.Correo;
         clienteExistente.Direccion = cliente.Direccion;
         clienteExistente.Dni = cliente.Dni;
         clienteExistente.FechaNacimiento = cliente.FechaNacimiento;
-
         _context.SaveChanges();
+        return ok;
+
+
+
     }
 
 

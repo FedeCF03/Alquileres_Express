@@ -5,6 +5,8 @@
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Net.Mail
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 @using System.Security.Claims
 @inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
 @inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
@@ -31,11 +33,11 @@
                     placeholder="Ingrese su contraseña" />
             </div>
             <div class="login-links">
-                <a href="/forgot-password" class="link-secondary">¿Olvidaste tu contraseña?</a>
+                @*<a disabled="true" href="/forgot-password" class="link-secondary">¿Olvidaste tu contraseña?</a>*@
                 <a href="/usuario" class="link-secondary">Regístrarse</a>
             </div>
-
             <button type="submit" class="btn-primary">Ingresar</button>
+
         </EditForm>
         @if (ErrorMessage)
         {
@@ -54,8 +56,8 @@
 
     private async Task IniciarSesionComoGerenteFake()
     {
-        user.Correo = "tomicarp12@gmail.com";
-        user.Rol = RolUsuario.Gerente;
+        user.Correo = "marfacucosas@gmail.com";
+        user.Rol = RolUsuario.Administrador;
         await guardarEnCookie("jorge");
 
     }
@@ -76,7 +78,7 @@
 
             else
             {
-                guardarEnCookie(personal.Nombre);
+                await guardarEnCookie(personal.Nombre);
                 NavigationManager.NavigateTo("/?justLogged=true");
             }
 
@@ -103,9 +105,9 @@
     {
 
         var claims = new List<Claim> {
-        new Claim(ClaimTypes.Name, user.Correo),
-        new Claim(ClaimTypes.Role, user.Rol.ToString())
-    };
+new Claim(ClaimTypes.Name, user.Correo),
+new Claim(ClaimTypes.Role, user.Rol.ToString())
+};
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         await HttpContext.SignInAsync(principal);
@@ -119,6 +121,14 @@
         public string? Correo { get; set; }
     }
 
-
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
 
 }

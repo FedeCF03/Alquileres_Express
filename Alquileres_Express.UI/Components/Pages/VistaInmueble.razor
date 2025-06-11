@@ -7,88 +7,218 @@
 @inject NavigationManager NavigationManager
 @using BlazorDateRangePicker
 @inject ServicioVerificarPago _servicioVerificarPago
+@inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
 
 @using Microsoft.AspNetCore.Components.Authorization
+@using Alquileres_Express.Aplicacion.Enumerativo
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 
-<div class="container">
-    <h1>@inmueble.Nombre</h1>
-    <p class="text-muted">@inmueble.Direccion - @inmueble.Ciudad</p>
+<div class="property-page">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-overlay"></div>
 
-    <div class="row">
-        <div class="col-md-7">
+        <!-- Gallery Section -->
+        <div class="gallery-container">
             @if (imagenes.Length > 0)
             {
-                <section class="galeria">
-                    <button @onclick="FotoAnterior" class="btn-flecha">◀</button>
-                    <img src="@imagenes[fotoActual]" alt="Foto propiedad" class="foto" />
-                    <button @onclick="FotoSiguiente" class="btn-flecha">▶</button>
-                </section>
+                <div class="main-gallery">
+                    <div class="gallery-navigation">
+                        <button @onclick="FotoAnterior" class="nav-btn prev-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button @onclick="FotoSiguiente" class="nav-btn next-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="image-container">
+                        <img src="@imagenes[fotoActual]" alt="@inmueble.Nombre" class="main-image" />
+                        <div class="image-indicator">
+                            <span>@(fotoActual + 1) / @imagenes.Length</span>
+                        </div>
+                    </div>
+
+                    <!-- Thumbnails -->
+                    <div class="thumbnails">
+                        @for (int i = 0; i < Math.Min(imagenes.Length, 4); i++)
+                        {
+                            int index = i;
+                            <div class="thumbnail @(fotoActual == index ? "active" : "")" @onclick="() => CambiarFoto(index)">
+                                <img src="@imagenes[index]" alt="Foto @(index + 1)" />
+                            </div>
+                        }
+                        @if (imagenes.Length > 4)
+                        {
+                            <div class="thumbnail more-photos">
+                                <span>+@(imagenes.Length - 4)</span>
+                            </div>
+                        }
+                    </div>
+                </div>
             }
             else
             {
-                <p><em>Sin imágenes disponibles</em></p>
+                <div class="no-images">
+                    <i class="fas fa-image"></i>
+                    <p>Sin imágenes disponibles</p>
+                </div>
             }
         </div>
 
-        <div class="col-md-5">
-    <div class="card p-3 shadow-sm">
-        <h2 class="text-success">$@inmueble.Precio.ToString()</h2>
-        <p><strong>Camas:</strong> @inmueble.CantidadDeCamas</p>
-        <p><strong>Baños:</strong> @inmueble.Banios</p>
-
-        <DateRangePicker @bind-StartDate="StartDate" @bind-EndDate="EndDate"
-                         DaysEnabledFunction="(d)=>!NoEsHabil(d)"
-                         class="form-control form-control-sm"
-                         placeholder="Seleccionar fechas..."
-                         OnRangeSelect="VerificarFechas" />
-
-        @if (!string.IsNullOrEmpty(mensajeError))
-        {
-            <div class="text-danger">@mensajeError</div>
-        }
-
-    <AuthorizeView Roles="Gerente">
-        @if (!podesPagar)
-        {
-            <button class="btn btn-primary mt-3" disabled>Reservar</button>
-        }
-        else
-        {
-            <div class="text-success">Precio total: $@calcularPrecio().ToString("F2")</div>
-            <button class="btn btn-primary mt-3" @onclick="IniciarCompra">Reservar</button>
-        }
-
-    </AuthorizeView>
-    <AuthorizeView>
-        <Authorized Context="authState">
-            @if (authState.User.IsInRole("Empleado") || authState.User.IsInRole("Gerente") || authState.User.IsInRole("Administrativo"))
-            {
-                <div class="nav-item px-3">
-                <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
-                    <button class="btn btn-sm btn-primary">Alquilar Presencial</button>
-                </NavLink>
+        <!-- Property Header -->
+        <div class="property-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="property-info">
+                        <h1 class="property-title">@inmueble.Nombre</h1>
+                        <div class="property-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>@inmueble.Direccion, @inmueble.Ciudad</span>
+                        </div>
+                        <div class="property-features">
+                            <div class="feature">
+                                <i class="fas fa-bed"></i>
+                                <span>@inmueble.CantidadDeCamas Camas</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-bath"></i>
+                                <span>@inmueble.Banios Baños</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-home"></i>
+                                <span>@inmueble.TipoInmueble</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            }
-        </Authorized>
-    </AuthorizeView>
-        
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <div class="content-grid">
+                <!-- Property Details -->
+                <div class="property-details">
+                    <div class="details-card">
+                        <h3>Sobre esta propiedad</h3>
+                        <div class="amenities-grid">
+                            <div class="amenity">
+
+                                <p>Espacio seguro para tu vehículo</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map Section -->
+                    <div class="map-section">
+                        <h3>Ubicación</h3>
+                        <div class="map-container">
+                            <iframe width="100%" height="300" frameborder="0" style="border:0"
+                                src="https://www.google.com/maps?q=@inmueble.CoordLat,@inmueble.CoordLong&hl=es;z=14&output=embed"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Card -->
+                <div class="booking-sidebar">
+                    <div class="booking-card">
+                        <div class="price-section">
+                            <div class="price">
+                                <span class="currency">$</span>
+                                <span class="amount">@inmueble.Precio</span>
+                                <span class="period">/ noche</span>
+                            </div>
+
+                        </div>
+
+                        <div class="date-picker-section">
+                            <div class="date-picker-container">
+                                <div class="date-fields">
+                                    <div class="date-field">
+                                        <label>CHECK-IN</label>
+                                        <div class="date-value">@(StartDate?.ToString("dd/M/yyyy") ?? "Seleccionar")
+                                        </div>
+                                    </div>
+                                    <div class="date-separator"></div>
+                                    <div class="date-field">
+                                        <label>CHECK-OUT</label>
+                                        <div class="date-value">@(EndDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
+                                    </div>
+                                </div>
+                                <DateRangePicker StartDatePlaceholder="CHECK-IN" EndDatePlaceholder="CHECK-OUT"
+                                    @bind-StartDate="StartDate" @bind-EndDate="EndDate"
+                                    DaysEnabledFunction="(d) => !NoEsHabil(d)" class="hidden-picker"
+                                    placeholder="Select dates..." OnRangeSelect="VerificarFechas" />
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(mensajeError))
+                            {
+                                <div class="error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    @mensajeError
+                                </div>
+                            }
+
+                            @if (podesPagar && StartDate != null && EndDate != null)
+                            {
+                                <div class="price-breakdown">
+
+                                    <div class="breakdown-total">
+                                        <span>Total</span>
+                                        <span>$@calcularPrecio().ToString("N0")</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <AuthorizeView Roles="Cliente">
+                            <div class="booking-actions">
+                                @if (!podesPagar)
+                                {
+                                    <button class="reserve-btn disabled" disabled>
+                                        <i class="fas fa-calendar-times"></i>
+                                        Selecciona fechas disponibles
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="reserve-btn" @onclick="IniciarCompra">
+                                        <i class="fas fa-credit-card"></i>
+                                        Reservar ahora
+                                    </button>
+                                }
+                                <p class="no-charge-text">No se realizará ningún cargo por ahora</p>
+                            </div>
+                        </AuthorizeView>
+                        <AuthorizeView Roles="Empleado,Gerente,Administrador">
+                            <Authorized>
+                                <div class="booking-actions mt-3">
+                                    <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-user-check"></i> Registrar alquiler presencial
+                                        </button>
+                                    </NavLink>
+                                    <NavLink class="nav-link" href="@($"/editar-inmueble/{Id}")">
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-user-check"></i> Editar inmueble
+                                        </button>
+                                    </NavLink>
+                                </div>
+                            </Authorized>
+                        </AuthorizeView>
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-    </div>
-
-    <div class="mt-5">
-        <h4>Ubicación</h4>
-        <iframe width="100%" height="300" frameborder="0" style="border:0"
-            src="https://www.google.com/maps?q=@inmueble.CoordLat,@inmueble.CoordLong&hl=es;z=14&output=embed"
-            allowfullscreen>
-        </iframe>
-    </div>
-
-</div>
-
-
 
 @code {
     [Parameter]
@@ -102,23 +232,31 @@
     private string[] imagenes { get; set; } = new string[0];
     String? correo { get; set; }
     String? rol { get; set; }
+    Personal? personal { get; set; }
+    Cliente? cliente { get; set; }
+
     private List<RangoDeFechas> FechasReservadas { get; set; } = [];
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        if (user.Identity != null && user.Identity.IsAuthenticated)
+        if (user.Identity.IsAuthenticated)
         {
             correo = user.Identity.Name;
             rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+            cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
+        
         }
     }
 
     void FotoSiguiente()
     {
         fotoActual = (fotoActual + 1) % imagenes.Length;
-        StateHasChanged(); // Actualiza la vista para mostrar la nueva foto
+        StateHasChanged();
     }
 
     void FotoAnterior()
@@ -127,7 +265,11 @@
         StateHasChanged();
     }
 
-
+    void CambiarFoto(int index)
+    {
+        fotoActual = index;
+        StateHasChanged();
+    }
 
     protected override void OnParametersSet()
     {
@@ -136,38 +278,31 @@
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
             CrearRangosDeFechaReservados(inmueble.Alquileres);
             imagenes = repositorioFotos.ObtenerFotosPorInmueble(Id).Select(f => f.Url).ToArray();
-
-
         }
         catch (Exception ex)
         {
-            // Manejo de errores, por ejemplo, redirigir a una página de error o mostrar un mensaje
             NavigationManager.NavigateTo("/");
         }
     }
+
     private async Task IniciarCompra()
     {
         decimal precio = calcularPrecio();
-
-        Alquiler alquiler = new Alquiler { CorreoCliente = correo, 
-        FechaDeInicio = StartDate!.Value.Date, 
-        FechaDeFin = EndDate!.Value.Date,
-        Precio = precio,
-        InmuebleId = inmueble.Id};
+        Alquiler alquiler = new Alquiler(correo, StartDate.Value.Date, EndDate.Value.Date, precio, inmueble.Id){ClienteId = cliente!.Id};
         var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre, alquiler);
-
-        NavigationManager.NavigateTo(url, forceLoad: true); // redirige al checkout de MP
+        NavigationManager.NavigateTo(url, forceLoad: true);
     }
 
     private void CrearRangosDeFechaReservados(List<Alquiler> alquileres)
     {
         FechasReservadas.Clear();
         alquileres.Where(a => !a.Cancelado &&
-        !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado) && a.Pagado).ToList().ForEach(alquiler =>
+        !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado)).ToList().ForEach(alquiler =>
         {
             FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin));
         });
     }
+
     private bool NoEsHabil(DateTimeOffset date)
     {
         return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date < DateTime.Today;
@@ -192,17 +327,28 @@
         }
         mensajeError = string.Empty;
         podesPagar = true;
-
-
     }
 
     private decimal calcularPrecio()
     {
-        if (StartDate != null && EndDate != null)
+        if ((StartDate != null && EndDate != null) && inmueble.Precio != null)
         {
             int dias = (int)(EndDate.Value - StartDate.Value).TotalDays + 1;
             return dias * inmueble.Precio;
         }
         return 0;
     }
+
 }
+
+<style>
+    .hidden-picker {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+</style>

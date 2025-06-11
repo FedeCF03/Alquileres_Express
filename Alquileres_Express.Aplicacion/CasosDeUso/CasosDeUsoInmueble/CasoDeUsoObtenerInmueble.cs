@@ -7,7 +7,12 @@ public class CasoDeUsoObtenerInmueble(IRepositorioInmueble repo)
 {
     public Inmueble Ejecutar(int id)
     {
-        var inmueble = repo.ObtenerInmueblePorId(id) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {id}");
+        var inmueble = repo.ObtenerInmueblePorId(id);
+        return inmueble;
+    }
+    public Inmueble Ejecutar(string nombre)
+    {
+        var inmueble = repo.ObtenerInmueblePorNombre(nombre);
         return inmueble;
     }
 }

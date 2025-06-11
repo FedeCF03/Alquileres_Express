@@ -3,7 +3,7 @@ using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Aplicacion.CasosDeUso;
 namespace Alquileres_Express.Aplicacion.Servicios;
 
-public class FiltroDeInmueblesService(IRepositorioInmueble repositorioInmueble)
+public class FiltroDeInmueblesService()
 {
     private readonly List<Filtro<Inmueble>> filtros = [];
 

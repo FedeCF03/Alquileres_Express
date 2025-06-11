@@ -7,19 +7,19 @@
 
  @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
  @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoModificarPersonal CasoDeUsoModificarPersonal;
 
-@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsomodificarPersonal;
-
-@using BlazorDateRangePicker;
+@inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoModificarCliente casoDeUsoModificarCliente;        
+    
+@using BlazorDateRangePicker
 @inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
 @using Microsoft.AspNetCore.Components.Authorization
 @inject ServicioEnviarEmail servicioEnviarEmail
 
-            
-@if(cliente != null)
- {
+@if (cliente != null)
+{
     <div class="contenedor-edicion">
-        <h2 class="titulo">Bienvenido, @cliente.Nombre @cliente.Apellido</h2>
+        <h2 class="titulo">Bienvenido/a, @cliente.Nombre @cliente.Apellido</h2>
         <p class="subtitulo">Aquí puede editar sus datos personales</p>
         <div class="tablas-contenedor">
             <div class="tabla-card">
@@ -41,7 +41,7 @@
                     <input placeholder="DNI" @bind="_cliente.Dni" class="form-control" />
                     <input placeholder="Correo" @bind="_cliente.Correo" class="form-control" />
                     <input placeholder="Dirección" @bind="_cliente.Direccion" class="form-control" />
-                    <label class="mt-2">Fecha de Nacimiento</label>
+                    <label>Fecha de Nacimiento</label>
                     <div class="d-flex">
                         <DateRangePicker 
                             @bind-EndDate="selectedDate"
@@ -49,19 +49,20 @@
                             MaxDate="DateTime.Now"
                             SingleDatePicker="true" />
                     </div>
+                    <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
                 </div>
             </div>
         </div>
     </div>
- }
+}
 
- @if(personal != null)
- {
-     <div class="contenedor-edicion">
-        <h2 class="titulo">Bienvenido, @personal.Nombre @personal.Apellido</h2>
+ @if (personal != null)
+{
+    <div class="contenedor-edicion">
+        <h2 class="titulo">Bienvenido/a, @personal.Nombre @personal.Apellido</h2>
         <p class="subtitulo">Aquí puede editar sus datos personales</p>
         <div class="tablas-contenedor">
-            <div class="tabla-card">
+            <div class="tablapersonal">
                 <h3>Datos actuales</h3>
                 <table>
                     <tr><th>Nombre</th><td>@personal.Nombre</td></tr>
@@ -75,12 +76,12 @@
             <div class="tabla-card">
                 <h3>Editar datos</h3>
                 <div class="form-group">
-                    <input placeholder="Nombre" @bind="personal.Nombre" class="form-control" />
-                    <input placeholder="Apellido" @bind="personal.Apellido" class="form-control" />
-                    <input placeholder="DNI" @bind="personal.Dni" class="form-control" />
-                    <input placeholder="Correo" @bind="personal.Correo" class="form-control" />
-                    <input placeholder="Dirección" @bind="personal.Direccion" class="form-control" />
-                    <label class="mt-2">Fecha de Nacimiento</label>
+                    <input placeholder="Nombre" @bind="_personal.Nombre" class="form-control" />
+                    <input placeholder="Apellido" @bind="_personal.Apellido" class="form-control" />
+                    <input placeholder="DNI" @bind="_personal.Dni" class="form-control" />
+                    <input placeholder="Correo" @bind="_personal.Correo" class="form-control" />
+                    <input placeholder="Dirección" @bind="_personal.Direccion" class="form-control" />
+                    <label>Fecha de Nacimiento</label>
                     <div class="d-flex">
                         <DateRangePicker 
                             @bind-EndDate="selectedDate"
@@ -88,13 +89,17 @@
                             MaxDate="DateTime.Now"
                             SingleDatePicker="true" />
                     </div>
+                    <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
                 </div>
             </div>
         </div>
     </div>
- }
-              
- @* <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button> *@
+}            
+@if (ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
 
  @code {
    private string? ErrorMessage;
@@ -104,31 +109,75 @@
    Cliente _cliente = new Cliente();
    Personal _personal = new Personal();
 
-   @* void Aceptar()
-   {
-        if (cliente != null){
-            
-
-        if (selectedDate == null)
+    String? correo { get; set; }
+    Cliente? cliente { get; set; }
+    Personal? personal { get; set; }
+     protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
         {
-            ErrorMessage = "Por favor, seleccioná una fecha de nacimiento.";
-            return;
+            correo = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
+            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+            if (cliente != null)
+            {
+                _cliente = new Cliente{Nombre = cliente.Nombre,
+                    Id = cliente.Id,
+                    Apellido = cliente.Apellido,
+                    Dni = cliente.Dni,
+                    Correo = cliente.Correo,
+                    Direccion = cliente.Direccion,
+                    FechaNacimiento = cliente.FechaNacimiento,
+                    Contraseña = cliente.Contraseña,
+                    Rol = cliente.Rol
+                };
+
+                selectedDate = cliente.FechaNacimiento;
+            }
+            else if (personal != null)
+            {
+                _personal = new Personal
+                {
+                    Id = personal.Id,
+                    Nombre = personal.Nombre,
+                    Apellido = personal.Apellido,
+                    Dni = personal.Dni,
+                    Correo = personal.Correo,
+                    Direccion = personal.Direccion,
+                    FechaNacimiento = personal.FechaNacimiento,
+                    Contraseña = personal.Contraseña,
+                    Rol = personal.Rol,
+                    CodigoDeSeguridad = personal.CodigoDeSeguridad
+
+
+                };
+                selectedDate = personal.FechaNacimiento;
+            }
+
         }
+    }
 
-        try
+   void Aceptar()
+   {
+        if (cliente != null)
         {
-            _cliente.FechaNacimiento = selectedDate.Value.DateTime;
+            if (selectedDate == null)
+            {
+                ErrorMessage = "Por favor, seleccioná una fecha de nacimiento.";
+                return;
+            }
 
-            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
-                _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
+            try
+            {
+                _cliente.FechaNacimiento = selectedDate.Value.DateTime;
 
             bool ok = casoDeUsoModificarCliente.Ejecutar(_cliente);                                                                 //aca va editar perfil
-            if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
-                servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", 
-                "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Contraseña);
-            if (ok)
+             if (ok)
             {
-                Navegador.NavigateTo("/");
+                Navegador.NavigateTo("/Perfil");
             }
             else
             {
@@ -152,17 +201,11 @@
             try
             {
                 _personal.FechaNacimiento = selectedDate.Value.DateTime;
-
-                if (rol != null && !String.Equals(rol, "Personal", StringComparison.OrdinalIgnoreCase))
-                    _personal.Contraseña = _personal.Dni; // Asigna el DNI como contraseña por defecto
-
-                bool ok = CasoDeUsoModificarPersonal.Ejecutar(_personal);                                                                    //aca va editar perfil
-                if (rol != null && !String.Equals(rol, "Personal", StringComparison.OrdinalIgnoreCase))
-                    servicioEnviarEmail.EnviarEmail(_personal.Correo, "Usuario registrado", 
-                    "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _personal.Contraseña);
+                bool ok = CasoDeUsoModificarPersonal.Ejecutar(_personal);     
+                                                                               //aca va editar perfil
                 if (ok)
                 {
-                    Navegador.NavigateTo("/");
+                    Navegador.NavigateTo("/Perfil");
                 }
                 else
                 {
@@ -174,21 +217,7 @@
                 ErrorMessage = "Ocurrió un error inesperado: " + ex.Message;
             }
         }
-    } *@
-   
-    String correo { get; set; }
-    Cliente cliente { get; set; }
-    Personal personal { get; set; }
-     protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        if (user.Identity.IsAuthenticated)
-        {
-            correo = user.Identity.Name;
-            rol = user.FindFirst(ClaimTypes.Role)?.Value;
-            cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
-            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
-        }
     }
+   
+    
  }

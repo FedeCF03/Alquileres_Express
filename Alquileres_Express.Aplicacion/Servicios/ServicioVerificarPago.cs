@@ -10,7 +10,7 @@ public class ServicioVerificarPago(CasoDeUsoRegistrarAlquilerOnline casoDeUsoReg
 {
     List<PagoPendiente> PagosPendientes { get; set; } = new();
 
-    public bool VerificarPago(String idPago)
+    public bool AprobarPago(String idPago)
     {
         Console.WriteLine("Pago pendiente agregado. Total de pagos pendientes: " + PagosPendientes.Count);
 
@@ -35,5 +35,24 @@ public class ServicioVerificarPago(CasoDeUsoRegistrarAlquilerOnline casoDeUsoReg
         Console.WriteLine("Agregando pago pendiente: " + pagoPendiente.IdPago);
         PagosPendientes.Add(pagoPendiente);
         Console.WriteLine("Pago pendiente agregado. Total de pagos pendientes: " + PagosPendientes.Count);
+    }
+
+    public bool RechazarPago(String idPago)
+    {
+        Console.WriteLine("Pago pendiente agregado. Total de pagos pendientes: " + PagosPendientes.Count);
+
+        PagoPendiente? pagoEncontrado = PagosPendientes.FirstOrDefault(p => p.IdPago == idPago);
+        if (pagoEncontrado == null)
+        {
+            Console.WriteLine("No se encontró el pago pendiente con el ID proporcionado.");
+            return false;
+        }
+        else
+        {
+            Console.WriteLine("Lo encontre y lo saco.");
+            PagosPendientes.Remove(pagoEncontrado);
+            //servicioEnviarEmail.EnviarEmail(pagoEncontrado.alquiler.CorreoCliente, "Alquiler registrado exitosamente", "Su pago fue exitoso! Por favor contáctese", "");
+            return true;
+        }
     }
 }

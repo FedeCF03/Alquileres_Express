@@ -7,63 +7,40 @@
 @inject IJSRuntime JS
 @inject NavigationManager Nav
 @inject ValidadorInmueble ValidadorInmueble
+@attribute [Authorize(Roles = "Gerente,Administrador, Empleado")]
 
-<div class="contenedor">
-    <main class="contenido">
-        <section class="info-propiedad">
-            <div class="mt-2"
-                <h1 class="form-label">Nombre</h1>
-                <input placeholder="@inmueble.Nombre" type="text" @bind="inmuebleAuxiliar.Nombre" class="form-control mb-2" />
-            </div>
-            <div class="mt-2">
-                <h1 class="form-label">Direccion</h1>
-                <input type="text" @bind="inmuebleAuxiliar.Direccion" class="form-control mb-2" />
-            </div>
-            <div class=" mt-2">
-                <h1 class="form-label">Precio</h1>
-                <input type="number" @bind="inmuebleAuxiliar.Precio" class="form-control mb-2" />
-            </div>
-        </section>
-        <section class="detalles">
-            <h4>Detalles</h4>
-            <ul>
-                <li><strong>Tipo:</strong>@inmueble.Ciudad</li>
-                <li><strong>Tipo:</strong>@inmueble.TipoInmueble.ToString()</li>
-                <li><strong>Cantidad de baños: @inmueble.Banios</strong> 1</li>
-                <li><strong>Cantidad de Camas: @inmueble.CantidadDeCamas </strong> 1</li>
-                <li><strong>Otras características:</strong> Cocina - Balcón</li>
-            </ul>
-        </section>
-        <section class="galeria">
-            <InputFile @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
-            <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
-            <div class="image-list">
-                @foreach (var foto in fotos)
-                {
-                    <div class="image-card">
-                        <img src="@foto.Url" class="foto" />
-                        <button @onclick="()=>EliminarFoto(foto)">Eliminar</button>
-                    </div>
-                }
-            </div>
-            @if (errorPorFaltaDeFotos != string.Empty)
-                {
-                    <div class="alert alert-danger">
-                        <p>@errorPorFaltaDeFotos</p>
-                    </div>
-                }
-            @if (erroresDeFotos.Count > 0)
-                {
-                    <div class="alert alert-danger">
-                        @foreach (var error in erroresDeFotos)
-                        {
-                            <p>@error</p>
-                        }
-                    </div>
-                }
-        </section>
-   
+<AuthorizeView Roles="Gerente,Administrador">
+    <Authorized>
+        
+<h1 class="form-label">Nombre</h1>
+<input placeholder="@inmueble.Nombre" type="text" @bind="inmuebleAuxiliar.Nombre" class="form-control mb-2" />
 
+<h1 class="form-label">Direccion</h1>
+<input placeholder="@inmueble.Direccion" type="text" @bind="inmuebleAuxiliar.Direccion" class="form-control mb-2" />
+
+<h1 class="form-label">Precio</h1>
+<input type="number" @bind="inmuebleAuxiliar.Precio" class="form-control mb-2" />
+
+<h1 class="form-label">Ciudad</h1>
+<input placeholder="@inmueble.Ciudad" type="text" @bind="inmuebleAuxiliar.Ciudad" class="form-control mb-2" />
+<h1 class="form-label">Tipo de Inmueble</h1>
+<select @bind="inmuebleAuxiliar.TipoInmueble" class="form-select mb-2">
+    <option value="@TipoDeInmueble.Vivienda">Vivienda</option>
+    <option value="@TipoDeInmueble.Negocio">Negocio</option>
+    <option value="@TipoDeInmueble.Garaje">Garaje</option>
+</select>
+
+<h1 for="type">Elija una política de cancelación:</h1>
+<select  @bind=inmuebleAuxiliar.PoliticaDeCancelacion class="form-select mb-2">
+<option value="@PoliticaDeCancelacion.SinCosto" >Sin costo</option>
+<option value="@PoliticaDeCancelacion.VeintePorcientoDeReembolso">Con 20% de reembolso</option>
+<option value="@PoliticaDeCancelacion.NoReembolsable">No reembolsable</option>
+</select>
+<h1 class="form-label">Cantidad de Baños</h1>
+<input type="number" @bind="inmuebleAuxiliar.Banios" class="form-control mb-2" />
+<h1 class="form-label">Cantidad de Camas</h1>
+<input type="number" @bind="inmuebleAuxiliar.CantidadDeCamas" class="form-control mb-2" />
+<h1 class="form-label">Fotos del Inmueble</h1>
 
 <div id="map" style="height: 400px; width: 80%;">
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initializeMap" async
@@ -98,9 +75,38 @@
 </script>
 </div>
 
-</main>
-
+<InputFile accept=".png,.jpeg,.jpg"@key=@(inputFileId) OnChange="CaptureFiles" multiple/>
+<button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
+<div class="image-list">
+    @foreach (var foto in fotos)
+    {
+        <div class="image-card">
+            <img src="@foto.Url" class="foto" />
+            <button @onclick="()=>EliminarFoto(foto)">Eliminar</button>
+        </div>
+    }
 </div>
+@if (errorPorFaltaDeFotos != string.Empty)
+    {
+        <div class="alert alert-danger">
+            <p>@errorPorFaltaDeFotos</p>
+        </div>
+    }
+@if (erroresDeFotos.Count > 0)
+    {
+        <div class="alert alert-danger">
+            @foreach (var error in erroresDeFotos)
+            {
+                <p>@error</p>
+            }
+        </div>
+    }
+    </Authorized>
+</AuthorizeView>
+
+<h1 class="form-label"> ¿Está disponible el inmueble?</h1>
+<input type="checkbox" @bind="inmuebleAuxiliar.Disponible" class="form-check-input mb-2" />
+
 <button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
 <button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
 
@@ -163,6 +169,7 @@
                 Precio = inmueble.Precio,
                 Ciudad = inmueble.Ciudad,
                 TipoInmueble = inmueble.TipoInmueble,
+                Disponible = inmueble.Disponible,
                 Banios = inmueble.Banios,
                 CantidadDeCamas = inmueble.CantidadDeCamas,
                 CoordLat = inmueble.CoordLat,
@@ -171,9 +178,9 @@
 
            fotos = inmueble.Fotos ?? [];
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Nav.NavigateTo("/");
+            Nav.NavigateTo($"/?mensaje={ex.Message}&esMensajeDeError=true", true);
         }
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -195,29 +202,29 @@
     
     private void GuardarCambios()
     {
-        inmueble.CoordLat = inmuebleAuxiliar.CoordLat;
-        inmueble.CoordLong = inmuebleAuxiliar.CoordLong;
-        inmueble.Nombre = inmuebleAuxiliar.Nombre;
-        inmueble.Direccion = inmuebleAuxiliar.Direccion;
-        inmueble.Precio = inmuebleAuxiliar.Precio;
-        inmueble.Ciudad = inmuebleAuxiliar.Ciudad;
-        inmueble.TipoInmueble = inmuebleAuxiliar.TipoInmueble;
-        inmueble.Banios = inmuebleAuxiliar.Banios;
-        inmueble.CantidadDeCamas = inmuebleAuxiliar.CantidadDeCamas;
         errores.Clear();
         if (fotos.Count == 0)
         {
             errorPorFaltaDeFotos = "Debe cargar al menos una foto del inmueble.";
-            errores = ValidadorInmueble.Ejecutar(inmueble);
+            errores = ValidadorInmueble.Ejecutar(inmuebleAuxiliar);
             StateHasChanged();
             return;
         }
-        if (erroresDeFotos.Count == 0 & casoDeUsoEditarInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out errores)){
-            ServicioFotos.EliminarFotosPorInmueble(inmueble.Id);
-            ServicioFotos.EliminarFotosDelDirectorio(fotosEliminadas);
-            ServicioFotos.PersistirFotos(fotos, inmueble.Id);
-            Nav.NavigateTo("/?mensaje=Inmueble editado correctamente");
+        try
+        {
+            if (erroresDeFotos.Count == 0 & casoDeUsoEditarInmueble.Ejecutar(inmuebleAuxiliar,RolUsuario.Gerente, out errores)){
+                ServicioFotos.EliminarFotosPorInmueble(inmueble.Id);
+                ServicioFotos.EliminarFotosDelDirectorio(fotosEliminadas);
+                ServicioFotos.PersistirFotos(fotos, inmueble.Id);
+                Nav.NavigateTo("/?mensaje=Inmueble editado correctamente");
+            }
         }
+        catch (KeyNotFoundException ex)
+        {
+            Nav.NavigateTo($"/?mensaje={ex.Message}&esMensajeDeError=true", true);
+        }
+        
+
     }
 
     private void EliminarFoto(Foto foto)

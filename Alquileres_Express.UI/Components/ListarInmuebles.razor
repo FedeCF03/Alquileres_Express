@@ -1,4 +1,4 @@
-@inject FiltroDeInmueblesService FiltroDeInmueblesService
+@* @inject FiltroDeInmueblesService FiltroDeInmueblesService
 @inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
 @rendermode InteractiveServer
 
@@ -34,4 +34,4 @@
     {
         inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(casoDeUsoListarInmuebles.Ejecutar());
     }
-}
+} *@
