@@ -54,7 +54,7 @@
     private async Task IniciarSesionComoGerenteFake()
     {
         user.Correo = "marfacucosas@gmail.com";
-        user.Rol = RolUsuario.Administrador;
+        user.Rol = RolUsuario.Cliente;
         await guardarEnCookie("jorge");
 
     }
