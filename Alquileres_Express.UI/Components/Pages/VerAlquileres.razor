@@ -85,9 +85,9 @@
 
                                 @if (estado == EstadoDeAlquiler.Terminado)
                                 {
-                        <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
+                        @* <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
                                         <i class="fas fa-star"></i> Dejar Reseña
-                                    </button>
+                                    </button> *@
                                     <span class="status-label terminado">
                                         <i class="fas fa-check"></i> Terminado
                                     </span>
@@ -110,9 +110,9 @@
                                 <span class="status-label" style="background: #e74c3c; color: white;">
                                     <i class="fas fa-ban"></i> Cancelado
                                 </span>
-                                   <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
+                                   @* <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
                     <i class="fas fa-star"> Dejar Reseña</i>
-                                    </button>
+                                    </button> *@
                             }
                         </div>
                     </div>

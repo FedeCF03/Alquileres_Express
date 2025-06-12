@@ -20,7 +20,7 @@ public class Crear
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Falsa 123",
                 FechaNacimiento = new DateTime(1990, 1, 1),
-                Rol = Aplicacion.Enumerativo.RolUsuario.Administrador,
+                Rol = Aplicacion.Enumerativo.RolUsuario.Gerente,
             });
             context.Add(new Personal
             {

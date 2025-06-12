@@ -2,106 +2,88 @@
 @rendermode InteractiveServer
 @inject NavigationManager Navegador
 @inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
-@using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ServicioEnviarEmail servicioEnviarEmail
 @inject ValidadorUsuario validadorUsuario
 @using BlazorDateRangePicker
 
-<div class="login-card">
-    <h3 class="login-title">Registrate</h3>
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center text-primary">📝 Registro de Nuevo Usuario</h2>
+        <p class="text-center text-muted">Complete los siguientes campos para registrarse.</p>
 
-    <div class="mb-2">
-        <label>Nombre</label>
-        <input @bind="_cliente.Nombre" class="form-control" />
-    </div>
-
-    <div class="mb-2">
-        <label>Apellido</label>
-        <input @bind="_cliente.Apellido" class="form-control" />
-    </div>
-
-    <div class="mb-2">
-        <label>DNI</label>
-        <input type="number" @bind="_cliente.Dni" class="form-control" />
-    </div>
-
-    <div class="mb-2">
-        <label>Correo</label>
-        <input @bind="_cliente.Correo" class="form-control" />
-    </div>
-
-    <AuthorizeView>
-        <NotAuthorized>
-            <div class="mb-2">
-                <label>Contraseña</label>
-                <input @bind="_cliente.Contraseña" type="password" class="form-control" />
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-user"></i> Nombre</label>
+                <input @bind="_cliente.Nombre" class="form-control form-control-lg" placeholder="Ingrese su nombre" />
             </div>
-        </NotAuthorized>
-    </AuthorizeView>
 
-    <div class="mb-2">
-        <label>Dirección</label>
-        <input @bind="_cliente.Direccion" class="form-control" />
-    </div>
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-user"></i> Apellido</label>
+                <input @bind="_cliente.Apellido" class="form-control form-control-lg" placeholder="Ingrese su apellido" />
+            </div>
 
-    <div class="mb-2">
-        <label>Fecha de Nacimiento</label>
-        <div class="d-flex">
-           <DateRangePicker @bind-EndDate="selectedDate" 
-           MinDate="minDate"
-           MaxDate ="DateTime.Now"
-           SingleDatePicker="true"/>
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-id-card"></i> DNI</label>
+                <input type="number" @bind="_cliente.Dni" class="form-control form-control-lg" placeholder="Ingrese su DNI" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-envelope"></i> Correo</label>
+                <input @bind="_cliente.Correo" class="form-control form-control-lg" placeholder="Ingrese su correo electrónico" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-lock"></i> Contraseña</label>
+                    <input @bind="_cliente.Contraseña" type="password" class="form-control form-control-lg" placeholder="Ingrese su contraseña" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-map-marker-alt"></i> Dirección</label>
+                <input @bind="_cliente.Direccion" class="form-control form-control-lg" placeholder="Ingrese su dirección" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-calendar-alt"></i> Fecha de Nacimiento</label>
+                <div class="border rounded p-2">
+                    <DateRangePicker @bind-EndDate="selectedDate" MinDate="minDate"
+                        MaxDate="DateTime.Now" SingleDatePicker="true" />
+                </div>
+            </div>
         </div>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-lg btn-success w-50" @onclick="Aceptar">
+                <i class="fas fa-check"></i> Registrarse
+            </button>
+        </div>
+
+        @foreach (var error in errores)
+        {
+            <div class="alert alert-danger mt-3 text-center">@error</div>
+        }
     </div>
 </div>
-<button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
-@foreach (var error in errores)
-{
-    <div class="alert alert-danger">@error</div>
-}
-
-
 
 @code {
     private Cliente _cliente = new Cliente();
-    private string? ErrorMessage;
     private DateTimeOffset? selectedDate;
     private DateTime minDate = new DateTime(DateTime.Now.Year - 100, 1, 1);
-    private string? rol;
-    private string? correoDelUsuarioEjecutando;
     private List<string> errores = [];
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        if (user.Identity != null && user.Identity.IsAuthenticated)
-        {
-            correoDelUsuarioEjecutando = user.Identity.Name;
-            rol = user.FindFirst(ClaimTypes.Role)?.Value;
-            if (rol != null && rol.Equals("Cliente", StringComparison.OrdinalIgnoreCase))
-            {
-                Navegador.NavigateTo("/mensaje=No tenés permisos para acceder a esta página.&EsMensajeDeError=true");
-            }
-        }
-    }
 
     private void Aceptar()
     {
         errores.Clear();
         if (selectedDate == null)
         {
-           errores = validadorUsuario.Ejecutar(_cliente);
-           errores.Add("Por favor, seleccioná una fecha de nacimiento.");
-           return;
-
+            errores = validadorUsuario.Ejecutar(_cliente);
+            errores.Add("Por favor, seleccioná una fecha de nacimiento.");
+            return;
         }
 
         _cliente.FechaNacimiento = selectedDate.Value.DateTime;
 
         if (casoDeUsoAltaCliente.Ejecutar(_cliente, out errores))
             Navegador.NavigateTo("/?mensaje=Cliente registrado correctamente");
-
     }
 }

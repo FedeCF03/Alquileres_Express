@@ -54,12 +54,12 @@
         }
         if (string.IsNullOrEmpty(modelo.Correo))
         {
-            errores.Add("Por favor, ingrese un correo electrónico.");
+            errores.Add("Por favor, ingrese un correo.");
         }
         else
             if (!modelo.Correo.Contains('@'))
             {
-                errores.Add("El correo electrónico ingresado no es válido.");
+                errores.Add("El correo ingresado no es válido.");
             }
         if (errores.Count > 0)
         {
