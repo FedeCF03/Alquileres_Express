@@ -226,8 +226,8 @@
 @code {
     [Parameter]
     public int Id { get; set; }
-    DateTimeOffset? StartDate { get; set; } = DateTime.Today;
-    DateTimeOffset? EndDate { get; set; } = DateTime.Today;
+    DateTimeOffset? StartDate { get; set; } 
+    DateTimeOffset? EndDate { get; set; } 
     private Inmueble inmueble;
     private bool podesPagar { get; set; } = false;
     private string mensajeError = string.Empty;
