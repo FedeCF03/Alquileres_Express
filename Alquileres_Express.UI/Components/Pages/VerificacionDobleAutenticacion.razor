@@ -9,22 +9,7 @@
 <PageTitle>Verificación de Doble Autenticación</PageTitle>
 
 <h3>Verificación</h3>
-<AuthorizeView>
-    <Authorized Context="auth">
-        @if (auth.User.IsInRole("Gerente"))
-        {
-            <p>Hola, gerente @auth.User.Identity.Name 👋</p>
-        }
-        else if (auth.User.IsInRole("Empleado"))
-        {
-            <p>Hola, empleado @auth.User.Identity.Name 👷‍♂️</p>
-        }
-        else if (auth.User.IsInRole("Administrador"))
-        {
-            <p>Rol no reconocido.</p>
-        }
-    </Authorized>
-</AuthorizeView>
+
 
 <EditForm Model="@modelo" OnValidSubmit="ProcesarVerificacion" FormName="CodigoVerificacion">
     <DataAnnotationsValidator />
@@ -55,7 +40,6 @@
     [SupplyParameterFromForm]
     private VerificacionModel modelo { get; set; } = new();
     private string? mensaje;
-    IRepositorioPersonal repositorioPersonal = new RepositorioPersonal();
     private async Task ProcesarVerificacion()
     {
         if (modelo.Codigo.Equals(""))

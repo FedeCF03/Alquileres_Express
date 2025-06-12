@@ -226,6 +226,7 @@
     private void CancelarReserva(int id)
     {
         casoDeUsoAlquilerCancelarAlquiler.Ejecutar(id);
+        NavigationManager.NavigateTo("/mis-alquileres", true);    
 
     }
 

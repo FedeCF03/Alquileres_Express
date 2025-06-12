@@ -19,5 +19,5 @@ public interface IRepositorioAlquiler
     public void cancelarAlquiler(int idAlquiler);
 
     public List<Alquiler> ObtenerAlquilerPorId(int idAlquiler);
-
+    public bool EstaDisponible(int inmuebleId, DateTime fechaInicio, DateTime fechaFin);
 }

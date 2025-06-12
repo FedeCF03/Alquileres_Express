@@ -1,4 +1,4 @@
-@page "/"
+@page "/InmueblesNoDisponibles"
 @inject IRepositorioFoto repositorioFotos
 @inject FiltroDeInmueblesService FiltroDeInmueblesService
 @inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
@@ -12,23 +12,7 @@
 @using Microsoft.AspNetCore.WebUtilities
 @rendermode InteractiveServer
 
-<PageTitle>Inmuebles</PageTitle>
-
-@if (!String.IsNullOrEmpty(Mensaje))
-{
-    @if (EsMensajeDeError == true)
-    {
-        <div class="toast-message red">
-            @Mensaje
-        </div>
-    }
-    else
-    {
-        <div class="toast-message">
-            @Mensaje
-        </div>
-    }
-}
+<PageTitle>Inmuebles no disponibles</PageTitle>
 
 <div class="contenedor-principal">
     <!-- COLUMNA IZQUIERDA: IMÁGENES -->
@@ -44,7 +28,7 @@
             <div class="galeria-imagenes">
                 @foreach (var inmueble in inmuebles)
                 {
-     <div class="tarjeta-inmueble">
+                    <div class="tarjeta-inmueble">
                         <NavLink class="imagen-link" href="" @onclick="() => irInmueble(inmueble.Id)">
                             <img src="@inmueble.Fotos[0].Url" alt="Foto propiedad" class="foto" />
                         </NavLink>
@@ -53,7 +37,6 @@
                             <p class="precio">$@inmueble.Precio</p>
                         </div>
                     </div>
-                    
                 }
             </div>
         }
@@ -143,7 +126,7 @@
 
     protected override void OnInitialized()
     {
-        inmuebles = casoDeUsoListarInmuebles.ListarDisponibles();
+        inmuebles = casoDeUsoListarInmuebles.ListarNoDisponibles();
         FiltroDeInmueblesService.AgregarFiltro(filtroPrecio);
         FiltroDeInmueblesService.AgregarFiltro(filtroCiudad);
         FiltroDeInmueblesService.AgregarFiltro(filtroCantidadPersonas);
@@ -178,7 +161,7 @@
         }
         if (!filtroPrecio.Aplicar && !filtroCiudad.Aplicar && !filtroCantidadPersonas.Aplicar)
         {
-            inmuebles = casoDeUsoListarInmuebles.ListarDisponibles();
+            inmuebles = casoDeUsoListarInmuebles.ListarNoDisponibles();
             StateHasChanged();
             return;
         }
@@ -214,7 +197,7 @@
             return;
         }
 
-        inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(casoDeUsoListarInmuebles.ListarDisponibles());
+        inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(casoDeUsoListarInmuebles.ListarNoDisponibles());
 
         StateHasChanged();
     }

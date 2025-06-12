@@ -5,101 +5,79 @@
  @inject CasoDeUsoAltaPersonal CasoDeUsoAltaPersonal;
  @inject AuthenticationStateProvider AuthenticationStateProvider
 
- @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
- @inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
-@inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoModificarPersonal CasoDeUsoModificarPersonal;
+ @inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+ @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject CasoDeUsoModificarPersonal casoDeUsoModificarPersonal;
 
-@inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoModificarCliente casoDeUsoModificarCliente;        
+@inject CasoDeUsoModificarCliente casoDeUsoModificarCliente;        
     
 @using BlazorDateRangePicker
-@inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Components.Authorization
+@inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
+@inject IHttpContextAccessor HttpContextAccessor
 @inject ServicioEnviarEmail servicioEnviarEmail
+@attribute [Authorize]
 
-@if (cliente != null)
-{
     <div class="contenedor-edicion">
-        <h2 class="titulo">Bienvenido/a, @cliente.Nombre @cliente.Apellido</h2>
+        <h2 class="titulo">Bienvenido/a, @usuarioNuevo.Nombre @usuarioNuevo.Apellido</h2>
         <p class="subtitulo">Aquí puede editar sus datos personales</p>
         <div class="tablas-contenedor">
             <div class="tabla-card">
                 <h3>Datos actuales</h3>
                 <table>
-                    <tr><th>Nombre</th><td>@cliente.Nombre</td></tr>
-                    <tr><th>Apellido</th><td>@cliente.Apellido</td></tr>
-                    <tr><th>DNI</th><td>@cliente.Dni</td></tr>
-                    <tr><th>Correo</th><td>@cliente.Correo</td></tr>
-                    <tr><th>Dirección</th><td>@cliente.Direccion</td></tr>
-                    <tr><th>Fecha de Nacimiento</th><td>@cliente.FechaNacimiento.ToString("dd/MM/yyyy")</td></tr>
+                    <tr><th>Nombre</th><td>@usuarioViejo.Nombre</td></tr>
+                    <tr><th>Apellido</th><td>@usuarioViejo.Apellido</td></tr>
+                    <tr><th>DNI</th><td>@usuarioViejo.Dni</td></tr>
+                    <tr><th>Correo</th><td>@usuarioViejo.Correo</td></tr>
+                    <tr><th>Dirección</th><td>@usuarioViejo.Direccion</td></tr>
+                    <tr><th>Fecha de Nacimiento</th><td>@usuarioViejo.FechaNacimiento.ToString("dd/MM/yyyy")</td></tr>
                 </table>
             </div>
             <div class="tabla-card">
                 <h3>Editar datos</h3>
+                <h4>!Cambiar su Email cerrara su sesion y debera iniciar sesion nuevamente!</h4>
                 <div class="form-group">
-                    <input placeholder="Nombre" @bind="_cliente.Nombre" class="form-control" />
-                    <input placeholder="Apellido" @bind="_cliente.Apellido" class="form-control" />
-                    <input placeholder="DNI" @bind="_cliente.Dni" class="form-control" />
-                    <input placeholder="Correo" @bind="_cliente.Correo" class="form-control" />
-                    <input placeholder="Dirección" @bind="_cliente.Direccion" class="form-control" />
+                    <input placeholder="Nombre" @bind="usuarioNuevo.Nombre" class="form-control" />
+                    <input placeholder="Apellido" @bind="usuarioNuevo.Apellido" class="form-control" />
+                    <input placeholder="DNI" @bind="usuarioNuevo.Dni" class="form-control" />
+                    <input placeholder="Correo" @bind="usuarioNuevo.Correo" class="form-control" />
+                    <input placeholder="Dirección" @bind="usuarioNuevo.Direccion" class="form-control" />
                     <label>Fecha de Nacimiento</label>
                     <div class="d-flex">
                         <DateRangePicker 
                             @bind-EndDate="selectedDate"
                             MinDate="minDate"
                             MaxDate="DateTime.Now"
-                            SingleDatePicker="true" />
+                            SingleDatePicker="true" 
+                            Placeholder="@selectedDate!.Value.DateTime.ToShortDateString()"/>
                     </div>
                     <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+                    <button class="btn btn-secondary" @onclick="@(() => Navegador.NavigateTo("/Perfil"))">Cancelar</button>
                 </div>
             </div>
         </div>
     </div>
-}
 
- @if (personal != null)
+@foreach (var error in errores)
 {
-    <div class="contenedor-edicion">
-        <h2 class="titulo">Bienvenido/a, @personal.Nombre @personal.Apellido</h2>
-        <p class="subtitulo">Aquí puede editar sus datos personales</p>
-        <div class="tablas-contenedor">
-            <div class="tablapersonal">
-                <h3>Datos actuales</h3>
-                <table>
-                    <tr><th>Nombre</th><td>@personal.Nombre</td></tr>
-                    <tr><th>Apellido</th><td>@personal.Apellido</td></tr>
-                    <tr><th>DNI</th><td>@personal.Dni</td></tr>
-                    <tr><th>Correo</th><td>@personal.Correo</td></tr>
-                    <tr><th>Dirección</th><td>@personal.Direccion</td></tr>
-                    <tr><th>Fecha de Nacimiento</th><td>@personal.FechaNacimiento.ToString("dd/MM/yyyy")</td></tr>
-                </table>
-            </div>
-            <div class="tabla-card">
-                <h3>Editar datos</h3>
-                <div class="form-group">
-                    <input placeholder="Nombre" @bind="_personal.Nombre" class="form-control" />
-                    <input placeholder="Apellido" @bind="_personal.Apellido" class="form-control" />
-                    <input placeholder="DNI" @bind="_personal.Dni" class="form-control" />
-                    <input placeholder="Correo" @bind="_personal.Correo" class="form-control" />
-                    <input placeholder="Dirección" @bind="_personal.Direccion" class="form-control" />
-                    <label>Fecha de Nacimiento</label>
-                    <div class="d-flex">
-                        <DateRangePicker 
-                            @bind-EndDate="selectedDate"
-                            MinDate="minDate"
-                            MaxDate="DateTime.Now"
-                            SingleDatePicker="true" />
-                    </div>
-                    <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
-                </div>
-            </div>
-        </div>
+    <div class="alert alert-danger">
+        @error
+    </div> 
+}
+@if (exitoso)
+{
+    <div class="alert alert-success">
+        Perfil editado exitosamente.
     </div>
-}            
-@if (ErrorMessage != null)
-{
-    <div class="alert alert-danger">@ErrorMessage</div>
+    @if (deslogeando)
+    {
+        <div class="alert alert-sucess">
+            Cerrando sesión...
+        </div>
+    }
 }
-
 
  @code {
    private string? ErrorMessage;
@@ -112,6 +90,14 @@
     String? correo { get; set; }
     Cliente? cliente { get; set; }
     Personal? personal { get; set; }
+    Usuario usuarioNuevo {get; set; }
+    Usuario usuarioViejo { get; set; }
+    [CascadingParameter]
+    HttpContext? HttpContext { get; set; }
+    private bool exitoso = false;
+    private bool deslogeando = false;
+
+    List<string> errores = [];
      protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -134,8 +120,9 @@
                     Contraseña = cliente.Contraseña,
                     Rol = cliente.Rol
                 };
-
                 selectedDate = cliente.FechaNacimiento;
+                usuarioViejo = cliente;
+                usuarioNuevo = _cliente;
             }
             else if (personal != null)
             {
@@ -155,69 +142,65 @@
 
                 };
                 selectedDate = personal.FechaNacimiento;
+                usuarioViejo = personal;
+                usuarioNuevo = _personal;
             }
-
         }
     }
 
-   void Aceptar()
+   async Task Aceptar()
    {
-        if (cliente != null)
+        errores = [];
+        if (selectedDate == null)
         {
-            if (selectedDate == null)
-            {
-                ErrorMessage = "Por favor, seleccioná una fecha de nacimiento.";
-                return;
-            }
-
-            try
-            {
-                _cliente.FechaNacimiento = selectedDate.Value.DateTime;
-
-            bool ok = casoDeUsoModificarCliente.Ejecutar(_cliente);                                                                 //aca va editar perfil
-             if (ok)
-            {
-                Navegador.NavigateTo("/Perfil");
-            }
-            else
-            {
-                ErrorMessage = "No se pudo registrar el cliente. Por favor, intente nuevamente.";
-            }
+            errores.Add("Por favor, seleccioná una fecha de nacimiento.");
+            return;
         }
-        catch (Exception ex)
+        usuarioNuevo.FechaNacimiento = selectedDate.Value.DateTime;
+
+        if (usuarioNuevo.Rol.Equals(RolUsuario.Cliente))
         {
-            ErrorMessage = "Ocurrió un error inesperado: " + ex.Message;
-        }
-
-        }
-        else if (personal != null)
-        {
-            if (selectedDate == null)
+            if (casoDeUsoModificarCliente.Ejecutar(_cliente, out errores))
             {
-                ErrorMessage = "Por favor, seleccioná una fecha de nacimiento.";
-                return;
-            }
-
-            try
-            {
-                _personal.FechaNacimiento = selectedDate.Value.DateTime;
-                bool ok = CasoDeUsoModificarPersonal.Ejecutar(_personal);     
-                                                                               //aca va editar perfil
-                if (ok)
-                {
-                    Navegador.NavigateTo("/Perfil");
+                if(usuarioNuevo.Correo.ToLower().Equals(usuarioViejo!.Correo.ToLower())){
+                    deslogeando = exitoso = true;
+                    
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/logout"));
                 }
-                else
-                {
-                    ErrorMessage = "No se pudo registrar el personal. Por favor, intente nuevamente.";
+                else{
+                    exitoso = true;
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/Perfil"));
                 }
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = "Ocurrió un error inesperado: " + ex.Message;
+               // HttpContextAccessor.HttpContext.SignOutAsync();
+               // await guardarEnCookie(); 
             }
         }
-    }
+        else
+            if (casoDeUsoModificarPersonal.Ejecutar(_personal, out errores))                                                      
+            {
+                if(usuarioNuevo.Correo.ToLower().Equals(usuarioViejo!.Correo.ToLower())){
+                    deslogeando = exitoso = true;
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/logout"));
+                }
+                else{
+                    exitoso = true;
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/Perfil"));
+                }
+               // HttpContextAccessor.HttpContext.SignOutAsync();
+               // await guardarEnCookie();
+            }
+}
    
-    
+    private async Task guardarEnCookie()
+    {
+
+        var claims = new List<Claim> {
+        new Claim(ClaimTypes.Name, usuarioNuevo.Correo),
+        new Claim(ClaimTypes.Role, usuarioNuevo.Rol.ToString())
+        };
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        await HttpContextAccessor.HttpContext.SignInAsync(principal);
+
+    }
  }

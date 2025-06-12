@@ -9,6 +9,14 @@ public class CasoDeUsoAltaCliente(ValidadorUsuario validador, IRepositorioClient
     public bool Ejecutar(Cliente c, out List<string> errores)
     {
         errores = validador.Ejecutar(c);
+        if (c.Dni != null && repo.SeRepiteDNI(c))
+        {
+            errores.Add("El DNI ya está registrado por otro usuario.");
+        }
+        if (c.Correo != null && repo.SeRepiteCorreo(c))
+        {
+            errores.Add("El correo ya está registrado por otro usuario.");
+        }
         if (errores.Count > 0)
             return false;
         try

@@ -1,4 +1,4 @@
-@page "/usuario"
+@page "/registrarse"
 @rendermode InteractiveServer
 @inject NavigationManager Navegador
 @inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
@@ -100,20 +100,8 @@
 
         _cliente.FechaNacimiento = selectedDate.Value.DateTime;
 
-
-        if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
-            _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
-
-        bool ok = casoDeUsoAltaCliente.Ejecutar(_cliente, out errores);
-        if (!ok)
-        {
-            return;
-        }
-        if (rol != null && !String.Equals(rol, "Cliente", StringComparison.OrdinalIgnoreCase))
-            servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", 
-            "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Dni);
-        Navegador.NavigateTo("/?mensaje=Cliente registrado correctamente");
-
+        if (casoDeUsoAltaCliente.Ejecutar(_cliente, out errores))
+            Navegador.NavigateTo("/?mensaje=Cliente registrado correctamente");
 
     }
 }
