@@ -12,74 +12,76 @@
 @rendermode InteractiveServer
 @using BlazorDateRangePicker
 
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center text-primary">👥 Agregar Personal</h2>
+        <p class="text-center text-muted">Complete los siguientes campos para registrar a un nuevo miembro del personal.</p>
 
-<div class="login-container">
-    <div class="login-card">
-        <h3 class="login-title">Agregar Personal</h3>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-user"></i> Nombre</label>
+                <input @bind="nuevoPersonal.Nombre" class="form-control form-control-lg" placeholder="Ingrese el nombre" />
+            </div>
 
-        <div class="mb-2">
-        <label>Nombre</label>
-        <input @bind="nuevoPersonal.Nombre" class="form-control" />
-    </div>
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-user"></i> Apellido</label>
+                <input @bind="nuevoPersonal.Apellido" class="form-control form-control-lg" placeholder="Ingrese el apellido" />
+            </div>
 
-    <div class="mb-2">
-        <label>Apellido</label>
-        <input @bind="nuevoPersonal.Apellido" class="form-control" />
-    </div>
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-id-card"></i> DNI</label>
+                <input type="number" @bind="nuevoPersonal.Dni" class="form-control form-control-lg" placeholder="Ingrese el DNI" />
+            </div>
 
-    <div class="mb-2">
-        <label>DNI</label>
-        <input type="number" @bind="nuevoPersonal.Dni" class="form-control" />
-    </div>
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-envelope"></i> Correo</label>
+                <input @bind="nuevoPersonal.Correo" class="form-control form-control-lg" placeholder="Ingrese el correo electrónico" />
+            </div>
 
-    <div class="mb-2">
-        <label>Correo</label>
-        <input @bind="nuevoPersonal.Correo" class="form-control" />
-    </div>
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-lock"></i> Contraseña</label>
+                <input @bind="nuevoPersonal.Contraseña" type="password" class="form-control form-control-lg" placeholder="Ingrese la contraseña" />
+            </div>
 
-    
-        <div class="mb-2">
-            <label>Contraseña</label>
-            <input @bind="nuevoPersonal.Contraseña" type="password" class="form-control" />
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-map-marker-alt"></i> Dirección</label>
+                <input @bind="nuevoPersonal.Direccion" class="form-control form-control-lg" placeholder="Ingrese la dirección" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-calendar-alt"></i> Fecha de Nacimiento</label>
+                <div class="border rounded p-2">
+                    <DateRangePicker @bind-EndDate="selectedDate" MinDate="minDate"
+                        MaxDate="DateTime.Now" SingleDatePicker="true" />
+                </div>
+            </div>
         </div>
 
-    <div class="mb-2">
-        <label>Dirección</label>
-        <input @bind="nuevoPersonal.Direccion" class="form-control" />
-    </div>
+        <div class="text-center mt-4">
+            <button class="btn btn-lg btn-success w-50" @onclick="Aceptar">
+                <i class="fas fa-check"></i> Agregar Personal
+            </button>
+        </div>
 
-    <div class="mb-2">
-        <label>Fecha de Nacimiento</label>
-        <div class="d-flex">
-           <DateRangePicker @bind-EndDate="selectedDate" 
-           MinDate="minDate"
-           MaxDate ="DateTime.Now"
-           SingleDatePicker="true"/>
+        @foreach (var error in errores)
+        {
+            <div class="alert alert-danger mt-3 text-center">@error</div>
+        }
+
+        <div class="alert alert-success mt-3 text-center" role="alert"
+            style="display: @(string.IsNullOrEmpty(mensajeExito) ? "none" : "block")">
+            @mensajeExito
         </div>
     </div>
 </div>
-    </div>
-@foreach (var error in errores)
-{
-    <div class="alert alert-danger mt-3" role="alert">@error</div>
-}
-
-<div class="alert alert-success mt-3" role="alert"
-    style="display: @(string.IsNullOrEmpty(mensajeExito) ? "none" : "block")">
-    @mensajeExito
-</div>
-
-<button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
-
 
 @code {
-    [SupplyParameterFromForm]
     private Personal nuevoPersonal { get; set; } = new();
-    private string mensajeError = string.Empty;
     private string mensajeExito = string.Empty;
     private DateTimeOffset? selectedDate;
     private DateTime minDate = new DateTime(DateTime.Now.Year - 100, 1, 1);
     private List<string> errores = [];
+
     private void Aceptar()
     {
         if (selectedDate == null)
@@ -103,6 +105,5 @@
         {
             errores.Add(ex.Message);
         }
-
     }
 }
