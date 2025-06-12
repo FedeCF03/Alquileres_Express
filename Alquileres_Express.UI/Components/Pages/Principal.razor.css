@@ -101,3 +101,14 @@
     90% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(20px); }
 }
+
+.columna-filtros {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.bloque-filtros, .bloque-busqueda {
+    margin-top: 1rem;
+}
