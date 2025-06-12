@@ -1,0 +1,48 @@
+@page "/cambiar-estado-inmueble/{id:int}"
+@rendermode InteractiveServer
+@inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
+@inject CasoDeUsoEditarInmueble casoDeUsoEditarInmueble
+@inject IRepositorioFoto repositorioFotos
+@inject ServicioFotos ServicioFotos
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+@inject ValidadorInmueble ValidadorInmueble
+@attribute [Authorize(Roles = "Gerente,Administrador, Empleado")]
+
+<h1 class="form-label"> ¿Está disponible el inmueble?</h1>
+<input type="checkbox" @bind="disponible" class="form-check-input mb-2" />
+
+<button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
+<button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
+
+@code
+{
+    [Parameter]
+    public int id { get; set; }
+
+    private Inmueble inmueble = new();
+    private bool disponible;
+    private List<string> errores = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            inmueble = casoDeUsoObtenerInmueble.Ejecutar(id);
+            disponible = inmueble.Disponible;
+        }
+        catch (Exception)
+        {
+            Nav.NavigateTo("/?mensaje=Inmueble no encontrado&EsMensajeDeError=true");
+        }
+        
+    }
+
+    private async Task GuardarCambios()
+    {
+        inmueble.Disponible = disponible;
+        casoDeUsoEditarInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out errores);
+        Nav.NavigateTo($"/inmueble/{inmueble.Id}");
+
+    }
+}
