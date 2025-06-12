@@ -26,9 +26,13 @@
 
     <button type="submit" class="btn btn-primary">Verificar</button>
 
-    @if (mensaje != null)
+    @foreach (var error in errores)
     {
-        <div class="alert alert-info mt-3">@mensaje</div>
+        <div class="alert alert-danger mt-2">@error</div>
+    }
+    @if (!string.IsNullOrEmpty(mensajeExito))
+    {
+        <div class="alert alert-success mt-2">@mensajeExito</div>
     }
 </EditForm>
 
@@ -39,44 +43,49 @@
 
     [SupplyParameterFromForm]
     private VerificacionModel modelo { get; set; } = new();
-    private string? mensaje;
+    private List<string> errores = new();
+    private string mensajeExito = "";
     private async Task ProcesarVerificacion()
     {
+        errores.Clear();
         if (modelo.Codigo.Equals(""))
         {
-            mensaje = "Por favor, ingrese un código válido.";
-            return;
+            errores.Add("Por favor, ingrese un código.");
         }
         if (string.IsNullOrEmpty(modelo.Correo))
         {
-            mensaje = "Por favor, ingrese un correo electrónico válido.";
+            errores.Add("Por favor, ingrese un correo electrónico.");
+        }
+        else
+            if (!modelo.Correo.Contains('@'))
+            {
+                errores.Add("El correo electrónico ingresado no es válido.");
+            }
+        if (errores.Count > 0)
+        {
             return;
         }
-        if (modelo.Codigo != "0")
 
+        Personal? usuario = casoDeUsoValidarCodigoDeSeguridad.Ejecutar(modelo.Correo, modelo.Codigo);
+        if (usuario != null)
         {
-            Personal? usuario = casoDeUsoValidarCodigoDeSeguridad.Ejecutar(modelo.Correo, modelo.Codigo);
-            if (usuario != null)
-            {
-                mensaje = "¡Verificación exitosa!";
-                await guardarEnCookie(modelo.Correo, usuario.Rol);
-            }
-            else
-            {
-                mensaje = "Email o código incorrecto.";
-            }
+            await guardarEnCookie(modelo.Correo, usuario.Rol, usuario.Nombre);
+
+        }
+        else
+        {
+            errores.Add("Email o código incorrectos.");
         }
     }
 
     public class VerificacionModel
-    {
-        [EmailAddress]
+    {       
         public string Correo { get; set; } = "";
 
         public string Codigo { get; set; } = "";
     }
 
-    private async Task guardarEnCookie(String correo, RolUsuario rol)
+    private async Task guardarEnCookie(String correo, RolUsuario rol, string nombre)
     {
 
         var claims = new List<Claim> {
@@ -86,6 +95,6 @@ new Claim(ClaimTypes.Role, rol.ToString())
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         await HttpContext.SignInAsync(principal);
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo($"/?mensaje=¡Hola {nombre} Bienvenido/a.");
     }
 }
