@@ -16,7 +16,7 @@
     <div class="login-card">
         <h3 class="login-title">Iniciar Sesión</h3>
 
-        <EditForm Model="@user" OnValidSubmit="IniciarSesionComoGerenteFake" FormName="loginForm">
+        <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -53,8 +53,8 @@
     private bool ErrorMessage { get; set; } = false;
     private async Task IniciarSesionComoGerenteFake()
     {
-        user.Correo = "marfacucosas@gmail.com";
-        user.Rol = RolUsuario.Administrador;
+        user.Correo = "tomicarp12@gmail.com";
+        user.Rol = RolUsuario.Gerente;
         await guardarEnCookie("jorge");
 
     }
@@ -102,9 +102,9 @@
     {
 
         var claims = new List<Claim> {
-new Claim(ClaimTypes.Name, user.Correo),
-new Claim(ClaimTypes.Role, user.Rol.ToString())
-};
+        new Claim(ClaimTypes.Name, user.Correo),
+        new Claim(ClaimTypes.Role, user.Rol.ToString())
+        };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         await HttpContext.SignInAsync(principal);

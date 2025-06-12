@@ -78,13 +78,6 @@ public class RepositorioCliente : IRepositorioCliente
             throw new KeyNotFoundException($"No se encontró un personal con el correo {cliente.Correo}");
         }
 
-        bool existe = _context.Clientes.Include(c => c.Alquileres).Include(c => c.RegistrosDeLlave).Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == cliente.Correo.ToLower()) && clienteExistente.Correo.ToLower() != cliente.Correo.ToLower();
-        if (existe)
-            throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
-        bool dniExiste = _context.Clientes.Any(x => x.Dni == cliente.Dni) || _context.Personal.Any(x => x.Dni == cliente.Dni);
-        if (dniExiste)
-            throw new InvalidOperationException("El DNI ya está registrado por otro usuario.");
-
         clienteExistente.Nombre = cliente.Nombre;
         clienteExistente.Apellido = cliente.Apellido;
 

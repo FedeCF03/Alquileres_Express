@@ -8,7 +8,8 @@
     padding-right: 1rem;
 }
 .red{
-     background-color: #bf1919;
+    background-color: #bf1919;
+    background-image: linear-gradient(to right, rgb(222, 42, 42) , rgb(151, 37, 19));
 }
 
 .main-content-contactos {

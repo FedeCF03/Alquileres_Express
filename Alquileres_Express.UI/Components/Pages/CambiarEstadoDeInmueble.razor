@@ -12,7 +12,7 @@
 <h1 class="form-label"> ¿Está disponible el inmueble?</h1>
 <input type="checkbox" @bind="disponible" class="form-check-input mb-2" />
 
-<button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
+<button class="btn btn-primary" @onclick="GuardarCambios">Guardar cambios</button>
 <button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
 
 @code

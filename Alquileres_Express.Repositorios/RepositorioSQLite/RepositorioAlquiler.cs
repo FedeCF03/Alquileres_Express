@@ -10,9 +10,9 @@ namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
 public class RepositorioAlquiler : IRepositorioAlquiler
 {
-    readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
     public void RegistrarAlquilerPresencial(String correo, int idInmueble, DateTime fechaInicio, DateTime fechaFin, int numeroPersonal)
     {
+        using Alquileres_ExpressContext _context = new();
         Cliente? cliente = _context.Clientes.FirstOrDefault(c => c.Correo.ToLower() == correo.ToLower());
         Personal? personal = _context.Personal.FirstOrDefault(p => p.Id == numeroPersonal);
         Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == idInmueble);
@@ -28,6 +28,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
 
     private decimal calcularPrecio(DateTime fechaInicio, DateTime fechaFin, decimal? monto)
     {
+        using Alquileres_ExpressContext _context = new();
         if (monto == null)
             throw new ArgumentException("El monto debe tener valor");
         int cantidadDias = (fechaFin - fechaInicio).Days;
@@ -53,44 +54,37 @@ public class RepositorioAlquiler : IRepositorioAlquiler
 
     public void RegistrarPagoEnEfectivo(Alquiler alquiler, int idInmueble, DateTime fechaInicio, DateTime fechaFin)
     {
-
+        using Alquileres_ExpressContext _context = new();
         if (!EstaDisponible(idInmueble, fechaInicio, fechaFin))
             throw new InvalidOperationException("El inmueble no está disponible para el período seleccionado.");
-
-        alquiler.FechaDeInicio = fechaInicio;
-        alquiler.FechaDeFin = fechaFin;
-        alquiler.Precio = calcularPrecio(fechaInicio, fechaFin, alquiler.Precio);
+        
         {
-
             alquiler.Pagado = true;
-            //_context.Alquileres.Add(alquiler);
             guardarAlquilerEnBaseDeDatos(alquiler);
-
         }
     }
 
     public bool EstaDisponible(int inmuebleId, DateTime fechaInicio, DateTime fechaFin)
-{
-    var alquileresDelInmueble = _context.Alquileres
-        .Where(a => a.InmuebleId == inmuebleId)
-        .ToList();
+    {
+        using Alquileres_ExpressContext _context = new();
+        var alquileresDelInmueble = _context.Alquileres
+            .Where(a => a.InmuebleId == inmuebleId)
+            .ToList();
 
-    var fechasReservadas = alquileresDelInmueble
-        .Where(a => !a.Cancelado && a.Pagado && !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado))
-        .Select(a => new RangoDeFechas(a.FechaDeInicio, a.FechaDeFin))
-        .ToList();
-        
-    return !fechasReservadas.Any(rango => rango.Contains(fechaInicio) || rango.Contains(fechaFin));
-}
+        var fechasReservadas = alquileresDelInmueble
+            .Where(a => !a.Cancelado && a.Pagado && !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado))
+            .Select(a => new RangoDeFechas(a.FechaDeInicio, a.FechaDeFin))
+            .ToList();
+            
+        return !fechasReservadas.Any(rango => rango.SeSuperponeCon(new RangoDeFechas(fechaInicio, fechaFin)));
+    }
 
 
     private void guardarAlquilerEnBaseDeDatos(Alquiler alquiler)
     {
+        using Alquileres_ExpressContext _context = new();
         Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == alquiler.InmuebleId);//x2
 
-
-        // RegistroDeLlave registro = generarRegistroDeLlave(inmueble, personal, cliente.Id, alquiler.Id);
-        // alquiler.Registro = registro; 
         if (inmueble.Alquileres == null)
             inmueble.Alquileres = new List<Alquiler>();
 
@@ -108,6 +102,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
 
     public void pagarAlquilerMercadoPago(Alquiler alquiler)
     {
+        using Alquileres_ExpressContext _context = new();
         alquiler.Pagado = true;
         _context.Alquileres.Add(alquiler);
         _context.SaveChanges();
@@ -115,6 +110,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
     }
     public void RegistrarAlquilerVirtual(Alquiler alquiler)
     {
+        using Alquileres_ExpressContext _context = new();
         alquiler.Pagado = true;
         _context.Alquileres.Add(alquiler);
         _context.SaveChanges();
@@ -123,15 +119,18 @@ public class RepositorioAlquiler : IRepositorioAlquiler
 
     public List<Alquiler> ObtenerAlquileresPorCorreo(string correo)
     {
-        return [.. _context.Alquileres.Where(a => a.CorreoCliente == correo)];
+        using Alquileres_ExpressContext _context = new();
+        return [.. _context.Alquileres.Include(a => a.RegistrosDeLlave).Where(a => a.CorreoCliente == correo)];
     }
     public List<Alquiler> ObtenerTodosLosAlquileres()
     {
-        return [.. _context.Alquileres.ToList()];
+        using Alquileres_ExpressContext _context = new();
+        return [.. _context.Alquileres.Include(a => a.RegistrosDeLlave).ToList()];
     }
 
     public EstadoDeAlquiler GetEstadoDeAlquiler(int idAlquiler)
     {
+        using Alquileres_ExpressContext _context = new();
         Alquiler? alquiler = _context.Alquileres.FirstOrDefault(a => a.Id == idAlquiler);
 
         if (alquiler.FechaDeFin < DateTime.Now)
@@ -149,6 +148,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
 
     public void cancelarAlquiler(int idAlquiler)
     {
+        using Alquileres_ExpressContext _context = new();
         Alquiler? alquiler = _context.Alquileres.FirstOrDefault(a => a.Id == idAlquiler);
         if (alquiler == null)
             throw new InvalidOperationException("El alquiler no existe.");
@@ -160,7 +160,8 @@ public class RepositorioAlquiler : IRepositorioAlquiler
 
     public List<Alquiler> ObtenerAlquilerPorId(int idAlquiler)
     {
-        return [.. _context.Alquileres.Where(a => a.Id == idAlquiler)];
+        using Alquileres_ExpressContext _context = new();
+        return [.. _context.Alquileres.Include(a => a.RegistrosDeLlave).Where(a => a.Id == idAlquiler)];
     }
 }
 

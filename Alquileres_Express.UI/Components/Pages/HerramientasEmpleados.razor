@@ -1,6 +1,7 @@
 @page "/Herramientas"
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "Administrador,Gerente,Empleado")] 
 
     <div class="decorative-elements">
         <div class="circle"></div>
@@ -31,7 +32,7 @@
 
                  <a class="operation-btn historial" href = "/cargar-inmueble">
                     <span class="btn-icon">📋</span>
-                    Cargar Inmueble
+                    Cargar inmueble
                 </a>
                 </Authorized>  
             </AuthorizeView>
@@ -40,11 +41,18 @@
                 <span class="btn-icon">📋</span>
                 Ver Historial de Llaves
             </button>
+
+            
                                                                                 -->     <!--                 LOS METODOS COMENTADOS SON PARA LA 2DA EMT O NO LOS TENEMOS IMPLEMENTADOS TODAVIA       -->
             <a class="operation-btn listar" href = "/listadoUsuario">
                   <span class="btn-icon">👥</span>
-                Listar Usuarios
+                Listar usuarios
             </a>
+
+            <a class="operation-btn historial" href = "/InmueblesNoDisponibles">
+                    <span class="btn-icon">🔑</span>
+                    Inmuebles no disponibles
+                </a>
         </div>
     </div>
 

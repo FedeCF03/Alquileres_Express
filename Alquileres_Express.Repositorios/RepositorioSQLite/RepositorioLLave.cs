@@ -6,11 +6,10 @@ namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
 public class RepositorioLlave : IRepositorioLlave
 {
-    readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
 
     public RegistroDeLlave RegistrarEntregaLLavePresencial(int idAlquiler, int idPersonal, int idCliente)
     {
-
+        using Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
         RegistroDeLlave registro = new RegistroDeLlave
         {
             AlquilerId = idAlquiler,
@@ -23,4 +22,24 @@ public class RepositorioLlave : IRepositorioLlave
         _context.SaveChanges();
         return registro;
     }
+
+    
+public List<RegistroDeLlave> ListarRegistroLlaves(int idAlquiler, bool? esEntrega = null)
+{
+    using Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
+    var llave = _context.Llaves.Where(llave => llave.AlquilerId == idAlquiler);
+
+    // Si esEntrega tiene un valor, filtra por ese criterio
+    if (esEntrega.HasValue)
+    {
+        llave = llave.Where(l => l.EsEntrega == esEntrega.Value);
+    }
+
+    // Ordenar por fecha (más reciente primero)
+    return llave.OrderByDescending(l => l.FechayHoraRegistro).ToList();
+}
+
+
+
+    
 }

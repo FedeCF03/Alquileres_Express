@@ -13,6 +13,7 @@
 @using Alquileres_Express.Aplicacion.Enumerativo
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject IRepositorioAlquiler repositorioAlquiler
 
 <div class="property-page">
     <!-- Hero Section -->
@@ -77,20 +78,6 @@
                             <i class="fas fa-map-marker-alt"></i>
                             <span>@inmueble.Direccion, @inmueble.Ciudad</span>
                         </div>
-                        <div class="property-features">
-                            <div class="feature">
-                                <i class="fas fa-bed"></i>
-                                <span>@inmueble.CantidadDeCamas Camas</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-bath"></i>
-                                <span>@inmueble.Banios Baños</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-home"></i>
-                                <span>@inmueble.TipoInmueble</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -105,14 +92,25 @@
                 <div class="property-details">
                     <div class="details-card">
                         <h3>Sobre esta propiedad</h3>
-                        <div class="amenities-grid">
-                            <div class="amenity">
-
-                                <p>Espacio seguro para tu vehículo</p>
+                        <div class="property-features">
+                            <div class="feature">
+                                <i class="fas fa-bed"></i>
+                                <span>@inmueble.CantidadDeCamas Camas</span>                                                         
                             </div>
-                        </div>
+                            <div class="feature">
+                                <i class="fas fa-bath"></i>
+                                <span>@inmueble.Banios Baños</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Politica de cancelacion:@inmueble.PoliticaDeCancelacion</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-home"></i>
+                                <span>@inmueble.TipoInmueble</span>
+                            </div>
+                        </div> 
                     </div>
-
                     <!-- Map Section -->
                     <div class="map-section">
                         <h3>Ubicación</h3>
@@ -209,6 +207,11 @@
                                             <i class="fas fa-user-check"></i> Editar inmueble
                                         </button>
                                     </NavLink>
+                                    <NavLink class="nav-link" href="@($"/cambiar-estado-inmueble/{Id}")">
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-user-check"></i> Cambiar estado de inmueble
+                                        </button>
+                                    </NavLink>
                                 </div>
                             </Authorized>
                         </AuthorizeView>
@@ -224,7 +227,7 @@
     [Parameter]
     public int Id { get; set; }
     DateTimeOffset? StartDate { get; set; } = DateTime.Today;
-    DateTimeOffset? EndDate { get; set; } = DateTime.Today.AddDays(1).AddTicks(-1);
+    DateTimeOffset? EndDate { get; set; } = DateTime.Today;
     private Inmueble inmueble;
     private bool podesPagar { get; set; } = false;
     private string mensajeError = string.Empty;
@@ -289,6 +292,13 @@
     {
         decimal precio = calcularPrecio();
         Alquiler alquiler = new Alquiler(correo, StartDate.Value.Date, EndDate.Value.Date, precio, inmueble.Id){ClienteId = cliente!.Id};
+        if (!repositorioAlquiler.EstaDisponible(Id, StartDate.Value.Date, EndDate.Value.Date))
+        {
+            mensajeError = "El inmueble no está disponible en las fechas seleccionadas.";
+            podesPagar = false;
+            return;
+        }
+        
         var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre, alquiler);
         NavigationManager.NavigateTo(url, forceLoad: true);
     }
@@ -316,11 +326,17 @@
             podesPagar = false;
             return;
         }
+        if (StartDate.Value.Date == EndDate.Value.Date)
+        {
+            mensajeError = "Debe elegir por lo menos una noche.";
+            podesPagar = false;
+            return;
+        }
         for (DateTime date = StartDate.Value.Date; date <= EndDate.Value.Date; date = date.AddDays(1))
         {
             if (NoEsHabil(date))
             {
-                mensajeError = $"La fecha {date.ToShortDateString()} ya está reservada.";
+                mensajeError = $"Una o más fechas seleccionadas no están disponibles. Por favor, elija fechas que no estén bloqueadas.";
                 podesPagar = false;
                 return;
             }
@@ -331,9 +347,9 @@
 
     private decimal calcularPrecio()
     {
-        if ((StartDate != null && EndDate != null) && inmueble.Precio != null)
+        if ((StartDate != null && EndDate != null))
         {
-            int dias = (int)(EndDate.Value - StartDate.Value).TotalDays + 1;
+            int dias = (int)(EndDate.Value - StartDate.Value).TotalDays;
             return dias * inmueble.Precio;
         }
         return 0;

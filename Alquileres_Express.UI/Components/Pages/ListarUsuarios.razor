@@ -4,6 +4,7 @@
 @inject CasoDeUsoListarRestringido casoDeUsoListarRestringido
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "Administrador,Gerente,Empleado")] 
 
 <h2>Listado de Usuarios</h2>
 

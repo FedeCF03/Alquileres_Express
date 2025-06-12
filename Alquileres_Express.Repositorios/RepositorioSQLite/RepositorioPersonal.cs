@@ -8,20 +8,20 @@ namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
 public class RepositorioPersonal : IRepositorioPersonal
 {
-    readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
-    public void AgregarPersonal(Personal p)
-    {
-        bool existe = (_context.Clientes.Any(x => x.Correo.ToLower() == p.Correo.ToLower())) || (_context.Personal.Any(x => x.Correo.ToLower() == p.Correo.ToLower()));
-        if (existe)
-            throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
-        bool dniExiste = _context.Clientes.Any(x => x.Dni == p.Dni) || _context.Personal.Any(x => x.Dni == p.Dni);
-        if (dniExiste)
-            throw new InvalidOperationException("El DNI ya está registrado por otro usuario.");
-        p.Contraseña = BCrypt.Net.BCrypt.HashPassword(p.Contraseña.Trim());
-        p.Rol = Aplicacion.Enumerativo.RolUsuario.Empleado;
-        _context.Personal.Add(p);
-        _context.SaveChanges();
-    }
+        public void AgregarPersonal(Personal p)
+        {
+            using Alquileres_ExpressContext _context = new();
+            bool existe = (_context.Clientes.Any(x => x.Correo.ToLower() == p.Correo.ToLower())) || (_context.Personal.Any(x => x.Correo.ToLower() == p.Correo.ToLower()));
+            if (existe)
+                throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
+            bool dniExiste = _context.Clientes.Any(x => x.Dni == p.Dni) || _context.Personal.Any(x => x.Dni == p.Dni);
+            if (dniExiste)
+                throw new InvalidOperationException("El DNI ya está registrado por otro usuario.");
+            p.Contraseña = BCrypt.Net.BCrypt.HashPassword(p.Contraseña.Trim());
+            p.Rol = Aplicacion.Enumerativo.RolUsuario.Empleado;
+            _context.Personal.Add(p);
+            _context.SaveChanges();
+        }
 
     public void EliminarPersonal(Personal c)
     {
@@ -29,19 +29,23 @@ public class RepositorioPersonal : IRepositorioPersonal
     }
     public Personal ObtenerPersonalPorId(int id)
     {
+        using Alquileres_ExpressContext _context = new();
         return _context.Personal.Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Id == id) ?? throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
     }
     public List<Personal> ObtenerTodosElPersonal()
     {
+        using Alquileres_ExpressContext _context = new();
         return _context.Personal.Include(c => c.RegistrosDeLlave).ToList();
     }
     public List<Personal> ObtenerPersonalPorNombre(string nombre)
     {
+        using Alquileres_ExpressContext _context = new();
         throw new NotImplementedException();
     }
 
     public Personal ObtenerPersonalPorDNI(string dni)
     {
+        using Alquileres_ExpressContext _context = new();
         var per = _context.Personal.Include(p => p.RegistrosDeLlave).FirstOrDefault(p => p.Dni == dni);
         if (per != null)
         {
@@ -52,6 +56,7 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     public Personal ObtenerPersonalPorMail(string mail)
     {
+        using Alquileres_ExpressContext _context = new();
         var per = _context.Personal.Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
         if (per != null)
         {
@@ -63,7 +68,7 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     public Personal? ObtenerPersonalPorMailYContraseña(string mail, string contraseña)
     {
-
+        using Alquileres_ExpressContext _context = new();
         var per = _context.Personal.Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
         if (per != null && BCrypt.Net.BCrypt.Verify(contraseña, per.Contraseña))
         {
@@ -75,6 +80,7 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad)
     {
+        using Alquileres_ExpressContext _context = new();
         var personal = _context.Personal.FirstOrDefault(p => p.Id == id);
         if (personal != null)
         {
@@ -86,6 +92,7 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     public Personal ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad)
     {
+        using Alquileres_ExpressContext _context = new();
         var personal = _context.Personal.FirstOrDefault(p => p.Correo == correo && p.CodigoDeSeguridad == int.Parse(codigoDeSeguridad));
         if (personal != null)
         {
@@ -99,7 +106,7 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     public bool ModificarPersonal(Personal personal)
     {
-
+        using Alquileres_ExpressContext _context = new();
         var personalExistente = ObtenerPersonalPorId(personal.Id);
         //se checkea q no se repita el correo y dni en caso de uso
         personalExistente.Nombre = personal.Nombre;
@@ -115,6 +122,7 @@ public class RepositorioPersonal : IRepositorioPersonal
     }
     public bool SeRepiteDNI(Personal cliente)
     {
+        using Alquileres_ExpressContext _context = new();
         Usuario? u = _context.Clientes.FirstOrDefault(c => c.Dni.Equals(cliente.Dni));
 
         Usuario? u2 = _context.Personal.FirstOrDefault(p => p.Dni.Equals(cliente.Dni) && p.Id != cliente.Id);
@@ -123,6 +131,7 @@ public class RepositorioPersonal : IRepositorioPersonal
     }
     public bool SeRepiteCorreo(Personal cliente)
     {
+        using Alquileres_ExpressContext _context = new();
         return _context.Clientes.FirstOrDefault(c => c.Correo.ToLower().Equals(cliente.Correo.ToLower()) && c.Id != cliente.Id) != null ||
         _context.Personal.FirstOrDefault(p => p.Correo.ToLower().Equals(cliente.Correo.ToLower()) && p.Id != cliente.Id) != null;
     }

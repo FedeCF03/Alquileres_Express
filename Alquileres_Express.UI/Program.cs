@@ -76,6 +76,7 @@ builder.Services
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
     .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
     .AddScoped<IRepositorioLlave, RepositorioLlave>()
+    .AddTransient<CasoDeUsoListarLlaves>()
 
 
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()

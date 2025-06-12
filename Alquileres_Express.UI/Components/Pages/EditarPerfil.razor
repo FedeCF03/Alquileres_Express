@@ -27,21 +27,22 @@
             <div class="tabla-card">
                 <h3>Datos actuales</h3>
                 <table>
-                    <tr><th>Nombre</th><td>@usuarioNuevo.Nombre</td></tr>
-                    <tr><th>Apellido</th><td>@usuarioNuevo.Apellido</td></tr>
-                    <tr><th>DNI</th><td>@usuarioNuevo.Dni</td></tr>
-                    <tr><th>Correo</th><td>@usuarioNuevo.Correo</td></tr>
-                    <tr><th>Dirección</th><td>@usuarioNuevo.Direccion</td></tr>
-                    <tr><th>Fecha de Nacimiento</th><td>@usuarioNuevo.FechaNacimiento.ToString("dd/MM/yyyy")</td></tr>
+                    <tr><th>Nombre</th><td>@usuarioViejo.Nombre</td></tr>
+                    <tr><th>Apellido</th><td>@usuarioViejo.Apellido</td></tr>
+                    <tr><th>DNI</th><td>@usuarioViejo.Dni</td></tr>
+                    <tr><th>Correo</th><td>@usuarioViejo.Correo</td></tr>
+                    <tr><th>Dirección</th><td>@usuarioViejo.Direccion</td></tr>
+                    <tr><th>Fecha de Nacimiento</th><td>@usuarioViejo.FechaNacimiento.ToString("dd/MM/yyyy")</td></tr>
                 </table>
             </div>
             <div class="tabla-card">
                 <h3>Editar datos</h3>
+                <h4>!Cambiar su Email cerrara su sesion y debera iniciar sesion nuevamente!</h4>
                 <div class="form-group">
                     <input placeholder="Nombre" @bind="usuarioNuevo.Nombre" class="form-control" />
                     <input placeholder="Apellido" @bind="usuarioNuevo.Apellido" class="form-control" />
                     <input placeholder="DNI" @bind="usuarioNuevo.Dni" class="form-control" />
-                    @* <input placeholder="Correo" @bind="usuarioNuevo.Correo" class="form-control" /> *@
+                    <input placeholder="Correo" @bind="usuarioNuevo.Correo" class="form-control" />
                     <input placeholder="Dirección" @bind="usuarioNuevo.Direccion" class="form-control" />
                     <label>Fecha de Nacimiento</label>
                     <div class="d-flex">
@@ -65,7 +66,18 @@
         @error
     </div> 
 }
-
+@if (exitoso)
+{
+    <div class="alert alert-success">
+        Perfil editado exitosamente.
+    </div>
+    @if (deslogeando)
+    {
+        <div class="alert alert-sucess">
+            Cerrando sesión...
+        </div>
+    }
+}
 
  @code {
    private string? ErrorMessage;
@@ -79,8 +91,12 @@
     Cliente? cliente { get; set; }
     Personal? personal { get; set; }
     Usuario usuarioNuevo {get; set; }
+    Usuario usuarioViejo { get; set; }
     [CascadingParameter]
     HttpContext? HttpContext { get; set; }
+    private bool exitoso = false;
+    private bool deslogeando = false;
+
     List<string> errores = [];
      protected override async Task OnInitializedAsync()
     {
@@ -104,8 +120,9 @@
                     Contraseña = cliente.Contraseña,
                     Rol = cliente.Rol
                 };
-
                 selectedDate = cliente.FechaNacimiento;
+                usuarioViejo = cliente;
+                usuarioNuevo = _cliente;
             }
             else if (personal != null)
             {
@@ -125,9 +142,9 @@
 
                 };
                 selectedDate = personal.FechaNacimiento;
+                usuarioViejo = personal;
+                usuarioNuevo = _personal;
             }
-            usuarioNuevo = _personal; 
-            usuarioNuevo ??= _cliente;
         }
     }
 
@@ -145,20 +162,32 @@
         {
             if (casoDeUsoModificarCliente.Ejecutar(_cliente, out errores))
             {
-
+                if(usuarioNuevo.Correo.ToLower().Equals(usuarioViejo!.Correo.ToLower())){
+                    deslogeando = exitoso = true;
+                    
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/logout"));
+                }
+                else{
+                    exitoso = true;
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/Perfil"));
+                }
                // HttpContextAccessor.HttpContext.SignOutAsync();
                // await guardarEnCookie(); 
-                
-                Navegador.NavigateTo("/Perfil");
             }
         }
         else
-            if (casoDeUsoModificarPersonal.Ejecutar(_personal, out errores))                                                       //aca va editar perfil
+            if (casoDeUsoModificarPersonal.Ejecutar(_personal, out errores))                                                      
             {
-
+                if(usuarioNuevo.Correo.ToLower().Equals(usuarioViejo!.Correo.ToLower())){
+                    deslogeando = exitoso = true;
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/logout"));
+                }
+                else{
+                    exitoso = true;
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/Perfil"));
+                }
                // HttpContextAccessor.HttpContext.SignOutAsync();
                // await guardarEnCookie();
-                Navegador.NavigateTo("/Perfil");
             }
 }
    

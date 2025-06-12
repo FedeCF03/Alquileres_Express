@@ -221,7 +221,7 @@
             erroresDeFotos.Clear();
             if (browser == null || browser.FileCount == 0)
             {
-                errorPorFaltaDeFotos=("No se ha seleccionado ningún archivo.");
+                errorPorFaltaDeFotos=("No se ha seleccionado ningúna foto.");
                 return;
             }
             errorPorFaltaDeFotos = string.Empty;
@@ -247,7 +247,7 @@
                 }
                 catch (Exception ex)
                 {
-                    erroresDeFotos.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
+                    erroresDeFotos.Add($"Error al cargar la foto {file.Name}");
                 }
             }
         }

@@ -14,6 +14,7 @@
 @inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
 @inject CasoDeUsoPagarEfectivo casoDeUsoPagarEfectivo
 @inject CasoDeUsoRegistrarEntregaPresencial casoDeUsoRegistrarEntrega
+@attribute [Authorize(Roles = "Administrador,Gerente,Empleado")]
 
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
@@ -90,7 +91,7 @@
     {
         if (monto == null)
             throw new ArgumentException("El monto debe tener valor");
-        int dias = (int)(fechaFin - fechaInicio).TotalDays + 1;
+        int dias = (int)(fechaFin - fechaInicio).TotalDays;
         decimal precioTotal = dias * monto.Value;
         return precioTotal;
     }
@@ -106,7 +107,7 @@
         catch (Exception)
         {
             // Manejo de errores, por ejemplo, redirigir a una página de error o mostrar un mensaje
-            Navegador.NavigateTo("/?mensaje=Inmueble no encontrado");
+            Navegador.NavigateTo("/?mensaje=Inmueble no encontrado&EsMensajeDeError=true");
         }
     }
 

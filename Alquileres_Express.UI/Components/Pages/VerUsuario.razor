@@ -16,6 +16,7 @@
     <h2 class="titulo">Hola @usuario.Nombre</h2>
 
     <div class="perfil-card">
+        <div><strong>@(usuario.Rol.Equals(RolUsuario.Cliente) ? "Número de cliente" : "Número de personal"):</strong> @usuario.Id</div>
         <div><strong>Apellido:</strong> @usuario.Apellido</div>
         <div><strong>DNI:</strong> @usuario.Dni</div>
         <div><strong>Correo:</strong> @usuario.Correo</div>
@@ -26,7 +27,7 @@
         {
             <div class="botones">
                 @* <button class="btn-editar" @onclick="CambiarContraseña">Cambiar contraseña</button>*@
-                <button class="btn-navlink">
+                <button @onclick="@(() => NavigationManager.NavigateTo($"/mis-alquileres/?id={ClienteId}"))"class="btn-navlink">
                     <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Ver alquileres
                 </button>
             </div>
@@ -75,7 +76,7 @@
             {
                 NavigationManager.NavigateTo($"/?mensaje=Usuario no encontrado&EsMensajeDeError=true");
             }
-            if (rol!.Equals("Empleado") && usuario!.Rol.Equals(RolUsuario.Administrador) || usuario.Rol.Equals(RolUsuario.Gerente))
+            if (rol!.Equals("Empleado") && (usuario!.Rol.Equals(RolUsuario.Administrador) || usuario.Rol.Equals(RolUsuario.Gerente)))
             {
                 NavigationManager.NavigateTo($"/?mensaje=No tienes permiso para ver este usuario&EsMensajeDeError=true");
             }
