@@ -43,34 +43,40 @@
 <h1 class="form-label">Fotos del Inmueble</h1>
 
 <div id="map" style="height: 400px; width: 80%;">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initializeMap" async
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ" async
     defer></script>
 <script>
-    function initializeMap(dotNetHelper, lat, lng) {
-        const initialPosition = { lat: lat, lng: lng }; // Coordenadas de Buenos Aires
+    window.initializeMap = function (dotNetHelper, lat, lng) {
+        function waitForGoogleMaps() {
+            if (window.google && google.maps) {
+                const initialPosition = { lat: lat, lng: lng };
 
-        const map = new google.maps.Map(document.getElementById("map"), {
-            center: initialPosition,
-            zoom: 12,
-        });
+                const map = new google.maps.Map(document.getElementById("map"), {
+                    center: initialPosition,
+                    zoom: 12,
+                });
 
-        const marker = new google.maps.Marker({
-            position: initialPosition,
-            map: map,
-            draggable: true,
-        });
+                const marker = new google.maps.Marker({
+                    position: initialPosition,
+                    map: map,
+                    draggable: true,
+                });
 
-        // Actualizar coordenadas al mover el marcador
-        marker.addListener("dragend", () => {
-            const position = marker.getPosition();
-            dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', position.lat(), position.lng());
-        });
+                marker.addListener("dragend", () => {
+                    const position = marker.getPosition();
+                    dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', position.lat(), position.lng());
+                });
 
-        // Permitir al usuario colocar un nuevo marcador al hacer clic en el mapa
-        map.addListener("click", (event) => {
-            marker.setPosition(event.latLng);
-            dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', event.latLng.lat(), event.latLng.lng());
-        });
+                map.addListener("click", (event) => {
+                    marker.setPosition(event.latLng);
+                    dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', event.latLng.lat(), event.latLng.lng());
+                });
+            } else {
+                setTimeout(waitForGoogleMaps, 100);
+            }
+        }
+
+        waitForGoogleMaps();
     }
 </script>
 </div>
@@ -244,7 +250,7 @@
             erroresDeFotos.Clear();
             if (browser == null || browser.FileCount == 0)
             {
-                erroresDeFotos.Add("No se ha seleccionado ningún archivo.");
+                errorPorFaltaDeFotos = ("No se ha seleccionado ningún archivo.");
                 return;
             }
             errorPorFaltaDeFotos = string.Empty;

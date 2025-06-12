@@ -53,6 +53,7 @@
                             Placeholder="@selectedDate!.Value.DateTime.ToShortDateString()"/>
                     </div>
                     <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+                    <button class="btn btn-secondary" @onclick="@(() => Navegador.NavigateTo("/Perfil"))">Cancelar</button>
                 </div>
             </div>
         </div>

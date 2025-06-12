@@ -11,4 +11,8 @@ public interface IRepositorioCliente
     public Cliente? ObtenerClientePorMail(string mail);
     public List<Cliente> ObtenerClientes();
     public Cliente? ObtenerClientePorMailYContraseña(string mail, string contraseña);
+    public bool SeRepiteDNI(Cliente cliente);
+
+    public bool SeRepiteCorreo(Cliente cliente);
+ 
 }

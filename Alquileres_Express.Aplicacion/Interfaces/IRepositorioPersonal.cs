@@ -19,5 +19,6 @@ public interface IRepositorioPersonal
     public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad);
 
     public Personal ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad);
-
+    public bool SeRepiteDNI(Personal p);
+    public bool SeRepiteCorreo(Personal p);
 }
