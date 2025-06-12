@@ -143,7 +143,7 @@
             // Llama al caso de uso para registrar el pago en efectivo
             casoDeUsoPagarEfectivo.PagarEfectivo(alquiler, inmueble.Id, StartDate.Value.DateTime, EndDate.Value.DateTime);
             ErrorMessage = "Alquiler registrado exitosamente.";
-            Navegador.NavigateTo("/");
+            Navegador.NavigateTo($"/?mensaje=¡Se registro el alquiler exitosamente!");
         }
         catch (Exception ex)
         {

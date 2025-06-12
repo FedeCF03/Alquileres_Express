@@ -1,4 +1,4 @@
-namespace Alquileres_Express.Aplicacion.Entidades;
+ namespace Alquileres_Express.Aplicacion.Entidades;
 using Alquileres_Express.Aplicacion.Enumerativo;
 
 public abstract class Usuario
