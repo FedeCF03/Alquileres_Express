@@ -83,21 +83,29 @@
 
 <InputFile accept=".png,.jpeg,.jpg"@key=@(inputFileId) OnChange="CaptureFiles" multiple/>
 <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
-<div class="image-list">
-    @foreach (var foto in fotos)
-    {
-        <div class="image-card">
-            <img src="@foto.Url" class="foto" />
-            <button @onclick="()=>EliminarFoto(foto)">Eliminar</button>
-        </div>
-    }
-</div>
+<p> Fotos subidas: @fotos.Count</p>
 @if (errorPorFaltaDeFotos != string.Empty)
     {
         <div class="alert alert-danger">
             <p>@errorPorFaltaDeFotos</p>
         </div>
     }
+
+<button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
+<button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
+
+<div class="image-list">
+
+
+@foreach (var foto in fotos)
+{
+    <div class="image-card">
+        <img src="@foto.Url" class="foto" />
+        <button @onclick="()=>EliminarFoto(foto)">Eliminar</button>
+    </div>
+}
+</div>
+
 @if (erroresDeFotos.Count > 0)
     {
         <div class="alert alert-danger">
@@ -110,8 +118,6 @@
     </Authorized>
 </AuthorizeView>
 
-<button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
-<button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
 
 @if (errores.Count > 0)
 {
@@ -244,17 +250,19 @@
     {
         try
         {
+            errorPorFaltaDeFotos = string.Empty;
             erroresDeFotos.Clear();
             if (browser == null || browser.FileCount == 0)
             {
                 errorPorFaltaDeFotos = ("No se ha seleccionado ningúna foto.");
                 return;
             }
-            errorPorFaltaDeFotos = string.Empty;
+            
 
-            if (browser.FileCount > maxAllowedFiles)
+            if (browser.FileCount > maxAllowedFiles || 
+                (fotos.Count + browser.FileCount) > maxAllowedFiles)
             {
-                erroresDeFotos.Add($"El número de máximo de fotos que puede cargar es {maxAllowedFiles}. Por favor, intente de nuevo con menos fotos");
+                errorPorFaltaDeFotos=($"El número de máximo de fotos que puede cargar es {maxAllowedFiles}.");
                 return;
             }   
             foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))
