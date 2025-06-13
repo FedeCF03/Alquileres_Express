@@ -39,7 +39,7 @@ public class MercadoPagoService
             {
                 Success = "https://localhost:5153/success",
                 Failure = "https://localhost:5153/failure",
-                Pending = "https://localhost:5153/failure"
+                Pending = "https://localhost:5153/pending"
             },
             AutoReturn = "approved",
 

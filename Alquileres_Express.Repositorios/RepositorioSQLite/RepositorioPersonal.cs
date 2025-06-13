@@ -8,6 +8,7 @@ namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
 public class RepositorioPersonal : IRepositorioPersonal
 {
+        private readonly Alquileres_ExpressContext _context;
         public void AgregarPersonal(Personal p)
         {
             using Alquileres_ExpressContext _context = new();
@@ -90,7 +91,7 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     }
 
-    public Personal ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad)
+    public Personal ValidarCodigoDeSeguridad(string correo, string codigoDeSeguridad)
     {
         using Alquileres_ExpressContext _context = new();
         var personal = _context.Personal.FirstOrDefault(p => p.Correo == correo && p.CodigoDeSeguridad == int.Parse(codigoDeSeguridad));
@@ -104,22 +105,45 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     }
 
+    //  public bool ModificarPersonal(Personal personal)
+    // {
+    //     var clienteExistente = ObtenerPersonalPorId(personal.Id);
+    //     bool ok = true;
+    //     if (clienteExistente == null)
+    //     {
+    //         ok = false;
+    //         throw new KeyNotFoundException($"No se encontró un personal con el correo {personal.Correo}");
+    //     }
+
+    //     clienteExistente.Nombre = personal.Nombre;
+    //     clienteExistente.Apellido = personal.Apellido;
+
+    //     clienteExistente.Correo = personal.Correo;
+    //     clienteExistente.Direccion = personal.Direccion;
+    //     clienteExistente.Dni = personal.Dni;
+    //     clienteExistente.FechaNacimiento = personal.FechaNacimiento;
+    //     _context.SaveChanges();
+    //     return ok;
+    // }
+
+
     public bool ModificarPersonal(Personal personal)
-    {
-        using Alquileres_ExpressContext _context = new();
-        var personalExistente = ObtenerPersonalPorId(personal.Id);
-        //se checkea q no se repita el correo y dni en caso de uso
-        personalExistente.Nombre = personal.Nombre;
-        personalExistente.Apellido = personal.Apellido;
+{
+    using Alquileres_ExpressContext _context = new();
+    var personalExistente = _context.Personal.FirstOrDefault(p => p.Id == personal.Id);
+    if (personalExistente == null)
+        return false; // O lanzar una excepción, según el caso
+    
+    personalExistente.Nombre = personal.Nombre;
+    personalExistente.Apellido = personal.Apellido;
+    personalExistente.Correo = personal.Correo;
+    personalExistente.Direccion = personal.Direccion;
+    personalExistente.Dni = personal.Dni;
+    personalExistente.FechaNacimiento = personal.FechaNacimiento;
 
-        personalExistente.Correo = personal.Correo;
-        personalExistente.Direccion = personal.Direccion;
-        personalExistente.Dni = personal.Dni;
-        personalExistente.FechaNacimiento = personal.FechaNacimiento;
-
-        _context.SaveChanges();
-        return true;
-    }
+    _context.SaveChanges();
+    return true;
+}
     public bool SeRepiteDNI(Personal cliente)
     {
         using Alquileres_ExpressContext _context = new();

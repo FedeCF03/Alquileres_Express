@@ -170,7 +170,6 @@
             {
                 if(!usuarioNuevo.Correo.ToLower().Equals(correo.ToLower())){
                     deslogeando = exitoso = true;
-                    
                     await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/logout"));
                 }
                 else{
@@ -184,7 +183,7 @@
         else
             if (casoDeUsoModificarPersonal.Ejecutar(_personal, out errores))                                                      
             {
-                if(usuarioNuevo.Correo.ToLower().Equals(correo.ToLower())){
+                if(!usuarioNuevo.Correo.ToLower().Equals(correo.ToLower())){
                     deslogeando = exitoso = true;
                     await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/logout"));
                 }

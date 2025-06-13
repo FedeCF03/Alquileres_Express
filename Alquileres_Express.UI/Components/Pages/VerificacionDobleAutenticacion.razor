@@ -7,7 +7,6 @@
 @using Alquileres_Express.Repositorios.RepositorioSQLite
 @inject CasoDeUsoValidarCodigoDeSeguridad casoDeUsoValidarCodigoDeSeguridad
 <PageTitle>Verificación de Doble Autenticación</PageTitle>
-
 <h3>Verificación</h3>
 
 
@@ -65,17 +64,16 @@
         {
             return;
         }
-
         Personal? usuario = casoDeUsoValidarCodigoDeSeguridad.Ejecutar(modelo.Correo, modelo.Codigo);
         if (usuario != null)
         {
             await guardarEnCookie(modelo.Correo, usuario.Rol, usuario.Nombre);
-
         }
         else
         {
             errores.Add("Email o código incorrectos.");
         }
+            
     }
 
     public class VerificacionModel

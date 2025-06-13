@@ -10,7 +10,7 @@ public class ServicioVerificarPago(CasoDeUsoRegistrarAlquilerOnline casoDeUsoReg
 {
     List<PagoPendiente> PagosPendientes { get; set; } = new();
 
-    public bool AprobarPago(String idPago)
+    public bool AprobarPago(string idPago)
     {
         Console.WriteLine("Pago pendiente agregado. Total de pagos pendientes: " + PagosPendientes.Count);
 
@@ -25,7 +25,7 @@ public class ServicioVerificarPago(CasoDeUsoRegistrarAlquilerOnline casoDeUsoReg
             Console.WriteLine("Lo encontre y lo saco.");
             PagosPendientes.Remove(pagoEncontrado);
             casoDeUsoRegistrarAlquilerOnline.Ejecutar(pagoEncontrado.alquiler);
-            //servicioEnviarEmail.EnviarEmail(pagoEncontrado.alquiler.CorreoCliente, "Alquiler registrado exitosamente", "Su pago fue exitoso! Por favor contáctese", "");
+            servicioEnviarEmail.EnviarEmail(pagoEncontrado.alquiler.CorreoCliente, "Alquiler registrado exitosamente", "Su pago fue exitoso! Por favor contáctese para coordinar la entrega de llaves", "");
             return true;
         }
     }
@@ -51,7 +51,24 @@ public class ServicioVerificarPago(CasoDeUsoRegistrarAlquilerOnline casoDeUsoReg
         {
             Console.WriteLine("Lo encontre y lo saco.");
             PagosPendientes.Remove(pagoEncontrado);
-            //servicioEnviarEmail.EnviarEmail(pagoEncontrado.alquiler.CorreoCliente, "Alquiler registrado exitosamente", "Su pago fue exitoso! Por favor contáctese", "");
+            return true;
+        }
+    }
+    public bool PagoPendiente(String idPago)
+    {
+       
+
+        PagoPendiente? pagoEncontrado = PagosPendientes.FirstOrDefault(p => p.IdPago == idPago);
+        if (pagoEncontrado == null)
+        {
+          
+            return false;
+        }
+        else
+        {
+            Console.WriteLine("Lo encontre y lo saco.");
+            PagosPendientes.Remove(pagoEncontrado);
+            casoDeUsoRegistrarAlquilerOnline.Ejecutar(pagoEncontrado.alquiler);
             return true;
         }
     }

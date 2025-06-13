@@ -309,7 +309,7 @@
         alquileres.Where(a => !a.Cancelado &&
         !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado)).ToList().ForEach(alquiler =>
         {
-            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin));
+            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin.AddDays(-1)));
         });
     }
 

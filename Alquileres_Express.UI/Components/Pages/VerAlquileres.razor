@@ -1,4 +1,4 @@
-@page "/mis-alquileres"
+@page "/mis-alquileres/{Id:int}"
 @attribute [Authorize]
 
 @using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler
@@ -10,6 +10,7 @@
 @inject CasoDeUsoAlquilerCancelarAlquiler casoDeUsoAlquilerCancelarAlquiler
 @inject CasoDeUsoAlquilerGetEstadoDeAlquiler casoDeUsoAlquilerGetEstadoDeAlquiler
 @inject CasoDeUsoObtenerAlquilerPorId casoDeUsoObtenerAlquilerPorId
+@inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
 
 @rendermode InteractiveServer
 
@@ -79,9 +80,11 @@
                             {
                                 EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
 
-                    <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
-                                <i class="fas fa-times"></i> Cancelar
-                        </button>
+                            @if (estado == EstadoDeAlquiler.Vigente)
+                             {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                             }
 
                                 @if (estado == EstadoDeAlquiler.Terminado)
                                 {
@@ -98,12 +101,7 @@
                                         <i class="fas fa-spinner"></i> En Proceso
                                     </span>
                                 }
-                                else
-                                {
-                                    <span class="status-label pendiente">
-                                        <i class="fas fa-clock"></i> Pendiente
-                                    </span>
-                                }
+                             
                             }
                             else
                             {
@@ -134,11 +132,12 @@
 @code {
     private string correo = "";
     private string rol = "";
-    private List<Alquiler> alquileres = new List<Alquiler>();
+    private List<Alquiler>? alquileres = new List<Alquiler>();
     private List<Inmueble> inmuebles = new List<Inmueble>();
 
-    [SupplyParameterFromQuery]
-    private int id { get; set; } = 0;
+    [Parameter]
+    public int id { get; set; } = 0;
+    Cliente? cliente;
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -147,12 +146,22 @@
         {
             correo = user.Identity.Name;
             rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            if (id != 0)
+            {
+                cliente = casoDeUsoBuscarClientePorId.Ejecutar(id);
+            }
 
             if (rol == "Cliente")
             {
                 try
                 {
-                    alquileres = casoDeUsoObtenerAlquileresPorCorreo.Ejecutar(correo);
+                    if (cliente == null)
+                    {
+                        NavigationManager.NavigateTo("/?mensaje=Cliente no encontrado&EsMensajeError=true");
+                        return;
+                    }
+                
+                    alquileres = cliente.Alquileres;
                 }
                 catch (Exception ex)
                 {
@@ -165,7 +174,7 @@
                 {
                     if( id != 0)
                     {
-                        alquileres = casoDeUsoObtenerAlquilerPorId.Ejecutar(id);
+                        alquileres = cliente.Alquileres;
                     }
                     else
                     alquileres = casoDeUsoObtenerTodosLosAlquileres.Ejecutar();
@@ -223,10 +232,10 @@
         return inmuebles.FirstOrDefault(i => i.Id == inmuebleId);
     }
 
-    private void CancelarReserva(int id)
+    private void CancelarReserva(int Alquilerid)
     {
-        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(id);
-        NavigationManager.NavigateTo("/mis-alquileres", true);    
+        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(Alquilerid);
+        NavigationManager.NavigateTo($"/mis-alquileres/{id}", true);    
 
     }
 
