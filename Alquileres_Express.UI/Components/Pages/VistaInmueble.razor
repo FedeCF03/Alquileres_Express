@@ -280,7 +280,7 @@
         {
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
             CrearRangosDeFechaReservados(inmueble.Alquileres);
-            imagenes = repositorioFotos.ObtenerFotosPorInmueble(Id).Select(f => f.Url).ToArray();
+            imagenes = inmueble.Fotos != null ? inmueble.Fotos.Select(f=>f.Url).ToArray() : new string[0];
         }
         catch (Exception ex)
         {

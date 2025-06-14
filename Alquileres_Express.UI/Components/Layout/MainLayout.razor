@@ -45,7 +45,7 @@
                         <div class="nav-item px-3">
                             <NavLink class="nav-link" href="/Perfil">
                                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span><i
-                                    class="fas fa-user"></i>@cliente.Nombre
+                                    class="fas fa-user"></i>@(cliente?.Nombre ?? "Perfil")
                                 
                             </NavLink>
                         </div>
@@ -55,7 +55,7 @@
                         <div class="nav-item px-3">
                             <NavLink class="nav-link" href="/Perfil">
                                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span><i
-                                    class="fas fa-user"></i>@personal.Nombre
+                                    class="fas fa-user"></i>@(personal?.Nombre ?? "Perfil")
                             </NavLink>
                         </div>
                     }

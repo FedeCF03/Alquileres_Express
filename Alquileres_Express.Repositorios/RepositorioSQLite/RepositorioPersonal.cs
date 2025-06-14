@@ -156,7 +156,7 @@ public class RepositorioPersonal : IRepositorioPersonal
     public bool SeRepiteCorreo(Personal cliente)
     {
         using Alquileres_ExpressContext _context = new();
-        return _context.Clientes.FirstOrDefault(c => c.Correo.ToLower().Equals(cliente.Correo.ToLower()) && c.Id != cliente.Id) != null ||
+        return _context.Clientes.FirstOrDefault(c => c.Correo.ToLower().Equals(cliente.Correo.ToLower())) != null ||
         _context.Personal.FirstOrDefault(p => p.Correo.ToLower().Equals(cliente.Correo.ToLower()) && p.Id != cliente.Id) != null;
     }
 }

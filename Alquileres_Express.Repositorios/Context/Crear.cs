@@ -35,7 +35,7 @@ public class Crear
                 ,
             });
 
-            /*
+            
             context.Add(new Inmueble
             {
                 Nombre = "Departamento en la playa",                    //para probar sin inmuebles
@@ -80,7 +80,7 @@ public class Crear
                 InmuebleId = 2
             });
 
-        */
+        
             context.SaveChanges();
         }
         
