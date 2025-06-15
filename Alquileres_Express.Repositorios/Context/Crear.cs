@@ -22,16 +22,16 @@ public class Crear
                 FechaNacimiento = new DateTime(1990, 1, 1),
                 Rol = Aplicacion.Enumerativo.RolUsuario.Gerente,
             });
-            context.Add(new Personal
+            context.Add(new Cliente
             {
                 Nombre = "Mario",
                 Apellido = "Castro",
-                Correo = "castrotomasandres05@gmail.com",
-                Dni = "12312312",
+                Correo = "gallomartinianolc@gmail.com",
+                Dni = "11111112",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Falsa 123",
                 FechaNacimiento = new DateTime(1990, 1, 1),
-                Rol = Aplicacion.Enumerativo.RolUsuario.Empleado
+                Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
                 ,
             });
 
