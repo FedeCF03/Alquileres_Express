@@ -10,14 +10,27 @@ public abstract class Usuario
     public string Nombre { get; set; } = "";
     public string Apellido { get; set; } = "";
     public string Direccion { get; set; } = "";
-    public DateTime FechaNacimiento { get; set; } 
+    public DateTime FechaNacimiento { get; set; }
     public List<RegistroDeLlave>? RegistrosDeLlave { get; set; }
 
-    public RolUsuario Rol { get; set; } 
+    public RolUsuario Rol { get; set; }
 
     public Usuario()
     {
 
+    }
+    // Constructor de la clase base que inicializa los campos comunes
+    public Usuario(int id, string dni, string correo, string contraseña, string nombre, string apellido, string direccion, DateTime fechaNacimiento, RolUsuario rol)
+    {
+        Id = id;
+        Dni = dni;
+        Correo = correo;
+        Contraseña = contraseña;
+        Nombre = nombre;
+        Apellido = apellido;
+        Direccion = direccion;
+        FechaNacimiento = fechaNacimiento;
+        Rol = rol;
     }
     
     // Constructor de la clase base

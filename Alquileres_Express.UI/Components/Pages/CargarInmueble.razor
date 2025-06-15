@@ -29,7 +29,7 @@
 
 <label class="form-label">Dirección del Inmueble</label>
 <input required=true type="text" @bind="inmueble.Direccion" placeholder="Dirección del Inmueble" class="form-control mb-2" />
-<label class="form-label">Precio por día del Inmueble</label>
+<label class="form-label">Precio por noche del Inmueble</label>
 <input required=true type="number" @bind="inmueble.Precio" placeholder="Precio del Inmueble" class="form-control mb-2" />
 <label class="form-label">Cantidad de camas del Inmueble</label>
 <input required=true type="number" @bind="inmueble.CantidadDeCamas" placeholder="Cantidad de camas" class="form-control mb-2" />
@@ -103,6 +103,13 @@
 
 <InputFile accept=".jpg,.png,.jpeg" id="input" @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
 <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
+<p> Fotos subidas: @fotos.Count</p>
+@if (errorPorFaltaDeFotos != string.Empty)
+    {
+        <div class="alert alert-danger">
+            <p>@errorPorFaltaDeFotos</p>
+        </div>
+    }
 
 <button class="btn btn-primary" @onclick="() => Cargar()">Cargar Inmueble</button>
 
@@ -132,12 +139,7 @@
 }
         
 
-@if (errorPorFaltaDeFotos != string.Empty)
-    {
-        <div class="alert alert-danger">
-            <p>@errorPorFaltaDeFotos</p>
-        </div>
-    }
+
 
 @code {
     Inmueble inmueble = new();
@@ -226,9 +228,9 @@
             }
             errorPorFaltaDeFotos = string.Empty;
 
-            if (browser.FileCount > maxAllowedFiles)
+            if (browser.FileCount > maxAllowedFiles || (browser.FileCount + fotos.Count) > maxAllowedFiles)
             {
-                erroresDeFotos.Add($"El número de máximo de fotos que puede cargar es {maxAllowedFiles}. Por favor, intente de nuevo con menos fotos");
+                errorPorFaltaDeFotos=($"El número de máximo de fotos que puede cargar es {maxAllowedFiles}.");
                 return;
             }   
             foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))

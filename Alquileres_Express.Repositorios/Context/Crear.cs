@@ -16,18 +16,7 @@ public class Crear
                 Nombre = "María",
                 Apellido = "Torres",
                 Correo = "marfacucosas@gmail.com",
-                Dni = "12345678",
-                Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
-                Direccion = "Calle Falsa 123",
-                FechaNacimiento = new DateTime(1990, 1, 1),
-                Rol = Aplicacion.Enumerativo.RolUsuario.Administrador,
-            });
-            context.Add(new Personal
-            {
-                Nombre = "Mario",
-                Apellido = "Castro",
-                Correo = "tomicarp12@gmail.com",
-                Dni = "87654321",
+                Dni = "11111111",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Falsa 123",
                 FechaNacimiento = new DateTime(1990, 1, 1),
@@ -37,7 +26,7 @@ public class Crear
             {
                 Nombre = "Mario",
                 Apellido = "Castro",
-                Correo = "a@gmail.com",
+                Correo = "castrotomasandres05@gmail.com",
                 Dni = "12312312",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Falsa 123",

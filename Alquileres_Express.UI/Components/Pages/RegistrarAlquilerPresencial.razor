@@ -17,11 +17,6 @@
 @attribute [Authorize(Roles = "Administrador,Gerente,Empleado")]
 
 
-@if (!string.IsNullOrEmpty(ErrorMessage))
-{
-    <div class="alert alert-danger">@ErrorMessage</div>
-}
-
 <div class="container mt-5">
     <div class="card shadow-lg p-4">
         <h2 class="card-title text-center text-primary">📌 Registrar Alquiler Presencial</h2>
@@ -142,7 +137,6 @@
 
             // Llama al caso de uso para registrar el pago en efectivo
             casoDeUsoPagarEfectivo.PagarEfectivo(alquiler, inmueble.Id, StartDate.Value.DateTime, EndDate.Value.DateTime);
-            ErrorMessage = "Alquiler registrado exitosamente.";
             Navegador.NavigateTo($"/?mensaje=¡Se registro el alquiler exitosamente!");
         }
         catch (Exception ex)
@@ -156,7 +150,7 @@
         alquileres.Where(a => !a.Cancelado &&
         !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado) && a.Pagado).ToList().ForEach(alquiler =>
         {
-            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin));
+            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin.AddDays(-1)));
         });
     }
     private bool NoEsHabil(DateTimeOffset date)
@@ -176,7 +170,7 @@
         {
             if (NoEsHabil(date))
             {
-                mensajeError = $"La fecha {date.ToShortDateString()} ya está reservada.";
+                mensajeError = $"Una o más fechas seleccionadas no están disponibles. Por favor, elija fechas que no estén bloqueadas.";
                 StateHasChanged();
                 podesPagar = false;
                 return;

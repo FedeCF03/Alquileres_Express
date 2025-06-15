@@ -169,7 +169,7 @@
 
                                     <div class="breakdown-total">
                                         <span>Total</span>
-                                        <span>$@calcularPrecio().ToString("N0")</span>
+                                        <span>$@calcularPrecio().ToString()</span>
                                     </div>
                                 </div>
                             }
@@ -309,7 +309,7 @@
         alquileres.Where(a => !a.Cancelado &&
         !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado)).ToList().ForEach(alquiler =>
         {
-            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin));
+            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin.AddDays(-1)));
         });
     }
 

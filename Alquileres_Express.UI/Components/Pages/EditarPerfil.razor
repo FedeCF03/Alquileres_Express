@@ -21,7 +21,7 @@
 @attribute [Authorize]
 
     <div class="contenedor-edicion">
-        <h2 class="titulo">Bienvenido/a, @usuarioNuevo.Nombre @usuarioNuevo.Apellido</h2>
+        <h2 class="titulo">Bienvenido/a, @usuarioViejo.Nombre @usuarioViejo.Apellido</h2>
         <p class="subtitulo">Aquí puede editar sus datos personales</p>
         <div class="tablas-contenedor">
             <div class="tabla-card">
@@ -37,12 +37,12 @@
             </div>
             <div class="tabla-card">
                 <h3>Editar datos</h3>
-                <h4>!Cambiar su Email cerrara su sesion y debera iniciar sesion nuevamente!</h4>
+                <p>¡Cambiar su email cerrará su sesión y deberá iniciar sesión nuevamente!</p>
                 <div class="form-group">
                     <input placeholder="Nombre" @bind="usuarioNuevo.Nombre" class="form-control" />
                     <input placeholder="Apellido" @bind="usuarioNuevo.Apellido" class="form-control" />
                     <input placeholder="DNI" @bind="usuarioNuevo.Dni" class="form-control" />
-                    <input placeholder="Correo" @bind="usuarioNuevo.Correo" class="form-control" />
+                    <input placeholder="Correo" @bind="correoNuevo" class="form-control" />
                     <input placeholder="Dirección" @bind="usuarioNuevo.Direccion" class="form-control" />
                     <label>Fecha de Nacimiento</label>
                     <div class="d-flex">
@@ -84,14 +84,15 @@
    private DateTimeOffset? selectedDate;
    private string? rol;
    private DateTime minDate = new DateTime(DateTime.Now.Year - 100, 1, 1);
-   Cliente _cliente = new Cliente();
-   Personal _personal = new Personal();
+   Cliente _cliente;
+   Personal _personal; 
 
     String? correo { get; set; }
+    string correoNuevo { get; set; } = string.Empty;
     Cliente? cliente { get; set; }
     Personal? personal { get; set; }
-    Usuario usuarioNuevo {get; set; }
-    Usuario usuarioViejo { get; set; }
+    Usuario? usuarioNuevo {get; set; } 
+    Usuario? usuarioViejo { get; set; }
     [CascadingParameter]
     HttpContext? HttpContext { get; set; }
     private bool exitoso = false;
@@ -106,44 +107,47 @@
         {
             correo = user.Identity.Name;
             rol = user.FindFirst(ClaimTypes.Role)?.Value;
-            cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
-            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+            cliente ??= CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
+            personal ??= CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
             if (cliente != null)
             {
-                _cliente = new Cliente{Nombre = cliente.Nombre,
+                _cliente = new Cliente{
+                    Nombre = new String(cliente.Nombre),
                     Id = cliente.Id,
-                    Apellido = cliente.Apellido,
-                    Dni = cliente.Dni,
-                    Correo = cliente.Correo,
-                    Direccion = cliente.Direccion,
+                    Apellido = new String(cliente.Apellido),
+                    Dni = new String(cliente.Dni),
+                    Correo = new String(cliente.Correo),
+                    Direccion = new String(cliente.Direccion),
                     FechaNacimiento = cliente.FechaNacimiento,
-                    Contraseña = cliente.Contraseña,
+                    Contraseña = new String(cliente.Contraseña),
                     Rol = cliente.Rol
                 };
                 selectedDate = cliente.FechaNacimiento;
-                usuarioViejo = cliente;
-                usuarioNuevo = _cliente;
+                usuarioViejo ??= cliente;
+                usuarioNuevo ??= _cliente;
+                correoNuevo = _cliente.Correo;
             }
             else if (personal != null)
             {
                 _personal = new Personal
                 {
                     Id = personal.Id,
-                    Nombre = personal.Nombre,
-                    Apellido = personal.Apellido,
-                    Dni = personal.Dni,
-                    Correo = personal.Correo,
-                    Direccion = personal.Direccion,
+                    Nombre = new String(personal.Nombre),
+                    Apellido = new String(personal.Apellido),
+                    Dni = new String(personal.Dni),
+                    Correo = new String(personal.Correo),
+                    Direccion = new String(personal.Direccion),
                     FechaNacimiento = personal.FechaNacimiento,
-                    Contraseña = personal.Contraseña,
+                    Contraseña = new String(personal.Contraseña),
                     Rol = personal.Rol,
                     CodigoDeSeguridad = personal.CodigoDeSeguridad
 
 
                 };
                 selectedDate = personal.FechaNacimiento;
-                usuarioViejo = personal;
-                usuarioNuevo = _personal;
+                usuarioViejo ??= personal;
+                usuarioNuevo ??= _personal;
+                correoNuevo = _personal.Correo;
             }
         }
     }
@@ -156,15 +160,16 @@
             errores.Add("Por favor, seleccioná una fecha de nacimiento.");
             return;
         }
-        usuarioNuevo.FechaNacimiento = selectedDate.Value.DateTime;
+        usuarioNuevo!.FechaNacimiento = selectedDate.Value.DateTime;
+        usuarioNuevo!.Correo = correoNuevo;
+        
 
         if (usuarioNuevo.Rol.Equals(RolUsuario.Cliente))
         {
             if (casoDeUsoModificarCliente.Ejecutar(_cliente, out errores))
             {
-                if(usuarioNuevo.Correo.ToLower().Equals(usuarioViejo!.Correo.ToLower())){
+                if(!usuarioNuevo.Correo.ToLower().Equals(correo.ToLower())){
                     deslogeando = exitoso = true;
-                    
                     await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/logout"));
                 }
                 else{
@@ -178,7 +183,7 @@
         else
             if (casoDeUsoModificarPersonal.Ejecutar(_personal, out errores))                                                      
             {
-                if(usuarioNuevo.Correo.ToLower().Equals(usuarioViejo!.Correo.ToLower())){
+                if(!usuarioNuevo.Correo.ToLower().Equals(correo.ToLower())){
                     deslogeando = exitoso = true;
                     await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/logout"));
                 }

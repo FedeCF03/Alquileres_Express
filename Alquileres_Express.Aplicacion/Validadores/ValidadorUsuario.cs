@@ -59,7 +59,7 @@ public class ValidadorUsuario
     private void ValidarDni(string dni)
     {
         if (!Regex.IsMatch(dni, @"^\d{7,8}$"))
-           _errores.Add("El DNI debe contener solo números y tener entre 7 y 8 dígitos.");
+           _errores.Add("El DNI debe tener entre 7 y 8 dígitos.");
     }
 
 }

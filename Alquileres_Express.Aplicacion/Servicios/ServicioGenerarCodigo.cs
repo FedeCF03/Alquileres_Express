@@ -5,10 +5,10 @@ public  class ServicioGenerarCodigo
     public string GenerarCodigoAleatorio()
     {
         Random random = new();
-        String codigo = "";
+        string codigo = "";
         for (int i = 0; i < 4; i++)
         {
-            int numeroAleatorio = random.Next(0, 10);
+            int numeroAleatorio = random.Next(1, 10);
             codigo += numeroAleatorio.ToString();
         }
         return codigo;

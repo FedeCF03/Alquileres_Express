@@ -73,7 +73,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
 
         var fechasReservadas = alquileresDelInmueble
             .Where(a => !a.Cancelado && a.Pagado && !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado))
-            .Select(a => new RangoDeFechas(a.FechaDeInicio, a.FechaDeFin))
+            .Select(a => new RangoDeFechas(a.FechaDeInicio, a.FechaDeFin.AddDays(-1)))
             .ToList();
             
         return !fechasReservadas.Any(rango => rango.SeSuperponeCon(new RangoDeFechas(fechaInicio, fechaFin)));
@@ -111,6 +111,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
     public void RegistrarAlquilerVirtual(Alquiler alquiler)
     {
         using Alquileres_ExpressContext _context = new();
+        alquiler.FechaDeInicio.AddHours(15);
         alquiler.Pagado = true;
         _context.Alquileres.Add(alquiler);
         _context.SaveChanges();

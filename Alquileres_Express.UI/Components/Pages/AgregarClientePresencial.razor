@@ -1,0 +1,111 @@
+@page "/registrar-cliente-presencial"
+@rendermode InteractiveServer
+@inject NavigationManager Navegador
+@inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ServicioEnviarEmail servicioEnviarEmail
+@inject ValidadorUsuario validadorUsuario
+@attribute [Authorize (Roles = "Empleado,Gerente,Administrador")]
+@using BlazorDateRangePicker
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center text-primary">📝 Registrar Cliente Presencial</h2>
+        <p class="text-center text-muted">Complete los siguientes campos para registrar un cliente.</p>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="fw-bold">Nombre</label>
+                <input @bind="_cliente.Nombre" class="form-control form-control-lg" placeholder="Ingrese su nombre" />
+            </div>
+            <div class="col-md-6">
+                <label class="fw-bold">Apellido</label>
+                <input @bind="_cliente.Apellido" class="form-control form-control-lg" placeholder="Ingrese su apellido" />
+            </div>
+            <div class="col-md-6">
+                <label class="fw-bold">DNI</label>
+                <input type="number" @bind="_cliente.Dni" class="form-control form-control-lg" placeholder="Ingrese su DNI" />
+            </div>
+            <div class="col-md-6">
+                <label class="fw-bold">Correo</label>
+                <input @bind="_cliente.Correo" class="form-control form-control-lg" placeholder="Ingrese su correo electrónico" />
+            </div>
+            <div class="col-md-6">
+                <label class="fw-bold">Dirección</label>
+                <input @bind="_cliente.Direccion" class="form-control form-control-lg" placeholder="Ingrese su dirección" />
+            </div>
+            <div class="col-md-6">
+                <label class="fw-bold">Fecha de Nacimiento</label>
+                <div class="border rounded p-2">
+                    <DateRangePicker @bind-EndDate="selectedDate" 
+                                     MinDate="minDate"
+                                     MaxDate="DateTime.Now" 
+                                     SingleDatePicker="true" />
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-lg btn-success w-50" @onclick="Aceptar">
+                Aceptar
+            </button>
+        </div>
+
+        @foreach (var error in errores)
+        {
+            <div class="alert alert-danger mt-3 text-center">@error</div>
+        }
+    </div>
+</div>
+
+@code {
+    private Cliente _cliente = new Cliente();
+    private string? ErrorMessage;
+    private DateTimeOffset? selectedDate;
+    private DateTime minDate = new DateTime(DateTime.Now.Year - 100, 1, 1);
+    private string? rol;
+    private string? correoDelUsuarioEjecutando;
+    private List<string> errores = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            correoDelUsuarioEjecutando = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            if (rol != null && rol.Equals("Cliente", StringComparison.OrdinalIgnoreCase))
+            {
+                Navegador.NavigateTo("/mensaje=No tenés permisos para acceder a esta página.&EsMensajeDeError=true");
+            }
+        }
+    }
+
+    private void Aceptar()
+    {
+        errores.Clear();
+        if (selectedDate == null)
+        {
+            errores = validadorUsuario.Ejecutar(_cliente);
+            errores.Add("Por favor, seleccioná una fecha de nacimiento.");
+            return;
+        }
+
+        _cliente.FechaNacimiento = selectedDate.Value.DateTime;
+        _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
+
+        bool ok = casoDeUsoAltaCliente.Ejecutar(_cliente, out errores);
+        if (!ok)
+        {
+            return;
+        }
+        
+        servicioEnviarEmail.EnviarEmail(
+            _cliente.Correo, 
+            "Usuario registrado", 
+            "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", 
+            _cliente.Dni);
+        Navegador.NavigateTo("/?mensaje=Cliente registrado correctamente");
+    }
+}

@@ -14,9 +14,9 @@
 @inject ServicioEnviarEmail servicioEnviarEmail
 <div class="login-container">
     <div class="login-card">
-        <h3 class="login-title">Iniciar Sesión</h3>
+        <h3 class="login-title">Iniciar sesión</h3>
 
-        <EditForm Model="@user" OnValidSubmit="IniciarSesionComoGerenteFake" FormName="loginForm">
+        <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -32,16 +32,14 @@
             </div>
             <div class="login-links">
                 @*<a disabled="true" href="/forgot-password" class="link-secondary">¿Olvidaste tu contraseña?</a>*@
-                <a href="/usuario" class="link-secondary">Regístrarse</a>
+                 @*<<a href="/usuario" class="link-secondary">Regístrarse</a> *@
             </div>
             <button type="submit" class="btn-primary">Ingresar</button>
 
         </EditForm>
-        @if (ErrorMessage)
+        @foreach (var error in errores)
         {
-            <div class="alert alert-danger mt-3">
-                <strong>Error:</strong> Credenciales incorrectas.
-            </div>
+            <div class="alert alert-danger mt-2">@error</div>
         }
     </div>
 </div>
@@ -50,7 +48,7 @@
     public HttpContext? HttpContext { get; set; }
     [SupplyParameterFromForm]
     private LoginModel user { get; set; } = new();
-    private bool ErrorMessage { get; set; } = false;
+    private List<string> errores { get; set; } = [];
     private async Task IniciarSesionComoGerenteFake()
     {
         user.Correo = "tomicarp12@gmail.com";
@@ -60,6 +58,25 @@
     }
     private async Task IniciarSesion()
     {
+        errores.Clear();
+        if (string.IsNullOrEmpty(user.Correo))
+        {
+            errores.Add("Por favor, ingrese un correo.");   
+        }
+        else if (!user.Correo.Contains('@'))
+        {
+            errores.Add("El correo ingresado no es válido.");
+        }
+        if (string.IsNullOrEmpty(user.Contraseña))
+        {
+            errores.Add("Por favor, ingrese una contraseña.");
+        }
+        if (errores.Count > 0)
+        {
+            return;
+        }
+
+
         Cliente? cliente = null;
         Personal? personal = casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
         if (personal != null)
@@ -91,7 +108,7 @@
             else
             {
                 cliente = null;
-                ErrorMessage = true;
+                errores.Add("Email o contraseña incorrectos.");
             }
         }
 
@@ -127,5 +144,4 @@
             NavigationManager.NavigateTo("/");
         }
     }
-
 }
