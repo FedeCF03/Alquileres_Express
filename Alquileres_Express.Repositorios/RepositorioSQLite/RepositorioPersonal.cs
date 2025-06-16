@@ -8,7 +8,6 @@ namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
 public class RepositorioPersonal : IRepositorioPersonal
 {
-        private readonly Alquileres_ExpressContext _context;
         public void AgregarPersonal(Personal p)
         {
             using Alquileres_ExpressContext _context = new();
@@ -91,7 +90,7 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     }
 
-    public Personal ValidarCodigoDeSeguridad(string correo, string codigoDeSeguridad)
+    public Personal? ValidarCodigoDeSeguridad(string correo, string codigoDeSeguridad)
     {
         using Alquileres_ExpressContext _context = new();
         var personal = _context.Personal.FirstOrDefault(p => p.Correo == correo && p.CodigoDeSeguridad == int.Parse(codigoDeSeguridad));
@@ -104,27 +103,6 @@ public class RepositorioPersonal : IRepositorioPersonal
         return personal;
 
     }
-
-    //  public bool ModificarPersonal(Personal personal)
-    // {
-    //     var clienteExistente = ObtenerPersonalPorId(personal.Id);
-    //     bool ok = true;
-    //     if (clienteExistente == null)
-    //     {
-    //         ok = false;
-    //         throw new KeyNotFoundException($"No se encontró un personal con el correo {personal.Correo}");
-    //     }
-
-    //     clienteExistente.Nombre = personal.Nombre;
-    //     clienteExistente.Apellido = personal.Apellido;
-
-    //     clienteExistente.Correo = personal.Correo;
-    //     clienteExistente.Direccion = personal.Direccion;
-    //     clienteExistente.Dni = personal.Dni;
-    //     clienteExistente.FechaNacimiento = personal.FechaNacimiento;
-    //     _context.SaveChanges();
-    //     return ok;
-    // }
 
 
     public bool ModificarPersonal(Personal personal)

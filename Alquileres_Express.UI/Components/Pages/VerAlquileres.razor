@@ -1,4 +1,4 @@
-@page "/mis-alquileres/{Id:int}"
+@page "/alquileres/{Id:int}"
 @attribute [Authorize]
 
 @using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler
@@ -11,13 +11,35 @@
 @inject CasoDeUsoAlquilerGetEstadoDeAlquiler casoDeUsoAlquilerGetEstadoDeAlquiler
 @inject CasoDeUsoObtenerAlquilerPorId casoDeUsoObtenerAlquilerPorId
 @inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
+@inject CasoDeUsoAñadirLlave casoDeUsoAlquilerAñadirLlave
+@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 
 @rendermode InteractiveServer
 
-<div class="page-header">
-    <h1><i class="fas fa-home"></i> Mis Alquileres</h1>
-    <p>Gestiona tus reservas de manera fácil y rápida</p>
-</div>
+<AuthorizeView Roles="Cliente">
+<Authorized>
+    <div class="page-header">
+        <h1><i class="fas fa-home"></i> Mis Alquileres</h1>
+        <p>Gestiona tus reservas de manera fácil y rápida</p>
+    </div>
+</Authorized>
+<NotAuthorized>
+    
+    <div class="page-header">
+        @if (id != 0)
+        {
+            <h1><i class="fas fa-home"></i> Alquileres de @cliente?.Nombre</h1>
+            <p>Gestiona los alquileres del cliente de manera fácil y rápida</p>
+        }
+        else
+        {
+            <h1><i class="fas fa-home"></i> Alquileres</h1>
+            <p>Gestiona los alquileres de todos los clientes</p>
+        }
+        
+    </div>
+</NotAuthorized>
+</AuthorizeView>
 
 <div class="rental-grid">
     @if (alquileres != null && alquileres.Count > 0)
@@ -31,7 +53,6 @@
                     <div class="rental-image">
                         <NavLink href="@($"/inmueble/{alquiler.InmuebleId}")">
                             <img src="@getImagenInmueble(alquiler.InmuebleId)" alt="@inmueble.Nombre" href />
-
                         </NavLink>
                         <div class="price-badge">
     @if (alquiler.Precio > 0)
@@ -76,6 +97,32 @@
                         </div>
 
                         <div class="rental-actions">
+                         <AuthorizeView Roles="Administrador, Gerente, Empleado">
+                            @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
+                            {
+                            <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
+                                    <i class= "fas fa-times" > </i> Registrar entrega 
+                            </button>
+                            } 
+                            else 
+                            {
+                                <a class="operation-btn historial" href ="@($"/ListarLlaves/{alquiler.Id}")">
+                                    <span class="btn-icon">📋</span>
+                                        Listar historial de llaves
+                                </a>
+                                if(alquiler.RegistrosDeLlave.Count == 2)
+                                {
+                                    <p><i class= "fas fa-check" > </i> Entrega y devolución registrada</p>
+                                }
+                                else
+                                {
+                                    <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, false)" >
+                                            <i class= "fas fa-times" > </i> Registrar devolucion 
+                                    </button >
+                                }
+                                
+                            }
+                            </AuthorizeView>
                             @if (!alquiler.Cancelado)
                             {
                                 EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
@@ -88,9 +135,9 @@
 
                                 @if (estado == EstadoDeAlquiler.Terminado)
                                 {
-                        @* <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
+                         <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
                                         <i class="fas fa-star"></i> Dejar Reseña
-                                    </button> *@
+                                    </button> 
                                     <span class="status-label terminado">
                                         <i class="fas fa-check"></i> Terminado
                                     </span>
@@ -108,9 +155,9 @@
                                 <span class="status-label" style="background: #e74c3c; color: white;">
                                     <i class="fas fa-ban"></i> Cancelado
                                 </span>
-                                   @* <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
+                                    <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
                     <i class="fas fa-star"> Dejar Reseña</i>
-                                    </button> *@
+                                    </button> 
                             }
                         </div>
                     </div>
@@ -132,63 +179,39 @@
 @code {
     private string correo = "";
     private string rol = "";
-    private List<Alquiler>? alquileres = new List<Alquiler>();
-    private List<Inmueble> inmuebles = new List<Inmueble>();
+    private List<Alquiler>? alquileres = new ();
+    private List<Inmueble> inmuebles = new();
 
     [Parameter]
     public int id { get; set; } = 0;
     Cliente? cliente;
+    Personal? personal;
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        if (user.Identity.IsAuthenticated)
+        if (user.Identity!.IsAuthenticated)
         {
-            correo = user.Identity.Name;
-            rol = user.FindFirst(ClaimTypes.Role)?.Value;
-            if (id != 0)
+            correo = user.Identity.Name!;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value!;
+            cliente = casoDeUsoBuscarClientePorId.Ejecutar(id);
+            if (cliente == null)
             {
-                cliente = casoDeUsoBuscarClientePorId.Ejecutar(id);
+                NavigationManager.NavigateTo("/?mensaje=Cliente no encontrado&EsMensajeError=true");
+                return; 
             }
-
-            if (rol == "Cliente")
+            if (rol == "Cliente" && cliente.Correo != correo)
             {
-                try
-                {
-                    if (cliente == null)
-                    {
-                        NavigationManager.NavigateTo("/?mensaje=Cliente no encontrado&EsMensajeError=true");
-                        return;
-                    }
                 
-                    alquileres = cliente.Alquileres;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error al obtener los alquileres: {ex.Message}");
-                }
+                                NavigationManager.NavigateTo("/?mensaje=No tenes permisos papi&EsMensajeError=true");
             }
-            else if (rol == "Administrador" || rol == "Gerente" || rol == "Empleado")
+            if (rol == "Administrador" || rol == "Gerente" || rol == "Empleado")
             {
-                try
-                {
-                    if( id != 0)
-                    {
-                        alquileres = cliente.Alquileres;
-                    }
-                    else
-                    alquileres = casoDeUsoObtenerTodosLosAlquileres.Ejecutar();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error al obtener los alquileres: {ex.Message}");
-                    NavigationManager.NavigateTo("/");
-
-                }
+                personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
             }
+            alquileres = cliente.Alquileres;
 
-            // IMPORTANTE: Cargar los inmuebles después de obtener los alquileres
-            if (alquileres.Count > 0)
+            if (alquileres != null && alquileres.Count > 0)
             {
                 getInmuebles();
             }
@@ -204,7 +227,6 @@
         try
         {
             inmuebles = casoDeUsoListarInmuebles.ListarDisponibles();
-            // Filtrar solo los inmuebles que tienen alquileres
             inmuebles = inmuebles.FindAll(i => alquileres.Any(a => a.InmuebleId == i.Id));
         }
         catch (Exception ex)
@@ -235,7 +257,7 @@
     private void CancelarReserva(int Alquilerid)
     {
         casoDeUsoAlquilerCancelarAlquiler.Ejecutar(Alquilerid);
-        NavigationManager.NavigateTo($"/mis-alquileres/{id}", true);    
+        NavigationManager.NavigateTo($"/alquileres/{id}", true);    
 
     }
 
@@ -243,4 +265,13 @@
     {
         NavigationManager.NavigateTo($"/inmueble/{id}");
     }
+
+    public void AñadirLlave(int alquilerId,  int clienteId, bool esEntrega )
+    {
+        RegistroDeLlave registroDeLlave = new(alquilerId, personal.Id, clienteId,esEntrega);
+
+        casoDeUsoAlquilerAñadirLlave.Ejecutar(registroDeLlave);
+        NavigationManager.NavigateTo($"/alquileres/{id}", true);
+    }
+    
 }

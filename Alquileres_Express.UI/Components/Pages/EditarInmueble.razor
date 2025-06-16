@@ -9,26 +9,25 @@
 @inject ValidadorInmueble ValidadorInmueble
 @attribute [Authorize(Roles = "Gerente,Administrador, Empleado")]
 
-<AuthorizeView Roles="Gerente,Administrador">
-    <Authorized>
-        
 <h1 class="form-label">Nombre</h1>
 <input placeholder="@inmueble.Nombre" type="text" @bind="inmuebleAuxiliar.Nombre" class="form-control mb-2" />
 
-<h1 class="form-label">Direccion</h1>
-<input placeholder="@inmueble.Direccion" type="text" @bind="inmuebleAuxiliar.Direccion" class="form-control mb-2" />
-
-<h1 class="form-label">Precio por noche</h1>
+ <h1 class="form-label">Precio por noche</h1>
 <input type="number" @bind="inmuebleAuxiliar.Precio" class="form-control mb-2" />
 
-<h1 class="form-label">Ciudad</h1>
-<input placeholder="@inmueble.Ciudad" type="text" @bind="inmuebleAuxiliar.Ciudad" class="form-control mb-2" />
-<h1 class="form-label">Tipo de Inmueble</h1>
-<select @bind="inmuebleAuxiliar.TipoInmueble" class="form-select mb-2">
-    <option value="@TipoDeInmueble.Vivienda">Vivienda</option>
-    <option value="@TipoDeInmueble.Negocio">Negocio</option>
-    <option value="@TipoDeInmueble.Garaje">Garaje</option>
-</select>
+@if (botonActivado)
+{
+    <h1 class="form-label">Direccion</h1>
+    <input placeholder="@inmueble.Direccion" type="text" @bind="inmuebleAuxiliar.Direccion" class="form-control mb-2" />
+    <h1 class="form-label">Ciudad</h1>
+    <input  placeholder="@inmueble.Ciudad" type="text" @bind="inmuebleAuxiliar.Ciudad" class="form-control mb-2" />
+    <h1 class="form-label">Tipo de Inmueble</h1>
+    <select @bind="inmuebleAuxiliar.TipoInmueble" class="form-select mb-2">
+        <option value="@TipoDeInmueble.Vivienda">Vivienda</option>
+        <option value="@TipoDeInmueble.Negocio">Negocio</option>
+        <option value="@TipoDeInmueble.Garaje">Garaje</option>
+    </select>
+}
 
 <h1 for="type">Elija una política de cancelación:</h1>
 <select  @bind=inmuebleAuxiliar.PoliticaDeCancelacion class="form-select mb-2">
@@ -36,15 +35,7 @@
 <option value="@PoliticaDeCancelacion.VeintePorcientoDeReembolso">Con 20% de reembolso</option>
 <option value="@PoliticaDeCancelacion.NoReembolsable">No reembolsable</option>
 </select>
-<h1 class="form-label">Cantidad de Baños</h1>
-<input type="number" @bind="inmuebleAuxiliar.Banios" class="form-control mb-2" />
-<h1 class="form-label">Cantidad de Camas</h1>
-<input type="number" @bind="inmuebleAuxiliar.CantidadDeCamas" class="form-control mb-2" />
-<h1 class="form-label">Fotos del Inmueble</h1>
 
-<div id="map" style="height: 400px; width: 80%;">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ" async
-    defer></script>
 <script>
     window.initializeMap = function (dotNetHelper, lat, lng) {
         function waitForGoogleMaps() {
@@ -79,11 +70,25 @@
         waitForGoogleMaps();
     }
 </script>
-</div>
 
+@if (botonActivado)
+{
+    <h1 class="form-label">Cantidad de Baños</h1>
+    <input type="number" @bind="inmuebleAuxiliar.Banios" class="form-control mb-2" />
+    <h1 class="form-label">Cantidad de Camas</h1>
+    <input type="number" @bind="inmuebleAuxiliar.CantidadDeCamas" class="form-control mb-2" />
+    <h1 class="form-label">Fotos del Inmueble</h1>
+    
+<div id="map" style="height: 400px; width: 80%;">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ" async
+    defer></script>
+
+</div>
+}
 <InputFile accept=".png,.jpeg,.jpg"@key=@(inputFileId) OnChange="CaptureFiles" multiple/>
 <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
 <p> Fotos subidas: @fotos.Count</p>
+
 @if (errorPorFaltaDeFotos != string.Empty)
     {
         <div class="alert alert-danger">
@@ -115,8 +120,7 @@
             }
         </div>
     }
-    </Authorized>
-</AuthorizeView>
+
 
 
 @if (errores.Count > 0)
@@ -149,6 +153,7 @@
    
     private Guid inputFileId = Guid.NewGuid();
     private InputFileChangeEventArgs? browser;
+    private bool botonActivado = false;
 
     private Inmueble inmuebleAuxiliar = new Inmueble();
 
@@ -170,6 +175,7 @@
         try
         {
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            botonActivado = inmueble.Alquileres == null || inmueble.Alquileres.Count == 0 || inmueble.Alquileres.All(a =>a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Cancelado || a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Terminado);
             inmuebleAuxiliar = new Inmueble
             {
                 Id = inmueble.Id,
@@ -246,7 +252,7 @@
         }
     }
     
-    private async Task GuardarFotos()
+    private void GuardarFotos()
     {
         try
         {
@@ -293,7 +299,7 @@
             StateHasChanged();
         }
     }
-    private async Task CaptureFiles(InputFileChangeEventArgs e)
+    private void CaptureFiles(InputFileChangeEventArgs e)
     {
         browser = e;
     }

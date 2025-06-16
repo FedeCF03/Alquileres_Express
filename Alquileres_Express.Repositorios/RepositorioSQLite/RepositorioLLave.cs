@@ -6,40 +6,26 @@ namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
 public class RepositorioLlave : IRepositorioLlave
 {
-
-    public RegistroDeLlave RegistrarEntregaLLavePresencial(int idAlquiler, int idPersonal, int idCliente)
+    public List<RegistroDeLlave> ListarRegistroLlaves(int idAlquiler, bool? esEntrega = null)
     {
-        using Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
-        RegistroDeLlave registro = new RegistroDeLlave
+        using Alquileres_ExpressContext _context = new();
+        var llave = _context.Llaves.Where(llave => llave.AlquilerId == idAlquiler);
+
+        // Si esEntrega tiene un valor, filtra por ese criterio
+        if (esEntrega.HasValue)
         {
-            AlquilerId = idAlquiler,
-            ClienteId = idCliente,
-            PersonalId = idPersonal,
-            FechayHoraRegistro = DateTime.Now,
-            EsEntrega = true
-        };
-        _context.Llaves.Add(registro);
-        _context.SaveChanges();
-        return registro;
+            llave = llave.Where(l => l.EsEntrega == esEntrega.Value);
+        }
+
+        // Ordenar por fecha (más reciente primero)
+        return llave.OrderByDescending(l => l.FechayHoraRegistro).ToList();
     }
-
-    
-public List<RegistroDeLlave> ListarRegistroLlaves(int idAlquiler, bool? esEntrega = null)
-{
-    using Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
-    var llave = _context.Llaves.Where(llave => llave.AlquilerId == idAlquiler);
-
-    // Si esEntrega tiene un valor, filtra por ese criterio
-    if (esEntrega.HasValue)
+    public void AñadirRegistroDeLlave( RegistroDeLlave registroDeLlave)
     {
-        llave = llave.Where(l => l.EsEntrega == esEntrega.Value);
+        using Alquileres_ExpressContext _context = new();
+        if (!_context.Alquileres.Any(a => a.Id == registroDeLlave.AlquilerId))
+            throw new InvalidOperationException("Alquiler no encontrado.");
+        _context.Llaves.Add(registroDeLlave);
+        _context.SaveChanges();
     }
-
-    // Ordenar por fecha (más reciente primero)
-    return llave.OrderByDescending(l => l.FechayHoraRegistro).ToList();
-}
-
-
-
-    
 }

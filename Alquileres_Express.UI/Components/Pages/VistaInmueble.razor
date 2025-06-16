@@ -228,13 +228,13 @@
     public int Id { get; set; }
     DateTimeOffset? StartDate { get; set; } 
     DateTimeOffset? EndDate { get; set; } 
-    private Inmueble inmueble;
+    private Inmueble inmueble = new Inmueble();
     private bool podesPagar { get; set; } = false;
     private string mensajeError = string.Empty;
     private int fotoActual = 0;
     private string[] imagenes { get; set; } = new string[0];
-    String? correo { get; set; }
-    String? rol { get; set; }
+    String correo { get; set; } = string.Empty;
+    String rol { get; set; } = string.Empty;
     Personal? personal { get; set; }
     Cliente? cliente { get; set; }
 
@@ -246,10 +246,10 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        if (user.Identity.IsAuthenticated)
+        if (user.Identity!.IsAuthenticated)
         {
-            correo = user.Identity.Name;
-            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            correo = user.Identity.Name!;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value!;
             personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
             cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
         
@@ -282,7 +282,7 @@
             CrearRangosDeFechaReservados(inmueble.Alquileres);
             imagenes = inmueble.Fotos != null ? inmueble.Fotos.Select(f=>f.Url).ToArray() : new string[0];
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             NavigationManager.NavigateTo("/");
         }
@@ -291,7 +291,7 @@
     private async Task IniciarCompra()
     {
         decimal precio = calcularPrecio();
-        Alquiler alquiler = new Alquiler(correo, StartDate.Value.Date, EndDate.Value.Date, precio, inmueble.Id){ClienteId = cliente!.Id};
+        Alquiler alquiler = new Alquiler(correo!, StartDate!.Value.Date, EndDate!.Value.Date, precio, inmueble.Id){ClienteId = cliente!.Id};
         if (!repositorioAlquiler.EstaDisponible(Id, StartDate.Value.Date, EndDate.Value.Date))
         {
             mensajeError = "El inmueble no está disponible en las fechas seleccionadas.";
@@ -299,7 +299,7 @@
             return;
         }
         
-        var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre, alquiler);
+        var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre!, alquiler);
         NavigationManager.NavigateTo(url, forceLoad: true);
     }
 

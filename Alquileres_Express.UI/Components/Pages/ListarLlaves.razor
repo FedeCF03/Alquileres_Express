@@ -1,4 +1,4 @@
-@page "/ListarLlaves/<idAlquiler:int>"
+@page "/ListarLlaves/{idAlquiler:int}"
 @inject CasoDeUsoListarLlaves CasoDeUsoListarLlaves
 
 <h3>Listado de Llaves del Alquiler: @idAlquiler</h3>
@@ -9,7 +9,6 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID Registro</th>
                 <th>Personal ID</th>
                 <th>Cliente ID</th>
                 <th>Fecha y Hora Registro</th>
@@ -19,7 +18,6 @@
             @foreach (var registro in listaEntrega)
             {
                 <tr>
-                    <td>@registro.Id</td>
                     <td>@registro.PersonalId</td>
                     <td>@registro.ClienteId</td>
                     <td>@registro.FechayHoraRegistro.ToString("dd/MM/yyyy HH:mm")</td>
@@ -70,7 +68,7 @@ else
     private List<RegistroDeLlave> listaEntrega;
     private List<RegistroDeLlave> listaDevolucion;
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
         // Se obtienen las llaves de entrega y de devolución usando el caso de uso
         listaEntrega = CasoDeUsoListarLlaves.Ejecutar(idAlquiler, true);

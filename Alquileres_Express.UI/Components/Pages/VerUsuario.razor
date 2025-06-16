@@ -27,7 +27,7 @@
         {
             <div class="botones">
                 @* <button class="btn-editar" @onclick="CambiarContraseña">Cambiar contraseña</button>*@
-                <button @onclick="@(() => NavigationManager.NavigateTo($"/mis-alquileres/{ClienteId}"))"class="btn-navlink">
+                <button @onclick="@(() => NavigationManager.NavigateTo($"/alquileres/{ClienteId}"))"class="btn-navlink">
                     <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Ver alquileres
                 </button>
             </div>
