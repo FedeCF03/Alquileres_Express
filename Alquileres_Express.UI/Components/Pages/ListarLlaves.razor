@@ -9,7 +9,6 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Personal ID</th>
                 <th>Cliente ID</th>
                 <th>Fecha y Hora Registro</th>
             </tr>
@@ -47,7 +46,6 @@ else
             @foreach (var registro in listaDevolucion)
             {
                 <tr>
-                    <td>@registro.Id</td>
                     <td>@registro.PersonalId</td>
                     <td>@registro.ClienteId</td>
                     <td>@registro.FechayHoraRegistro.ToString("dd/MM/yyyy HH:mm")</td>
