@@ -63,6 +63,7 @@ builder.Services
     .AddTransient<CasoDeUsoObtenerAlquileresPorCorreo>()
     .AddTransient<CasoDeUsoAlquilerGetEstadoDeAlquiler>()
     .AddTransient<CasoDeUsoBuscarPersonalPorId>()
+    .AddTransient<CasoDeUsoAñadirLlave>()
 
 
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
@@ -80,7 +81,6 @@ builder.Services
 
 
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
-    .AddTransient<CasoDeUsoRegistrarEntregaPresencial>()
     .AddScoped<CasoDeUsoPagarEfectivo>()
     .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()

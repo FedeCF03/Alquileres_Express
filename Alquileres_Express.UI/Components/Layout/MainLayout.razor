@@ -39,52 +39,27 @@
                     </div>
                 }
                 @if (!string.Equals(currentRoute, "Perfil", StringComparison.OrdinalIgnoreCase))
-{
-    @if (rol == "Cliente")
-    {
-        @if (cliente != null)
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/Perfil">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>
-                    <i class="fas fa-user"></i> @cliente.Nombre
-                </NavLink>
-            </div>
-        }
-        else
-        {
-            <!-- Puedes mostrar un mensaje o un icono por defecto si no se encontró el cliente -->
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/Perfil">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>
-                    <i class="fas fa-user"></i> Usuario
-                </NavLink>
-            </div>
-        }
-    }
-    else
-    {
-        @if (personal != null)
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/Perfil">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>
-                    <i class="fas fa-user"></i> @personal.Nombre
-                </NavLink>
-            </div>
-        }
-        else
-        {
-            <!-- Mostrar un valor por defecto en caso de que personal sea null -->
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/Perfil">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>
-                    <i class="fas fa-user"></i> Usuario
-                </NavLink>
-            </div>
-        }
-    }
-}
+                {
+                    @if (rol == "Cliente")
+                    {
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/Perfil">
+                                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span><i
+                                    class="fas fa-user"></i>@(cliente?.Nombre ?? "Perfil")
+                                
+                            </NavLink>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/Perfil">
+                                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span><i
+                                    class="fas fa-user"></i>@(personal?.Nombre ?? "Perfil")
+                            </NavLink>
+                        </div>
+                    }
+                }
             </Authorized>
             <NotAuthorized>
                 @if (!string.Equals(currentRoute, "login", StringComparison.OrdinalIgnoreCase))

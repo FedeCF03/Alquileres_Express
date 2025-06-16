@@ -102,7 +102,7 @@ public class RepositorioCliente : IRepositorioCliente
     public bool SeRepiteCorreo(Cliente cliente)
     {
         return _context.Clientes.FirstOrDefault(c => c.Correo.ToLower().Equals(cliente.Correo.ToLower()) && c.Id != cliente.Id) != null ||
-        _context.Personal.FirstOrDefault(p => p.Correo.ToLower().Equals(cliente.Correo.ToLower()) && p.Id != cliente.Id) != null;
+        _context.Personal.FirstOrDefault(p => p.Correo.ToLower().Equals(cliente.Correo.ToLower())) != null;
     }
 
 

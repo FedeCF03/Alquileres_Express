@@ -216,7 +216,7 @@
         }
     }
     
-    private async Task GuardarFotos()
+    private void GuardarFotos()
     {
         try
         {
@@ -247,7 +247,7 @@
                     }
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     erroresDeFotos.Add($"Error al cargar la foto {file.Name}");
                 }

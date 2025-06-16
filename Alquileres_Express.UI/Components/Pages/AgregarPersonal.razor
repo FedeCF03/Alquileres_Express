@@ -84,6 +84,8 @@
 
     private void Aceptar()
     {
+        mensajeExito = string.Empty;
+        errores.Clear();
         if (selectedDate == null)
         {
             errores = validadorUsuario.Ejecutar(nuevoPersonal);
@@ -99,7 +101,7 @@
             errores.Clear();
             nuevoPersonal = new();
             selectedDate = null;
-            mensajeExito = "Personal agregado correctamente.";
+            mensajeExito = "Empleado agregado correctamente.";
         }
         catch (Exception ex)
         {

@@ -22,20 +22,20 @@ public class Crear
                 FechaNacimiento = new DateTime(1990, 1, 1),
                 Rol = Aplicacion.Enumerativo.RolUsuario.Gerente,
             });
-            context.Add(new Cliente
+            context.Add(new Personal
             {
                 Nombre = "Mario",
                 Apellido = "Castro",
-                Correo = "gallomartinianolc@gmail.com",
-                Dni = "11111112",
+                Correo = "castrotomasandres05@gmail.com",
+                Dni = "12312312",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Falsa 123",
                 FechaNacimiento = new DateTime(1990, 1, 1),
-                Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
+                Rol = Aplicacion.Enumerativo.RolUsuario.Empleado
                 ,
             });
 
-            /*
+            
             context.Add(new Inmueble
             {
                 Nombre = "Departamento en la playa",                    //para probar sin inmuebles
@@ -80,7 +80,7 @@ public class Crear
                 InmuebleId = 2
             });
 
-        */
+        
             context.SaveChanges();
         }
         
