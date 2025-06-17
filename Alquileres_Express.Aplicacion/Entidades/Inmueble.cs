@@ -23,20 +23,21 @@ namespace Alquileres_Express.Aplicacion.Entidades;
         public bool Disponible { get; set; }
         public List<Foto>? Fotos { get; set; } = [];
         public List<Alquiler> Alquileres { get; set; } = [];
+        public List<Comentario>? Comentarios { get; set; } = [];
 
 
         public override bool Equals(object? obj)
+    {
+        if (obj == null)
         {
-            if (obj == null)
-            {
-                return false;
-            }
-            if (obj is Inmueble inmueble)
-            {
-                return Id == inmueble.Id;
-            }
             return false;
         }
+        if (obj is Inmueble inmueble)
+        {
+            return Id == inmueble.Id;
+        }
+        return false;
+    }
 
 
         public Inmueble()

@@ -7,7 +7,7 @@ namespace Alquileres_Express.Aplicacion.Interfaces;
 public interface IRepositorioComentario
 {
     public Task<List<Comentario>> ObtenerComentariosPorInmuebleIdAsync(int inmuebleId);
-    public Task<Comentario> AgregarComentarioAsync(Comentario comentario);
+    public bool AgregarComentario(Comentario comentario);
     public Task<bool> EditarComentarioAsync(Comentario comentario);
     public Task<bool> EliminarComentarioAsync(int comentarioId);
     public Task<List<Comentario>> ObtenerComentariosPorUsuarioIdAsync(int usuarioId, RolUsuario rolUsuario);

@@ -8,12 +8,14 @@ namespace Alquileres_Express.Aplicacion.Interfaces
 
     public class RepositorioComentario : IRepositorioComentario
     {
-        public Task<Comentario> AgregarComentarioAsync(Comentario comentario)
+        public bool AgregarComentario(Comentario comentario)
         {
             using var db = new Alquileres_ExpressContext();
-            db.Comentarios.Add(comentario);
-            db.SaveChanges();
-            return Task.FromResult(comentario);
+
+                db.Comentarios.Add(comentario);
+                db.SaveChanges();
+                return true;
+    
             
         }
 

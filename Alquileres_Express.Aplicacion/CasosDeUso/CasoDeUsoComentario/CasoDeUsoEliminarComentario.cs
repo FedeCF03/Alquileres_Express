@@ -5,7 +5,7 @@ using Alquileres_Express.Aplicacion.Interfaces;
 
 public class CasoDeUsoEliminarComentario(IRepositorioComentario repo ) : CasoDeUsoComentario(repo)
 {
-    public async Task<bool> EliminarComentarioAsync(int comentarioId)
+    public async Task<bool> EjecutarAsync(int comentarioId)
     {
         if (comentarioId <= 0)
         {
