@@ -18,46 +18,67 @@
 
 <PageTitle>Cargar inmueble</PageTitle>
 
-<h1 class="form-label">Cargar Inmueble</h1>
+<div class="container mt-5">
+    <div class="card shadow p-4">
+        <h2 class="text-center text-primary mb-4"><i class="fas fa-building"></i> Cargar Inmueble</h2>
+        <p class="text-center text-muted">Por favor, completá los campos para publicar el nuevo inmueble</p>
 
-<label class="form-label">Por favor, complete los siguientes campos:</label>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Nombre</label>
+                <input required @bind="inmueble.Nombre" class="form-control form-control-lg" placeholder="Ej: Departamento en Palermo" />
+            </div>
 
-<label class="form-label">Nombre del Inmueble</label>
-<input required=true type="text" @bind="inmueble.Nombre" placeholder="Nombre del Inmueble" class="form-control mb-2" />
-<label class="form-label">Ciudad del Inmueble</label>
-<input required=true type=" text" @bind="inmueble.Ciudad" placeholder="Ciudad del Inmueble" class="form-control mb-2" />
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Ciudad</label>
+                <input required @bind="inmueble.Ciudad" class="form-control form-control-lg" placeholder="Ej: Buenos Aires" />
+            </div>
 
-<label class="form-label">Dirección del Inmueble</label>
-<input required=true type="text" @bind="inmueble.Direccion" placeholder="Dirección del Inmueble" class="form-control mb-2" />
-<label class="form-label">Precio por noche del Inmueble</label>
-<input required=true type="number" @bind="inmueble.Precio" placeholder="Precio del Inmueble" class="form-control mb-2" />
-<label class="form-label">Cantidad de camas del Inmueble</label>
-<input required=true type="number" @bind="inmueble.CantidadDeCamas" placeholder="Cantidad de camas" class="form-control mb-2" />
-<label class="form-label">Cantidad de habitaciones del Inmueble</label>
-<input required=true type="number" @bind="inmueble.CantidadDeHabitaciones" placeholder="Cantidad de camas" class="form-control mb-2" />
-<label class="form-label">Cantidad de baños del Inmueble</label>
-<input required=true type="number" @bind="inmueble.Banios" placeholder="Cantidad de baños" class="form-control mb-2" />
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Dirección</label>
+                <input required @bind="inmueble.Direccion" class="form-control form-control-lg" placeholder="Ej: Av. Santa Fe 1234" />
+            </div>
 
-<div class="mt-4">
-    <label for="type">Elija un tipo de inmueble:</label>
-    <p>Por defecto estará seleccionada la opción "Vivienda"</p>
-    <select  @bind=inmueble.TipoInmueble>
-    <option value="@TipoDeInmueble.Vivienda">Vivienda</option>
-    <option value="@TipoDeInmueble.Negocio">Negocio</option>
-    <option value="@TipoDeInmueble.Garaje">Garaje</option>
-    </select>
-</div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Precio por noche</label>
+                <input required type="number" @bind="inmueble.Precio" class="form-control form-control-lg" placeholder="$5000" />
+            </div>
 
-<div class="mt-4">
-    <label for="type">Elija una política de cancelación:</label>
-    <p>Por defecto estará seleccionada la opción "Sin costo"</p>
-    <select  @bind=inmueble.PoliticaDeCancelacion>
-    <option value="@PoliticaDeCancelacion.SinCosto" >Sin costo</option>
-    <option value="@PoliticaDeCancelacion.VeintePorcientoDeReembolso">Con 20% de reembolso</option>
-    <option value="@PoliticaDeCancelacion.NoReembolsable">No reembolsable</option>
-    </select>
-</div>
-<p> Por favor, elija una ubicación en el mapa para el Inmueble con el marcador</p> 
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Camas</label>
+                <input required type="number" @bind="inmueble.CantidadDeCamas" class="form-control form-control-lg" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Habitaciones</label>
+                <input required type="number" @bind="inmueble.CantidadDeHabitaciones" class="form-control form-control-lg" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Baños</label>
+                <input required type="number" @bind="inmueble.Banios" class="form-control form-control-lg" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Tipo de inmueble</label>
+                <select @bind="inmueble.TipoInmueble" class="form-select form-select-lg">
+                    <option value="@TipoDeInmueble.Vivienda">Vivienda</option>
+                    <option value="@TipoDeInmueble.Negocio">Negocio</option>
+                    <option value="@TipoDeInmueble.Garaje">Garaje</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Política de cancelación</label>
+                <select @bind="inmueble.PoliticaDeCancelacion" class="form-select form-select-lg">
+                    <option value="@PoliticaDeCancelacion.SinCosto">Sin costo</option>
+                    <option value="@PoliticaDeCancelacion.VeintePorcientoDeReembolso">Con 20% de reembolso</option>
+                    <option value="@PoliticaDeCancelacion.NoReembolsable">No reembolsable</option>
+                </select>
+            </div>
+        </div>
+
+        <p> Por favor, elija una ubicación en el mapa para el Inmueble con el marcador</p> 
  <div id="map" class="my-4" style="height: 400px; width: 80%;">
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ" async
@@ -101,44 +122,48 @@
 </script>
 </div> 
 
-<InputFile accept=".jpg,.png,.jpeg" id="input" @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
-<button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
-<p> Fotos subidas: @fotos.Count</p>
-@if (errorPorFaltaDeFotos != string.Empty)
-    {
-        <div class="alert alert-danger">
-            <p>@errorPorFaltaDeFotos</p>
+
+        <div class="mt-4">
+            <label class="form-label fw-bold">Fotos del inmueble</label>
+            <InputFile accept=".jpg,.png,.jpeg" id="input" @key=@(inputFileId) OnChange="CaptureFiles" multiple />
+            <button @onclick="GuardarFotos" class="btn btn-outline-primary mt-2">Subir fotos</button>
+            <p>Fotos subidas: @fotos.Count</p>
+
+            @if (!string.IsNullOrEmpty(errorPorFaltaDeFotos))
+            {
+                <div class="alert alert-danger">@errorPorFaltaDeFotos</div>
+            }
+
+            <div class="row mt-3">
+                @foreach (var foto in fotos)
+                {
+                    <div class="col-md-3 mb-3">
+                        <div class="card">
+                            <img class="card-img-top" src="@foto.Url" />
+                            <div class="card-body text-center">
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarFoto(foto.Nombre)">Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
-    }
 
-<button class="btn btn-primary" @onclick="() => Cargar()">Cargar Inmueble</button>
-
-
-<div class="image-list">
-    @foreach (var foto in fotos)
-    {
-        <div class="image-card">
-            <img src="@foto.Url" />
-            <button @onclick="()=>EliminarFoto(foto.Nombre)">Eliminar</button>
+        <div class="text-center mt-4">
+            <button class="btn btn-success btn-lg w-50" @onclick="Cargar">Cargar Inmueble</button>
         </div>
-    }
+
+        @foreach (var error in errores)
+        {
+            <div class="alert alert-danger mt-3">@error</div>
+        }
+
+        @foreach (var error in erroresDeFotos)
+        {
+            <div class="alert alert-danger mt-3">@error</div>
+        }
+    </div>
 </div>
-
-@foreach (var error in errores)
-{
-    <div class="alert alert-danger">
-    <p>@error</p>
-    </div>
-}
-
-@foreach (var error in erroresDeFotos)
-{
-    <div class="alert alert-danger">
-    <p>@error</p>
-    </div>
-}
-        
-
 
 
 @code {

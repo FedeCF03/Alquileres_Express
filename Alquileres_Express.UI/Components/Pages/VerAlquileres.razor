@@ -16,6 +16,13 @@
 
 @rendermode InteractiveServer
 
+@if (!string.IsNullOrEmpty(mensajeLlave))
+{
+    <div class="alert alert-success text-center mt-3" role="alert">
+        @mensajeLlave
+    </div>
+}
+
 <AuthorizeView Roles="Cliente">
 <Authorized>
     <div class="page-header">
@@ -106,10 +113,10 @@
                             } 
                             else 
                             {
-                                <a class="operation-btn historial" href ="@($"/ListarLlaves/{alquiler.Id}")">
-                                    <span class="btn-icon">📋</span>
-                                        Listar historial de llaves
-                                </a>
+                                <a class="btn btn-primary btn-sm shadow-sm d-flex align-items-center gap-2" 
+                                    href="@($"/ListarLlaves/{alquiler.Id}")">
+                                    <i class="fas fa-list"></i> Historial de llaves
+                                </a>                                
                                 if(alquiler.RegistrosDeLlave.Count == 2)
                                 {
                                     <p><i class= "fas fa-check" > </i> Entrega y devolución registrada</p>
@@ -176,11 +183,17 @@
         </div>
     }
 </div> 
+        <div class="alert alert-success mt-3 text-center" role="alert"
+            style="display: @(string.IsNullOrEmpty(mensajeLlave) ? "none" : "block")">
+            @mensajeLlave
+        </div>
 @code {
     private string correo = "";
     private string rol = "";
     private List<Alquiler>? alquileres = new ();
     private List<Inmueble> inmuebles = new();
+    private string mensajeLlave = string.Empty;
+
 
     [Parameter]
     public int id { get; set; } = 0;
@@ -266,11 +279,17 @@
         NavigationManager.NavigateTo($"/inmueble/{id}");
     }
 
-    public void AñadirLlave(int alquilerId,  int clienteId, bool esEntrega )
+    public async Task AñadirLlave(int alquilerId,  int clienteId, bool esEntrega )
     {
         RegistroDeLlave registroDeLlave = new(alquilerId, personal.Id, clienteId,esEntrega);
 
         casoDeUsoAlquilerAñadirLlave.Ejecutar(registroDeLlave);
+        mensajeLlave = esEntrega
+        ? "✔️ Entrega registrada correctamente."
+        : "🔄 Devolución registrada correctamente.";
+        // Esperá 4 segundos y luego ocultá el mensaje
+        await Task.Delay(1500);
+
         NavigationManager.NavigateTo($"/alquileres/{id}", true);
     }
     
