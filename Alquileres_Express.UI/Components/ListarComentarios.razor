@@ -1,0 +1,112 @@
+@rendermode InteractiveServer
+@inject CasoDeUsoListarComentarios casoDeUsoListarComentarios
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+
+@using Microsoft.AspNetCore.Components.Authorization
+
+@if (comentarios.Count == 0)
+{
+    <p class="sin-comentarios">No hay comentarios disponibles para este inmueble.</p>
+}
+else
+{
+    <div class="comentarios-container">
+        @foreach (var comentario in comentarios)
+        {
+            <div class="comentario-card">
+                <div class="comentario-header">
+                    <span class="autor">@comentario.NombreUsuario</span>
+                    <span class="fecha">@comentario.Fecha.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+                <div class="comentario-texto">@comentario.Texto</div>
+                <div class="comentario-acciones">
+                    @if (usuario != null)
+                    { 
+                        @if ((usuario.Rol == RolUsuario.Cliente && comentario.ClienteId == usuario.Id) ||
+                            (usuario.Rol != RolUsuario.Cliente && comentario.PersonalId == usuario.Id) ||
+                            (usuario.Rol != RolUsuario.Cliente && comentario.RolUsuario != RolUsuario.Gerente)
+                            )
+                        {
+                            <button class="btn-editar" @onclick="() => EditarComentario(comentario.Id)">Editar</button>
+                            <button class="btn-eliminar" @onclick="() => EliminarComentario(comentario.Id)">Eliminar</button>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code
+{
+    [Parameter]
+    public int InmuebleId { get; set; }
+    private List<Comentario> comentarios = [];
+    [Parameter]
+    public string Correo {get; set;} = "";
+    private Usuario? usuario;
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (InmuebleId <= 0)
+        {
+            throw new ArgumentException("El Id del inmueble debe ser mayor que cero.", nameof(InmuebleId));
+        }
+
+        //comentarios = await casoDeUsoListarComentarios.ListarComentariosPorInmuebleId(InmuebleId);
+        usuario = (Usuario?)CasoDeUsoBuscarClientePorCorreo.Ejecutar(Correo) ??
+                 (Usuario?) CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(Correo);
+        comentarios = new List<Comentario>
+        {
+            new Comentario
+            {
+                Id = 1,
+                InmuebleId = InmuebleId,
+                NombreUsuario = "sex Perez",
+                ClienteId = 2,
+                Texto = "Excelente inmueble, muy recomendable.",
+                Fecha = DateTime.Now.AddDays(-2),
+                RolUsuario = RolUsuario.Cliente
+            },
+            new Comentario
+            {
+                Id = 2,
+                InmuebleId = InmuebleId,
+                PersonalId = 2,
+                NombreUsuario = "Tomas Castro",
+                Texto = "Muy buena atención y el lugar es muy cómodo.",
+                Fecha = DateTime.Now.AddDays(-1),
+                RolUsuario = RolUsuario.Empleado
+            },
+            new Comentario
+            {
+                Id = 3,
+                InmuebleId = InmuebleId,
+                PersonalId = 1,
+                NombreUsuario = "Maria Torres",
+                Texto = "Muy mala atención y el lugar no es muy cómodo.",
+                Fecha = DateTime.Now.AddDays(-1),
+                RolUsuario = RolUsuario.Gerente
+            }
+
+        };
+    }
+
+    private void EditarComentario(int id)
+    {
+        // Lógica de edición: podrías navegar a otro componente o mostrar un modal
+        Console.WriteLine($"Editar comentario con ID: {id}");
+    }
+
+    private void EliminarComentario(int id)
+    {
+        // Lógica de eliminación (en esta versión mock, solo lo quitamos de la lista)
+        var comentario = comentarios.FirstOrDefault(c => c.Id == id);
+        if (comentario is not null)
+        {
+            comentarios.Remove(comentario);
+        }
+    }
+}

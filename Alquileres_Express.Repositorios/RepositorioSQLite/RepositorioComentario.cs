@@ -17,7 +17,7 @@ namespace Alquileres_Express.Aplicacion.Interfaces
             
         }
 
-        public Task<Comentario?> EditarComentarioAsync(Comentario comentario)
+        public Task<bool> EditarComentarioAsync(Comentario comentario)
         {
             using var db = new Alquileres_ExpressContext();
             var existingComentario = db.Comentarios.Find(comentario.Id);
@@ -29,7 +29,7 @@ namespace Alquileres_Express.Aplicacion.Interfaces
                 existingComentario.ClienteId = comentario.ClienteId;
                 db.SaveChanges();
             }
-            return Task.FromResult(existingComentario);
+            return Task.FromResult(existingComentario != null);
         }
 
         public Task<bool> EliminarComentarioAsync(int comentarioId)
@@ -45,10 +45,10 @@ namespace Alquileres_Express.Aplicacion.Interfaces
             return Task.FromResult(false);
         }
 
-        public Task<List<Comentario>?> ObtenerComentariosPorUsuarioIdAsync(int usuarioId, RolUsuario rolUsuario)
+        public Task<List<Comentario>> ObtenerComentariosPorUsuarioIdAsync(int usuarioId, RolUsuario rolUsuario)
         {
             using var db = new Alquileres_ExpressContext();
-            List<Comentario>? comentarios = null;
+            List<Comentario>? comentarios;
             if (rolUsuario == RolUsuario.Cliente)
             {
                 comentarios = db.Comentarios.Where(c => c.ClienteId == usuarioId).ToList();
@@ -57,7 +57,7 @@ namespace Alquileres_Express.Aplicacion.Interfaces
             {
                 comentarios = db.Comentarios.Where(c => c.PersonalId == usuarioId).ToList();
             }
-            return Task.FromResult(comentarios);
+            return Task.FromResult(comentarios)!;
 
         }
 
