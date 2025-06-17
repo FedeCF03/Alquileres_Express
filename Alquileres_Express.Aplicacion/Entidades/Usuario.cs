@@ -12,6 +12,7 @@ public abstract class Usuario
     public string Direccion { get; set; } = "";
     public DateTime FechaNacimiento { get; set; }
     public List<RegistroDeLlave>? RegistrosDeLlave { get; set; }
+    public List<Comentario>? Comentarios { get; set; }
 
     public RolUsuario Rol { get; set; }
 
