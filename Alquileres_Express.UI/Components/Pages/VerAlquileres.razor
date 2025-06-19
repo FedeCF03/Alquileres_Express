@@ -13,8 +13,16 @@
 @inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
 @inject CasoDeUsoAñadirLlave casoDeUsoAlquilerAñadirLlave
 @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject CasoDeUsoCalificarInmueble casoDeUsoCalificarInmueble
 
 @rendermode InteractiveServer
+
+@if (!string.IsNullOrEmpty(mensajeLlave))
+{
+    <div class="alert alert-success text-center mt-3" role="alert">
+        @mensajeLlave
+    </div>
+}
 
 <AuthorizeView Roles="Cliente">
 <Authorized>
@@ -55,15 +63,16 @@
                             <img src="@getImagenInmueble(alquiler.InmuebleId)" alt="@inmueble.Nombre" href />
                         </NavLink>
                         <div class="price-badge">
-    @if (alquiler.Precio > 0)
-    {
-        <i class="fas fa-dollar-sign"></i> @alquiler.Precio.ToString("N0")
-    }
-    else
-    {
-        <span style="color: red;">Sin precio</span>
-    }
-</div>
+            @if (alquiler.Precio > 0)
+            {
+                <i class="fas fa-dollar-sign"></i> @alquiler.Precio.ToString("N0")
+            }
+            else
+            {
+                <span style="color: red;">Sin precio</span>
+            }
+        </div>
+        
                     </div>
                     <div class="rental-content">
                         <div class="rental-header">
@@ -100,16 +109,17 @@
                          <AuthorizeView Roles="Administrador, Gerente, Empleado">
                             @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
                             {
-                            <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
+                                <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
                                     <i class= "fas fa-times" > </i> Registrar entrega 
-                            </button>
+                                </button>
+                                
                             } 
                             else 
                             {
-                                <a class="operation-btn historial" href ="@($"/ListarLlaves/{alquiler.Id}")">
-                                    <span class="btn-icon">📋</span>
-                                        Listar historial de llaves
-                                </a>
+                                <a class="btn btn-primary btn-sm shadow-sm d-flex align-items-center gap-2" 
+                                    href="@($"/ListarLlaves/{alquiler.Id}")">
+                                    <i class="fas fa-list"></i> Historial de llaves
+                                </a>                                
                                 if(alquiler.RegistrosDeLlave.Count == 2)
                                 {
                                     <p><i class= "fas fa-check" > </i> Entrega y devolución registrada</p>
@@ -126,7 +136,9 @@
                             @if (!alquiler.Cancelado)
                             {
                                 EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
-
+                            <button class="btn btn-review" @onclick="() => MostrarCalificacion(alquiler.InmuebleId)">
+                                <i class="fas fa-star"></i> Calificar
+                            </button>
                             @if (estado == EstadoDeAlquiler.Vigente)
                              {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
                                     <i class="fas fa-times"></i> Cancelar
@@ -135,7 +147,12 @@
 
                                 @if (estado == EstadoDeAlquiler.Terminado)
                                 {
-                         <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
+                                    @* <button class="btn btn-review" @onclick="() => MostrarCalificacion(alquiler.InmuebleId)">
+                                        <i class="fas fa-star"></i> Calificar
+                                    </button> *@
+
+
+                                    <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
                                         <i class="fas fa-star"></i> Dejar Reseña
                                     </button> 
                                     <span class="status-label terminado">
@@ -176,11 +193,68 @@
         </div>
     }
 </div> 
+@if (mostrarFormularioCalificacion)
+{
+    <div class="card shadow p-4 mt-4">
+        <h4 class="text-primary mb-3">
+            <i class="fas fa-star"></i> Calificar inmueble
+        </h4>
+
+        <!-- Estrellas 1-5 -->
+        <ul class="list-unstyled d-flex gap-1 mb-3">
+            @for (int i = 1; i <= 5; i++)
+            {
+                int estrella = i;                     <!-- ⚠️ copia local -->
+                <li>
+                    <i class="fas fa-star fa-2x cursor-pointer
+                        @(estrella <= calificacionSeleccionada
+                           ? "text-warning"
+                           : "text-secondary")"
+                       @onclick="@(() => SeleccionarCalificacion(estrella))">
+                    </i>
+                </li>
+            }
+        </ul>       
+
+
+        <!-- Comentario -->
+        <textarea class="form-control mb-3"
+                  placeholder="Comentario (opcional)" rows="3"
+                  @bind="comentario"></textarea>
+
+        <!-- Botones -->
+        <div class="d-flex gap-2">
+            @* <button class="btn btn-review" @onclick="() => MostrarCalificacion(alquiler.InmuebleId)">
+                                        <i class="fas fa-star"></i> Calificar
+                                    </button>  *@
+            <button class="btn btn-review" @onclick="() => EnviarCalificacion()">
+                <i class="fas fa-star"></i> Guardar
+            </button>
+            <button class="btn btn-outline-secondary"
+                    @onclick="() => mostrarFormularioCalificacion = false">
+                Cancelar
+            </button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensajeCalificacion))
+        {
+            <div class="alert alert-success mt-3">@mensajeCalificacion</div>
+        }
+    </div>
+    <div class="card shadow p-4 mt-4 mx-auto" style="max-width: 600px;"></div>
+}
+
+        <div class="alert alert-success mt-3 text-center" role="alert"
+            style="display: @(string.IsNullOrEmpty(mensajeLlave) ? "none" : "block")">
+            @mensajeLlave
+        </div>
 @code {
     private string correo = "";
     private string rol = "";
     private List<Alquiler>? alquileres = new ();
     private List<Inmueble> inmuebles = new();
+    private string mensajeLlave = string.Empty;
+
 
     [Parameter]
     public int id { get; set; } = 0;
@@ -266,12 +340,72 @@
         NavigationManager.NavigateTo($"/inmueble/{id}");
     }
 
-    public void AñadirLlave(int alquilerId,  int clienteId, bool esEntrega )
+    public async Task AñadirLlave(int alquilerId,  int clienteId, bool esEntrega )
     {
         RegistroDeLlave registroDeLlave = new(alquilerId, personal.Id, clienteId,esEntrega);
 
         casoDeUsoAlquilerAñadirLlave.Ejecutar(registroDeLlave);
+        mensajeLlave = esEntrega
+        ? "✔️ Entrega registrada correctamente."
+        : "🔄 Devolución registrada correctamente.";
+        // Esperá 4 segundos y luego ocultá el mensaje
+        await Task.Delay(1500);
+
         NavigationManager.NavigateTo($"/alquileres/{id}", true);
     }
+    /* ---------- variables ---------- */
+    bool   mostrarFormularioCalificacion = false;
+    int    idInmuebleAReseñar            = 0;
+    int    calificacionSeleccionada      = 5;
+    string comentario                    = "";
+    string mensajeCalificacion           = "";
+
+    /* ---------- abre el form ---------- */
+    void MostrarCalificacion(int idInmueble)
+{
+    idInmuebleAReseñar       = idInmueble;
+    calificacionSeleccionada = 0;   // ← arranca sin ninguna estrella
+    comentario               = "";
+    mensajeCalificacion      = "";
+    mostrarFormularioCalificacion = true;
+}
+
+void SeleccionarCalificacion(int valor)
+{
+    calificacionSeleccionada = valor;
+    StateHasChanged();              // ← forzá el refresco inmediato
+}
+
+
+    /* ---------- guarda la reseña ---------- */
+    void EnviarCalificacion()
+    {
+        if (calificacionSeleccionada < 1 || calificacionSeleccionada > 5)
+            return; // validación rápida
+        cliente = casoDeUsoBuscarClientePorId.Ejecutar(id);
+        if (cliente == null)
+        {
+            mensajeCalificacion = "Error: Cliente no encontrado.";
+            return;
+        }
+        var valoracion = new Valoracion
+        {
+            InmuebleId      = idInmuebleAReseñar,
+            ClienteId       = id,
+            Calificacion    = calificacionSeleccionada,
+            Comentario      = comentario,
+            NombreCliente   = cliente.Nombre,
+            ApellidoCliente = cliente.Apellido
+        };
+
+        // caso de uso
+        casoDeUsoCalificarInmueble.Ejecutar(valoracion.InmuebleId, cliente.Id, valoracion);
+
+        mensajeCalificacion = "¡Gracias! Tu reseña fue guardada.";
+        //await Task.Delay(1500);                 // mensaje 3 s
+        mostrarFormularioCalificacion = false;  // ocultar form
+        StateHasChanged();
+    }
+
     
 }

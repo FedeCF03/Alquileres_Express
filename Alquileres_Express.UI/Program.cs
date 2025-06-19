@@ -84,6 +84,8 @@ builder.Services
     .AddTransient<CasoDeUsoEditarComentario>()
     .AddTransient<CasoDeUsoEliminarComentario>()
     .AddTransient<CasoDeUsoListarComentarios>()
+    .AddTransient<CasoDeUsoCalificarInmueble>()
+
 
     .AddTransient<ValidadorComentario>()
 

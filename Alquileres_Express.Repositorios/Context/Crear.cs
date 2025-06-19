@@ -82,6 +82,7 @@ public class Crear
 
         
             context.SaveChanges();
+           
         }
         
         var connection = context.Database.GetDbConnection();
@@ -89,9 +90,5 @@ public class Crear
         using var command = connection.CreateCommand();
         command.CommandText = "PRAGMA journal_mode=DELETE;";
         command.ExecuteNonQuery();
-
-
-
-    }
-    
+    } 
 }

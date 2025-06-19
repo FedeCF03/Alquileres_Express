@@ -23,6 +23,7 @@ public class Alquileres_ExpressContext : DbContext
     {
         modelBuilder.Entity<RegistroDeLlave>()
             .HasKey(c => new { c.AlquilerId, c.EsEntrega });
+        
 }
 
 }
