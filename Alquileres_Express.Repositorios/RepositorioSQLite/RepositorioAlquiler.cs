@@ -57,7 +57,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
         using Alquileres_ExpressContext _context = new();
         if (!EstaDisponible(idInmueble, fechaInicio, fechaFin))
             throw new InvalidOperationException("El inmueble no está disponible para el período seleccionado.");
-        
+
         {
             alquiler.Pagado = true;
             guardarAlquilerEnBaseDeDatos(alquiler);
@@ -75,7 +75,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
             .Where(a => !a.Cancelado && a.Pagado && !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado))
             .Select(a => new RangoDeFechas(a.FechaDeInicio, a.FechaDeFin.AddDays(-1)))
             .ToList();
-            
+
         return !fechasReservadas.Any(rango => rango.SeSuperponeCon(new RangoDeFechas(fechaInicio, fechaFin)));
     }
 
@@ -163,6 +163,21 @@ public class RepositorioAlquiler : IRepositorioAlquiler
     {
         using Alquileres_ExpressContext _context = new();
         return [.. _context.Alquileres.Include(a => a.RegistrosDeLlave).Where(a => a.Id == idAlquiler)];
+    }
+    
+    public void CalificarAlquiler(int idInmueble, int idCliente, Valoracion valoracion)
+    {
+        using Alquileres_ExpressContext _context = new();
+        Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == idInmueble);
+
+
+        if (inmueble == null)
+            throw new InvalidOperationException("El inmueble no existe.");
+
+        if (inmueble.Valoraciones == null)
+            inmueble.Valoraciones = new List<Valoracion>();
+        
+        inmueble.Valoraciones.Add(valoracion);
     }
 }
 

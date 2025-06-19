@@ -77,7 +77,17 @@ builder.Services
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
     .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
     .AddScoped<IRepositorioLlave, RepositorioLlave>()
+    .AddScoped<IRepositorioComentario, RepositorioComentario>()
     .AddTransient<CasoDeUsoListarLlaves>()
+
+    .AddTransient<CasoDeUsoAgregarComentario>()
+    .AddTransient<CasoDeUsoEditarComentario>()
+    .AddTransient<CasoDeUsoEliminarComentario>()
+    .AddTransient<CasoDeUsoListarComentarios>()
+    .AddTransient<CasoDeUsoCalificarInmueble>()
+
+
+    .AddTransient<ValidadorComentario>()
 
 
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
