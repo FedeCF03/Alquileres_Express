@@ -24,7 +24,7 @@ namespace Alquileres_Express.Aplicacion.Entidades;
         public List<Foto>? Fotos { get; set; } = [];
         public List<Alquiler> Alquileres { get; set; } = [];
         public List<Comentario>? Comentarios { get; set; } = [];
-        public List<Valoracion>? Valoraciones { get; set; } = [];
+        public List<Valoracion>? Valoraciones { get; set; } = new List<Valoracion>();
 
         public override bool Equals(object? obj)
     {

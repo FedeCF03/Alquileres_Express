@@ -164,7 +164,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
         using Alquileres_ExpressContext _context = new();
         return [.. _context.Alquileres.Include(a => a.RegistrosDeLlave).Where(a => a.Id == idAlquiler)];
     }
-    
+
     public void CalificarAlquiler(int idInmueble, int idCliente, Valoracion valoracion)
     {
         using Alquileres_ExpressContext _context = new();
@@ -174,10 +174,15 @@ public class RepositorioAlquiler : IRepositorioAlquiler
         if (inmueble == null)
             throw new InvalidOperationException("El inmueble no existe.");
 
-        if (inmueble.Valoraciones == null)
-            inmueble.Valoraciones = new List<Valoracion>();
-        
+            
+        Valoracion? v = inmueble.Valoraciones.FirstOrDefault(v => v.ClienteId == idCliente);
+        //Console.WriteLine("Valoracion: " + v.ClienteId + v.ApellidoCliente);
+        if (v == null)
+            throw new InvalidOperationException("El cliente ya ha calificado este inmueble.");
+            
         inmueble.Valoraciones.Add(valoracion);
+        _context.Entry(inmueble).State = EntityState.Modified;
+        _context.SaveChanges();
     }
 }
 
