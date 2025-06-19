@@ -37,11 +37,6 @@ public class RepositorioPersonal : IRepositorioPersonal
         using Alquileres_ExpressContext _context = new();
         return _context.Personal.Include(c => c.RegistrosDeLlave).ToList();
     }
-    public List<Personal> ObtenerPersonalPorNombre(string nombre)
-    {
-        using Alquileres_ExpressContext _context = new();
-        throw new NotImplementedException();
-    }
 
     public Personal ObtenerPersonalPorDNI(string dni)
     {
@@ -54,7 +49,7 @@ public class RepositorioPersonal : IRepositorioPersonal
         throw new KeyNotFoundException($"No existe el personal con DNI {dni}. Por favor, intente de nuevo o pruebe otro personal.");
     }
 
-    public Personal ObtenerPersonalPorMail(string mail)
+    public Personal? ObtenerPersonalPorMail(string mail)
     {
         using Alquileres_ExpressContext _context = new();
         var per = _context.Personal.Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);

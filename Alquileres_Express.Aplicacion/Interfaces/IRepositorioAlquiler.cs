@@ -20,5 +20,5 @@ public interface IRepositorioAlquiler
 
     public List<Alquiler> ObtenerAlquilerPorId(int idAlquiler);
     public bool EstaDisponible(int inmuebleId, DateTime fechaInicio, DateTime fechaFin);
-    public void CalificarAlquiler(int idInmueble, int idCliente, Valoracion valoracion);
+    public bool CalificarAlquiler(int idInmueble, int idCliente, Valoracion valoracion);
 }
