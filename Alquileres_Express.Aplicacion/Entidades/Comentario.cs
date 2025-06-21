@@ -9,10 +9,10 @@ public class Comentario
     public int Id { get; set; }
     public int? PersonalId { get; set; }
     public int? ClienteId { get; set; }
-    public int InmuebleId { get; set; }
+    public int? InmuebleId { get; set; }
     public string NombreUsuario { get; set; } = "";
     public int? ComentarioId { get; set; } // comentario padre
-    public List<Comentario> Respuestas { get; set; } = [];
+    public List<Comentario>? Respuestas { get; set; } = [];
     public RolUsuario RolUsuario { get; set; }
 
     

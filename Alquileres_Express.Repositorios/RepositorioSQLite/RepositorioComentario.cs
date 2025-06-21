@@ -20,35 +20,35 @@ namespace Alquileres_Express.Aplicacion.Interfaces
             
         }
 
-        public Task<bool> EditarComentarioAsync(Comentario comentario)
+        public async Task<bool> EditarComentarioAsync(Comentario comentario)
         {
             using var db = new Alquileres_ExpressContext();
-            var existingComentario = db.Comentarios.Find(comentario.Id);
+            var existingComentario = await db.Comentarios.FindAsync(comentario.Id);
             if (existingComentario != null)
             {
                 existingComentario.Texto = comentario.Texto;
                 existingComentario.Fecha = comentario.Fecha;
                 existingComentario.PersonalId = comentario.PersonalId;
                 existingComentario.ClienteId = comentario.ClienteId;
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
-            return Task.FromResult(existingComentario != null);
+            return existingComentario != null;
         }
 
-        public Task<bool> EliminarComentarioAsync(int comentarioId)
+        public async Task<bool> EliminarComentarioAsync(int comentarioId)
         {
             using var db = new Alquileres_ExpressContext();
-            var comentario = db.Comentarios.Find(comentarioId);
+            var comentario = await db.Comentarios.FindAsync(comentarioId);
             if (comentario != null)
             {
                 db.Comentarios.Remove(comentario);
-                db.SaveChanges();
-                return Task.FromResult(true);
+                await db.SaveChangesAsync();
+                return true;
             }
-            return Task.FromResult(false);
+            return false;
         }
 
-        public Task<List<Comentario>> ObtenerComentariosPorUsuarioIdAsync(int usuarioId, RolUsuario rolUsuario)
+        public List<Comentario> ObtenerComentariosPorUsuarioIdAsync(int usuarioId, RolUsuario rolUsuario)
         {
             using var db = new Alquileres_ExpressContext();
             List<Comentario>? comentarios;
@@ -60,14 +60,23 @@ namespace Alquileres_Express.Aplicacion.Interfaces
             {
                 comentarios = db.Comentarios.Include(c => c.Respuestas).Where(c => c.PersonalId == usuarioId).ToList();
             }
-            return Task.FromResult(comentarios)!;
+            return comentarios;
 
         }
 
-        public Task<List<Comentario>> ObtenerComentariosPorInmuebleIdAsync(int inmuebleId)
+        public List<Comentario> ObtenerComentariosPorInmuebleIdAsync(int inmuebleId)
         {
             using var db = new Alquileres_ExpressContext();
-            return Task.FromResult(db.Comentarios.Include(c => c.Respuestas).Where(c => c.InmuebleId == inmuebleId).ToList());
+            return db.Comentarios.Include(c => c.Respuestas).Where(c => c.InmuebleId == inmuebleId).ToList();
+        }
+
+        public List<Comentario> BuscarRespuestasPorComentarioIdAsync(int comentarioId)
+        {
+            using var db = new Alquileres_ExpressContext();
+            return db.Comentarios
+                .Include(c => c.Respuestas)
+                .Where(c => c.ComentarioId == comentarioId)
+                .ToList();
         }
     }
 }

@@ -1,8 +1,3 @@
-.sin-comentarios {
-        font-style: italic;
-        color: #666;
-        margin-top: 1rem;
-    }
 
     .comentarios-container {
         display: flex;
@@ -53,7 +48,9 @@
     }
 
     .btn-editar,
-    .btn-eliminar {
+    .btn-eliminar,
+    .btn-responder,
+    .btn-ver-respuestas {
         padding: 0.4rem 0.8rem;
         font-size: 0.85rem;
         border-radius: 5px;
@@ -74,6 +71,10 @@
         background-color: #2d77e6;
         color: white;
     }
+    .btn-ver-respuestas {
+        background-color: #007bff;
+        color: white;
+    }
 
     .btn-editar:hover {
         background-color: #45a049;
@@ -82,3 +83,15 @@
     .btn-eliminar:hover {
         background-color: #e53935;
     }
+    .btn-responder:hover {
+        background-color: #1a5bb8;
+    }
+    .btn-ver-respuestas:hover {
+        background-color: #0056b3;
+    }
+    .respuestas-anidadas {
+    margin-left: 2rem;
+    border-left: 2px solid #ddd;
+    padding-left: 1rem;
+    margin-top: 0.5rem;
+}

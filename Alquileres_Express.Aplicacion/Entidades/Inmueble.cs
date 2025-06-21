@@ -22,7 +22,7 @@ namespace Alquileres_Express.Aplicacion.Entidades;
         public PoliticaDeCancelacion PoliticaDeCancelacion { get; set; } = PoliticaDeCancelacion.SinCosto;
         public bool Disponible { get; set; }
         public List<Foto>? Fotos { get; set; } = [];
-        public List<Alquiler> Alquileres { get; set; } = [];
+        public List<Alquiler>? Alquileres { get; set; } = [];
         public List<Comentario>? Comentarios { get; set; } = [];
         public List<Valoracion>? Valoraciones { get; set; } = new List<Valoracion>();
 

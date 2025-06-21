@@ -1,0 +1,186 @@
+@rendermode InteractiveServer
+@inject CasoDeUsoListarComentarios casoDeUsoListarComentarios
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+@inject CasoDeUsoEliminarComentario CasoDeUsoEliminarComentario
+@inject CasoDeUsoAgregarComentario CasoDeUsoAgregarComentario
+@inject NavigationManager NavigationManager
+
+@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="comentario-card">
+    <div class="comentario-header">
+        <span class="autor">@Comentario.NombreUsuario</span>
+        <span class="fecha">@Comentario.Fecha.ToString("dd/MM/yyyy HH:mm")</span>
+    </div>
+    <div class="comentario-texto">@Comentario.Texto</div>
+    
+    @if (usuario != null)
+    { 
+        <div class="comentario-acciones">
+        @if ((usuario.Rol == RolUsuario.Cliente && Comentario.ClienteId == usuario.Id) ||
+            (usuario.Rol != RolUsuario.Cliente && Comentario.PersonalId == usuario.Id) ||
+            (usuario.Rol != RolUsuario.Cliente && Comentario.RolUsuario != RolUsuario.Gerente)
+            )
+            {
+                <button class="btn-editar" @onclick="() => EditarComentario(Comentario.Id)">Editar</button>
+                <button class="btn-eliminar" @onclick="() => OnEliminar.InvokeAsync(Comentario.Id)">Eliminar</button>
+            }
+        </div>
+        <button class="btn-responder" @onclick="()=>ToggleFormularioRespuesta(Comentario.Id)">
+            @((mostrarFormularioRespuestaDeComentario == Comentario.Id ) ? "Cancelar" : "Responder")
+        </button>
+
+        @if (mostrarFormularioRespuestaDeComentario == Comentario.Id)
+        {
+            <div class="formulario-comentario">
+                <textarea placeholder="Escribe tu comentario..." @bind="respuesta.Texto"></textarea>
+            </div>
+            <button class="btn-agregar" @onclick="()=>AgregarRespuesta(respuesta, Comentario)">Agregar comentario</button>
+
+            @foreach (var error in errores)
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+        }
+    }
+    
+    @if (Comentario.Respuestas!.Count > 0)
+    {
+        <button class="btn-ver-respuestas" @onclick="ToggleMostrarRespuestas">Ver respuestas</button>
+        @if (mostrarRespuestas)
+        {
+            <div class="comentarios-container">
+                <h3 style="color:black;">Respuestas</h3>
+                @foreach (var respuesta in Comentario.Respuestas)
+                {
+                    <MostrarComentario InmuebleDelComentarioOriginal=InmuebleDelComentarioOriginal Comentario="respuesta" Correo="@Correo" OnEliminar="EliminarComentario" />
+                }
+            </div>
+        }
+    }
+</div>
+@code
+{
+    [Parameter]
+    public Comentario Comentario {get; set;} = new Comentario();
+    [Parameter]
+    public int? InmuebleId { get; set; }
+    [Parameter]
+    public int InmuebleDelComentarioOriginal { get; set; }
+    [Parameter]
+    public string Correo {get; set;} = "";
+    [Parameter] 
+    public EventCallback<int> OnEliminar { get; set; }
+
+    private Usuario? usuario;
+    private bool mostrarFormulario = false;
+    private bool mostrarRespuestas = false;
+    private int mostrarFormularioRespuestaDeComentario = 0; 
+    private List<string> errores = [];
+    private Comentario nuevoComentario = new ();
+    private Comentario respuesta = new ();
+    
+    protected override void OnParametersSet()
+    {
+        if (InmuebleId != null && InmuebleId <= 0)
+        {
+            throw new ArgumentException("El Id del inmueble debe ser mayor que cero.", nameof(InmuebleId));
+        }
+        
+        usuario = (Usuario?)CasoDeUsoBuscarClientePorCorreo.Ejecutar(Correo) ??
+                 (Usuario?) CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(Correo);
+        nuevoComentario = InicializarComentario();
+
+    }
+    private void ToggleFormularioComentario()
+    {
+        mostrarFormulario = !mostrarFormulario;
+        StateHasChanged();
+    }
+    private void ToggleMostrarRespuestas()
+    {
+        mostrarRespuestas = !mostrarRespuestas;
+        StateHasChanged();
+    }
+    private void ToggleFormularioRespuesta(int comentarioId)
+    {
+        if (mostrarFormularioRespuestaDeComentario == comentarioId)
+        {
+            mostrarFormularioRespuestaDeComentario = 0; // Ocultar el formulario
+        }
+        else
+        {
+            mostrarFormularioRespuestaDeComentario = comentarioId; // Mostrar el formulario para ese comentario
+            respuesta = InicializarComentario(); 
+            respuesta.ComentarioId = comentarioId; 
+            respuesta.InmuebleId = null;
+        }
+        StateHasChanged();
+        
+    }
+
+    private void AgregarRespuesta(Comentario respuesta, Comentario respondido)
+    {
+        errores.Clear();
+        if (CasoDeUsoAgregarComentario.Ejecutar(respuesta, out errores))
+        {
+            mostrarFormularioRespuestaDeComentario = 0; // Ocultar el formulario después de agregar
+            respondido.Respuestas!.Add(respuesta);
+        }
+        respuesta = InicializarComentario();
+        respuesta.InmuebleId = null;
+        StateHasChanged();
+    }
+
+    private Comentario InicializarComentario()
+    {
+        if (usuario == null)
+        {
+            return new Comentario();
+        }
+        Comentario c;
+        if (usuario!.Rol == RolUsuario.Cliente)
+        {
+            c = new Comentario()
+            {
+                InmuebleId = InmuebleId,
+                RolUsuario = usuario!.Rol,
+                ClienteId = usuario!.Id,
+                NombreUsuario = usuario!.Nombre + " " + usuario!.Apellido, 
+            };
+        }
+        else
+        {
+            c = new Comentario()
+            {
+                InmuebleId = InmuebleId,
+                RolUsuario = usuario!.Rol,
+                PersonalId = usuario!.Id,
+                NombreUsuario = usuario!.Nombre + " " + usuario!.Apellido, 
+            };
+        }
+        c.Fecha = DateTime.Now;
+        return c;
+    }
+
+    
+    private void EditarComentario(int id)
+    {
+        // Lógica de edición: podrías navegar a otro componente o mostrar un modal
+        Console.WriteLine($"Editar comentario con ID: {id}");
+    }
+
+    private async Task EliminarComentario(int id)
+    {
+        if (await CasoDeUsoEliminarComentario.EjecutarAsync(id))
+        {
+            Comentario comentario = Comentario.Respuestas!.FirstOrDefault(c => c.Id == id)!;
+            Comentario.Respuestas!.Remove(comentario);
+        }
+        StateHasChanged();
+        //NavigationManager.NavigateTo($"/inmueble/{InmuebleDelComentarioOriginal}/?mensaje=Error al eliminar el comentario.&esMensajeDeError=true", true);
+        
+    }
+}
