@@ -11,50 +11,59 @@
 
 @if (comentarios.Count == 0)
 {
-    <p class="sin-comentarios">No hay comentarios disponibles para este inmueble.</p>
+    <div class="alert alert-secondary text-center my-3">
+        No hay comentarios disponibles para este inmueble.
+    </div>
 }
 else
 {
-    <div class="comentarios-container">
+    <div class="comentarios-container list-group mb-4">
         @foreach (var comentario in comentarios)
         {
-           <MostrarComentario InmuebleDelComentarioOriginal=comentario.InmuebleId!.Value Comentario="comentario" Correo="@Correo" OnEliminar="EliminarComentarioAs" />
+            <MostrarComentario InmuebleDelComentarioOriginal="@comentario.InmuebleId!.Value" 
+                               Comentario="@comentario" 
+                               Correo="@Correo" 
+                               OnEliminar="EliminarComentarioAs" />
         }
     </div>
 }
+
 @if (usuario != null)
 {
-    <button class="btn-comentar" @onclick="ToggleFormularioComentario">
-        @((mostrarFormulario) ? "Cancelar" : "Comentar")
-    </button>
+    <div class="text-center mb-3">
+        <button class="btn btn-outline-primary" @onclick="ToggleFormularioComentario">
+            @((mostrarFormulario) ? "Cancelar" : "Agregar Comentario")
+        </button>
+    </div>
 
     @if (mostrarFormulario)
     {
-        <div class="formulario-comentario">
-            <textarea placeholder="Escribe tu comentario..." @bind="nuevoComentario.Texto"></textarea>
+        <div class="mb-3">
+            <label for="comentarioInput" class="form-label fw-bold">Nuevo comentario</label>
+            <textarea id="comentarioInput" class="form-control" rows="3" placeholder="Escribe tu comentario..." @bind="nuevoComentario.Texto"></textarea>
         </div>
-        <button class="btn-agregar" @onclick="AgregarComentario">Agregar comentario</button>
-
+        <div class="text-end mb-4">
+            <button class="btn btn-success" @onclick="AgregarComentario">Enviar</button>
+        </div>
     }
+
     @foreach (var error in errores)
     {
         <div class="alert alert-danger">@error</div>
     }
 }
-@code
-{
+
+@code {
     [Parameter]
     public int InmuebleId { get; set; }
-    private List<Comentario> comentarios = [];
+    private List<Comentario> comentarios = new();
     [Parameter]
-    public string Correo {get; set;} = "";
+    public string Correo { get; set; } = "";
     private Usuario? usuario;
     private bool mostrarFormulario = false;
-    private bool mostrarRespuestas = false;
-    private int mostrarFormularioRespuestaDeComentario = 0; 
-    private List<string> errores = [];
-    private Comentario nuevoComentario = new ();
-    private Comentario respuesta = new ();
+    private List<string> errores = new();
+    private Comentario nuevoComentario = new();
+
     protected override void OnParametersSet()
     {
         if (InmuebleId <= 0)
@@ -63,11 +72,12 @@ else
         }
 
         comentarios = casoDeUsoListarComentarios.ListarComentariosPorInmuebleId(InmuebleId);
-        usuario = (Usuario?)CasoDeUsoBuscarClientePorCorreo.Ejecutar(Correo) ??
-                 (Usuario?) CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(Correo);
-        nuevoComentario = InicializarComentario();
+        usuario = (Usuario?)CasoDeUsoBuscarClientePorCorreo.Ejecutar(Correo)
+                  ?? (Usuario?)CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(Correo);
 
+        nuevoComentario = InicializarComentario();
     }
+
     private void ToggleFormularioComentario()
     {
         mostrarFormulario = !mostrarFormulario;
@@ -78,51 +88,43 @@ else
         errores.Clear();
         if (CasoDeUsoAgregarComentario.Ejecutar(nuevoComentario, out errores))
         {
-            mostrarFormulario = false; // Ocultar el formulario después de agregar
+            mostrarFormulario = false;
             comentarios.Add(nuevoComentario);
         }
+
         nuevoComentario = InicializarComentario();
         StateHasChanged();
     }
 
     private Comentario InicializarComentario()
     {
-        if (usuario == null)
+        if (usuario == null) return new Comentario();
+
+        var c = new Comentario
         {
-            return new Comentario();
-        }
-        Comentario c;
-        if (usuario!.Rol == RolUsuario.Cliente)
-        {
-            c = new Comentario()
-            {
-                InmuebleId = InmuebleId,
-                RolUsuario = usuario!.Rol,
-                ClienteId = usuario!.Id,
-                NombreUsuario = usuario!.Nombre + " " + usuario!.Apellido, 
-            };
-        }
+            InmuebleId = InmuebleId,
+            RolUsuario = usuario.Rol,
+            NombreUsuario = $"{usuario.Nombre} {usuario.Apellido}",
+            Fecha = DateTime.Now
+        };
+
+        if (usuario.Rol == RolUsuario.Cliente)
+            c.ClienteId = usuario.Id;
         else
-        {
-            c = new Comentario()
-            {
-                InmuebleId = InmuebleId,
-                RolUsuario = usuario!.Rol,
-                PersonalId = usuario!.Id,
-                NombreUsuario = usuario!.Nombre + " " + usuario!.Apellido, 
-            };
-        }
-        c.Fecha = DateTime.Now;
+            c.PersonalId = usuario.Id;
+
         return c;
     }
+
     private async Task EliminarComentarioAs(int id)
     {
         if (await CasoDeUsoEliminarComentario.EjecutarAsync(id))
         {
-            Comentario comentario = comentarios.FirstOrDefault(c => c.Id == id)!;
-            comentarios.Remove(comentario);
+            var comentario = comentarios.FirstOrDefault(c => c.Id == id);
+            if (comentario != null)
+                comentarios.Remove(comentario);
         }
-        //NavigationManager.NavigateTo($"/inmueble/{InmuebleId}", true);
+
         StateHasChanged();
     }
 }

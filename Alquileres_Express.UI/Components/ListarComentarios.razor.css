@@ -1,84 +1,132 @@
 .sin-comentarios {
-        font-style: italic;
-        color: #666;
-        margin-top: 1rem;
-    }
+    font-style: italic;
+    color: #6c757d; /* texto secundario Bootstrap */
+    margin-top: 1rem;
+    text-align: center;
+}
 
-    .comentarios-container {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        margin-top: 1rem;
-    }
+/* Contenedor de todos los comentarios */
+.comentarios-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
 
-    .comentario-card {
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 1rem;
-        background-color: #f9f9f9;
-        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s ease;
-        position: relative;
-    }
+/* Tarjeta individual de comentario */
+.comentario-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
 
-    .comentario-card:hover {
-        transform: scale(1.01);
-    }
+.comentario-card:hover {
+    transform: scale(1.01);
+}
 
-    .comentario-header {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-    }
+/* Header del comentario: autor y fecha */
+.comentario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
 
-    .autor {
-        font-weight: bold;
-        color: #333;
-    }
+.autor {
+    font-weight: bold;
+    color: #212529;
+}
 
-    .fecha {
-        font-size: 0.85rem;
-        color: #999;
-    }
+.fecha {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
 
-    .comentario-texto {
-        font-size: 1rem;
-        color: #444;
-        margin-bottom: 0.5rem;
-    }
+/* Texto principal del comentario */
+.comentario-texto {
+    font-size: 1rem;
+    color: #343a40;
+    margin-bottom: 0.5rem;
+}
 
-    .comentario-acciones {
-        display: flex;
-        gap: 0.5rem;
-    }
+/* Botones de acción: editar, eliminar, responder */
+.comentario-acciones {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
 
-    .btn-editar,
-    .btn-eliminar {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
-        border-radius: 5px;
-        cursor: pointer;
-        border: none;
-    }
+.btn-editar,
+.btn-eliminar,
+.btn-responder {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    border: none;
+    color: white;
+    transition: background-color 0.2s ease-in-out;
+}
 
-    .btn-editar {
-        background-color: #4CAF50;
-        color: white;
-    }
+.btn-editar {
+    background-color: #28a745;
+}
 
-    .btn-eliminar {
-        background-color: #f44336;
-        color: white;
-    }
-    .btn-responder {
-        background-color: #2d77e6;
-        color: white;
-    }
+.btn-editar:hover {
+    background-color: #218838;
+}
 
-    .btn-editar:hover {
-        background-color: #45a049;
-    }
+.btn-eliminar {
+    background-color: #dc3545;
+}
 
-    .btn-eliminar:hover {
-        background-color: #e53935;
-    }
+.btn-eliminar:hover {
+    background-color: #c82333;
+}
+
+.btn-responder {
+    background-color: #007bff;
+}
+
+.btn-responder:hover {
+    background-color: #0069d9;
+}
+
+/* Formulario de nuevo comentario */
+.formulario-comentario textarea {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+    padding: 0.75rem;
+    font-size: 1rem;
+    resize: vertical;
+    margin-bottom: 1rem;
+}
+
+.btn-agregar {
+    background-color: #198754;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    border: none;
+}
+
+.btn-agregar:hover {
+    background-color: #157347;
+}
+
+.btn-comentar {
+    background-color: #0d6efd;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    border: none;
+    margin-top: 1rem;
+}
+
+.btn-comentar:hover {
+    background-color: #0b5ed7;
+}

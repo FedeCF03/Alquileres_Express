@@ -23,7 +23,7 @@
         @if (esAutorDelComentario)
             {
             <button class="btn-editar" @onclick="()=>ToggleFormularioEdicion(Comentario.Id)">
-                @((mostrarFormularioEdicionDeComentario == Comentario.Id ) ? "Cancelar" : "Editar")
+                @((mostrarFormularioEdicionDeComentario) ? "Cancelar" : "Editar")
             </button>                
             <button class="btn-eliminar" @onclick="() => OnEliminar.InvokeAsync(Comentario.Id)">Eliminar</button>
             }
@@ -32,20 +32,24 @@
                 <button class="btn-eliminar" @onclick="() => OnEliminar.InvokeAsync(Comentario.Id)">Eliminar</button>
             }
         </div>
-        @if (mostrarFormularioEdicionDeComentario == Comentario.Id)
+        @if (mostrarFormularioEdicionDeComentario)
         {
             <div class="formulario-comentario">
                 <textarea placeholder="Edita tu comentario..." @bind="comentarioEditado.Texto"></textarea>
             </div>
             <button class="btn-editar" @onclick="()=>EditarComentario(comentarioEditado)">Guardar</button>
+            @foreach (var error in erroresEdicion)
+            {
+                <div class="alert alert-danger">@error</div>
+            }
         }
 
 
         <button class="btn-responder" @onclick="()=>ToggleFormularioRespuesta(Comentario.Id)">
-            @((mostrarFormularioRespuestaDeComentario == Comentario.Id ) ? "Cancelar" : "Responder")
+            @((mostrarFormularioRespuestaDeComentario) ? "Cancelar" : "Responder")
         </button>
 
-        @if (mostrarFormularioRespuestaDeComentario == Comentario.Id)
+        @if (mostrarFormularioRespuestaDeComentario)
         {
             <div class="formulario-comentario">
                 <textarea placeholder="Escribe tu comentario..." @bind="respuesta.Texto"></textarea>
@@ -88,9 +92,10 @@
     public EventCallback<int> OnEliminar { get; set; }
     private Usuario? usuario;
     private bool mostrarRespuestas = false;
-    private int mostrarFormularioRespuestaDeComentario;
-    private int mostrarFormularioEdicionDeComentario;
+    private bool mostrarFormularioRespuestaDeComentario;
+    private bool mostrarFormularioEdicionDeComentario;
     private List<string> errores = [];
+    private List<string> erroresEdicion = [];
     private Comentario nuevoComentario = new ();
     private Comentario comentarioEditado = new ();
     private Comentario respuesta = new ();
@@ -119,13 +124,14 @@
     }
     private void ToggleFormularioRespuesta(int comentarioId)
     {
-        if (mostrarFormularioRespuestaDeComentario == comentarioId)
+        if (mostrarFormularioRespuestaDeComentario)
         {
-            mostrarFormularioRespuestaDeComentario = 0; // Ocultar el formulario
+            mostrarFormularioRespuestaDeComentario = false; // Ocultar el formulario
+            errores.Clear();
         }
         else
         {
-            mostrarFormularioRespuestaDeComentario = comentarioId; // Mostrar el formulario para ese comentario
+            mostrarFormularioRespuestaDeComentario = true; // Mostrar el formulario para ese comentario
             respuesta = InicializarComentario(); 
             respuesta.ComentarioId = comentarioId; 
             respuesta.InmuebleId = null;
@@ -134,13 +140,14 @@
     }
     private void ToggleFormularioEdicion(int comentarioId)
     {
-        if (mostrarFormularioEdicionDeComentario == comentarioId)
+        if (mostrarFormularioEdicionDeComentario)
         {
-            mostrarFormularioEdicionDeComentario = 0;
+            mostrarFormularioEdicionDeComentario = false;
+            erroresEdicion.Clear();
         }
         else
         {
-            mostrarFormularioEdicionDeComentario = comentarioId; 
+            mostrarFormularioEdicionDeComentario = true; 
             comentarioEditado = new Comentario
             {
                 Id = Comentario.Id,
@@ -156,7 +163,7 @@
         errores.Clear();
         if (CasoDeUsoAgregarComentario.Ejecutar(respuesta, out errores))
         {
-            mostrarFormularioRespuestaDeComentario = 0; // Ocultar el formulario después de agregar
+            mostrarFormularioRespuestaDeComentario = false; // Ocultar el formulario después de agregar
             respondido.Respuestas!.Add(respuesta);
         }
         respuesta = InicializarComentario();
@@ -198,10 +205,10 @@
     
     private void EditarComentario(Comentario c)
     {
-        errores.Clear();
-        if (CasoDeUsoEditarComentario.Ejecutar(c, out errores))
+        erroresEdicion.Clear();
+        if (CasoDeUsoEditarComentario.Ejecutar(c, out erroresEdicion))
         {
-            mostrarFormularioEdicionDeComentario = 0;
+            mostrarFormularioEdicionDeComentario = false;
             Comentario.Texto = c.Texto;
             Comentario.Fecha = c.Fecha;
             c = new Comentario();
