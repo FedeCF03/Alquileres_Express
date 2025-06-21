@@ -55,7 +55,6 @@ else
     private List<string> errores = [];
     private Comentario nuevoComentario = new ();
     private Comentario respuesta = new ();
-    
     protected override void OnParametersSet()
     {
         if (InmuebleId <= 0)
@@ -72,25 +71,6 @@ else
     private void ToggleFormularioComentario()
     {
         mostrarFormulario = !mostrarFormulario;
-    }
-    private void ToggleMostrarRespuestas()
-    {
-        mostrarRespuestas = !mostrarRespuestas;
-    }
-    private void ToggleFormularioRespuesta(int comentarioId)
-    {
-        if (mostrarFormularioRespuestaDeComentario == comentarioId)
-        {
-            mostrarFormularioRespuestaDeComentario = 0; // Ocultar el formulario
-        }
-        else
-        {
-            mostrarFormularioRespuestaDeComentario = comentarioId; // Mostrar el formulario para ese comentario
-            respuesta = InicializarComentario(); 
-            respuesta.ComentarioId = comentarioId; 
-            respuesta.InmuebleId = null;
-        }
-        
     }
 
     private void AgregarComentario()
@@ -135,12 +115,6 @@ else
         c.Fecha = DateTime.Now;
         return c;
     }
-    private void EditarComentario(int id)
-    {
-        // Lógica de edición: podrías navegar a otro componente o mostrar un modal
-        Console.WriteLine($"Editar comentario con ID: {id}");
-    }
-
     private async Task EliminarComentarioAs(int id)
     {
         if (await CasoDeUsoEliminarComentario.EjecutarAsync(id))

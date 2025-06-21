@@ -2,20 +2,15 @@ namespace Alquileres_Express.Aplicacion.CasosDeUso;
 
 using Alquileres_Express.Aplicacion.Entidades;
 using Alquileres_Express.Aplicacion.Interfaces;
+using Alquileres_Express.Aplicacion.Validadores;
 
-public class CasoDeUsoEditarComentario(IRepositorioComentario repo ) : CasoDeUsoComentario(repo)
+public class CasoDeUsoEditarComentario(IRepositorioComentario repo, ValidadorComentario validador) : CasoDeUsoComentario(repo)
 {
 
 
-    public async Task<bool> EditarComentarioAsync(Comentario comentario)
+    public bool Ejecutar(Comentario comentario, out List<string> errores)
     {
-        ArgumentNullException.ThrowIfNull(comentario);
-
-        if (string.IsNullOrWhiteSpace(comentario.Texto))
-        {
-            throw new ArgumentException("El texto del comentario no puede estar vacío.");
-        }
-
-        return await _repositorioComentario.EditarComentarioAsync(comentario);
+        errores = validador.Ejecutar(comentario);
+        return errores.Count == 0 && _repositorioComentario.EditarComentario(comentario);
     }
 }

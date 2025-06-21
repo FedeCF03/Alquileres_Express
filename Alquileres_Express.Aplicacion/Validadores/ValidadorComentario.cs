@@ -12,10 +12,11 @@ public class ValidadorComentario
         {
             _errores.Add("El comentario no puede ser nulo.");
         }
-        if (string.IsNullOrWhiteSpace(comentario.Texto))
-        {
-            _errores.Add("El texto del comentario no puede estar vacío.");
-        }
+        else
+            if (string.IsNullOrWhiteSpace(comentario.Texto))
+            {
+                _errores.Add("El texto del comentario no puede estar vacío.");
+            }
         return _errores;
     }
 }

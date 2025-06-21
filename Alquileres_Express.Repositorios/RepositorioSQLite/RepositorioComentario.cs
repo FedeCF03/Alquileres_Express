@@ -20,17 +20,15 @@ namespace Alquileres_Express.Aplicacion.Interfaces
             
         }
 
-        public async Task<bool> EditarComentarioAsync(Comentario comentario)
+        public bool EditarComentario(Comentario comentario)
         {
             using var db = new Alquileres_ExpressContext();
-            var existingComentario = await db.Comentarios.FindAsync(comentario.Id);
+            var existingComentario = db.Comentarios.Find(comentario.Id);
             if (existingComentario != null)
             {
                 existingComentario.Texto = comentario.Texto;
                 existingComentario.Fecha = comentario.Fecha;
-                existingComentario.PersonalId = comentario.PersonalId;
-                existingComentario.ClienteId = comentario.ClienteId;
-                await db.SaveChangesAsync();
+                db.SaveChanges();
             }
             return existingComentario != null;
         }
