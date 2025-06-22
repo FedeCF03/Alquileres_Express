@@ -28,6 +28,7 @@ namespace Alquileres_Express.Aplicacion.Interfaces
             {
                 existingComentario.Texto = comentario.Texto;
                 existingComentario.Fecha = comentario.Fecha;
+                existingComentario.Editado = true;
                 db.SaveChanges();
             }
             return existingComentario != null;

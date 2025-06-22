@@ -12,6 +12,7 @@ public class Comentario
     public int? InmuebleId { get; set; }
     public string NombreUsuario { get; set; } = "";
     public int? ComentarioId { get; set; } // comentario padre
+    public bool Editado { get; set; } = false;
     public List<Comentario>? Respuestas { get; set; } = [];
     public RolUsuario RolUsuario { get; set; }
 

@@ -36,6 +36,11 @@
         font-weight: bold;
         color: #333;
     }
+    .editado {
+        font-style: italic;
+        color: #888;
+        padding: 1rem;
+    }
 
     .fecha {
         font-size: 0.85rem;
@@ -74,14 +79,10 @@
     .btn-responder {
         background-color: #2d77e6;
     }
-    .btn-ver-respuestas {
-        background-color: 0d6efd;
-    }
 
     .btn-editar:hover,
     .btn-eliminar:hover,
-    .btn-responder:hover,
-    .btn-ver-respuestas:hover {
+    .btn-responder:hover{
         text-decoration: underline;
     }
     .btn-editar:hover {
@@ -93,10 +94,6 @@
     }
     .btn-responder:hover {
         background-color: #1a5bb8;
-    }
-    .btn-ver-respuestas:hover {
-        background-color: #0056b3;
-
     }
     .respuestas-anidadas {
     margin-left: 2rem;

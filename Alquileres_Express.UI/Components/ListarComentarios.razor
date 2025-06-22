@@ -45,12 +45,13 @@ else
         <div class="text-end mb-4">
             <button class="btn btn-success" @onclick="AgregarComentario">Enviar</button>
         </div>
-    }
-
     @foreach (var error in errores)
     {
         <div class="alert alert-danger">@error</div>
     }
+    }
+
+    
 }
 
 @code {
@@ -81,6 +82,14 @@ else
     private void ToggleFormularioComentario()
     {
         mostrarFormulario = !mostrarFormulario;
+        if (mostrarFormulario)
+        {
+            nuevoComentario = InicializarComentario();
+        }
+        else
+        {
+            errores.Clear();
+        }
     }
 
     private void AgregarComentario()

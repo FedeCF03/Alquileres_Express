@@ -12,7 +12,12 @@
 
 <div class="comentario-card">
     <div class="comentario-header">
-        <span class="autor">@Comentario.NombreUsuario</span>
+        <span class="autor">@Comentario.NombreUsuario 
+            @if (Comentario.Editado)
+            {
+                <span class="editado">(Editado)</span>
+            }
+        </span>
         <span class="fecha">@Comentario.Fecha.ToString("dd/MM/yyyy HH:mm")</span>
     </div>
     <div class="comentario-texto">@Comentario.Texto</div>
@@ -65,7 +70,7 @@
     
     @if (Comentario.Respuestas!.Count > 0)
     {
-        <button class="btn-ver-respuestas" @onclick="ToggleMostrarRespuestas">Ver respuestas</button>
+        <button class="btn-responder" @onclick="ToggleMostrarRespuestas">Ver respuestas</button>
         @if (mostrarRespuestas)
         {
             <div class="comentarios-container">
@@ -205,14 +210,21 @@
     
     private void EditarComentario(Comentario c)
     {
+        
         erroresEdicion.Clear();
-        if (CasoDeUsoEditarComentario.Ejecutar(c, out erroresEdicion))
+        if (c.Texto.Equals(Comentario.Texto))
         {
             mostrarFormularioEdicionDeComentario = false;
-            Comentario.Texto = c.Texto;
-            Comentario.Fecha = c.Fecha;
-            c = new Comentario();
         }
+        else
+            if (CasoDeUsoEditarComentario.Ejecutar(c, out erroresEdicion))
+            {
+                mostrarFormularioEdicionDeComentario = false;
+                Comentario.Texto = c.Texto;
+                Comentario.Fecha = c.Fecha;
+                Comentario.Editado = true;
+                c = new Comentario();
+            }
         StateHasChanged();
     }
 
