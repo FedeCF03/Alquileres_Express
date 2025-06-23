@@ -13,5 +13,6 @@ public interface IRepositorioInmueble
     public List<Inmueble> ObtenerInmueblesPorTipo(TipoDeInmueble tipo);
     public List<Inmueble> ObtenerInmueblesDisponibles();
     public List<Inmueble> ObtenerLosInmueblesNoDisponibles();
+    public decimal obtenerIngresosDeInmueble(int id);
     public bool SeRepiteNombre(Inmueble inmueble);
 }

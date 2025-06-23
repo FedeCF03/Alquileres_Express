@@ -12,7 +12,8 @@ public class RepositorioCliente : IRepositorioCliente
     readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
     public void AgregarCliente(Cliente c)
     {
-        c.Rol = Aplicacion.Enumerativo.RolUsuario.Cliente;
+        c.Rol = Aplicacion.Enumerativo.RolUsuario.Cliente;     //usamos esto para actualizar algo?
+        c.FechaCreacionCuenta = DateTime.Now;
         bool existe = _context.Clientes.Any(x => x.Correo.ToLower() == c.Correo.ToLower()) || _context.Personal.Any(x => x.Correo.ToLower() == c.Correo.ToLower());
         if (existe)
             throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
@@ -103,6 +104,13 @@ public class RepositorioCliente : IRepositorioCliente
     {
         return _context.Clientes.FirstOrDefault(c => c.Correo.ToLower().Equals(cliente.Correo.ToLower()) && c.Id != cliente.Id) != null ||
         _context.Personal.FirstOrDefault(p => p.Correo.ToLower().Equals(cliente.Correo.ToLower())) != null;
+    }
+
+
+     public int ObtenerCantidadDeClientesEntreFechas(DateTime fechaInicio, DateTime fechaFin)
+    {
+        var num = _context.Clientes.Count(p => p.FechaCreacionCuenta >= fechaInicio && p.FechaCreacionCuenta <= fechaFin);
+        return num;
     }
 
 

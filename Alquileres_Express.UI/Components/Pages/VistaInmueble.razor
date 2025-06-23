@@ -13,6 +13,7 @@
 @using Alquileres_Express.Aplicacion.Enumerativo
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject CasoDeUsoObtenerIngresosDeInmueble CasoDeUsoObtenerIngresosDeInmueble
 @inject IRepositorioAlquiler repositorioAlquiler
 
 <div class="property-page">
@@ -214,8 +215,16 @@
                                     </NavLink>
                                 </div>
                             </Authorized>
+                            
                         </AuthorizeView>
-
+                        <AuthorizeView Roles="Gerente">
+                             <Authorized>
+                                <button class="reserve-btn" @onclick="MostrarIngresos">
+                                        <i class="fas fa-credit-card"></i>
+                                        Ingresos de alquiler
+                                </button>
+                             </Authorized>
+                        </AuthorizeView>
                     </div>
                 </div>
             </div>
@@ -348,6 +357,11 @@
         podesPagar = true;
     }
 
+    private void MostrarIngresos()
+    {
+        mensajeError = "$" + @CasoDeUsoObtenerIngresosDeInmueble.Ejecutar(Id).ToString();
+
+    }
     private decimal calcularPrecio()
     {
         if ((StartDate != null && EndDate != null))

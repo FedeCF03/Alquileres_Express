@@ -45,6 +45,8 @@ builder.Services
     .AddTransient<CasoDeUsoListarInmuebles>()
     .AddTransient<CasoDeUsoEditarInmueble>()
     .AddTransient<CasoDeUsoBuscarClientePorId>()
+    .AddTransient<CasoDeUsoObtenerCantidadDeClientesEntreFechas>()
+    .AddTransient<CasoDeUsoObtenerValorDeAlquileresEntreFechas>()
 
     .AddTransient<CasoDeUsoModificarInmueble>()
     .AddTransient<CasoDeUsoAltaInmueble>()
@@ -52,7 +54,8 @@ builder.Services
     .AddTransient<CasoDeUsoEliminarInmueble>()
     .AddTransient<CasoDeUsoObtenerInmueble>()
     .AddTransient<CasoDeUsoVerInmueble>()
-
+    .AddTransient<CasoDeUsoObtenerIngresosDeInmueble>()
+    
     .AddTransient<CasoDeUsoAltaPersonal>()
     .AddTransient<CasoDeUsoModificarPersonal>()
     .AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>()
