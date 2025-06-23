@@ -74,6 +74,18 @@ public class Crear
                 Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
             };
             context.Add(cliente);
+            var cliente2 = new Cliente
+            {
+                Nombre = "Juan",
+                Apellido = "Sanchez",
+                Correo = "prueba2@gmail.com",
+                Dni = "22222211",
+                Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
+                Direccion = "Calle Real 456",
+                FechaNacimiento = new DateTime(1995, 5, 15),
+                Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
+            };
+            context.Add(cliente2);
             context.SaveChanges(); // para generar el Id
 
             var alquiler1 = new Alquiler
@@ -98,9 +110,21 @@ public class Crear
                 Pagado = true
             };
 
-            context.Alquileres.AddRange(alquiler1, alquiler2);
+            var alquiler3 = new Alquiler
+            {
+                ClienteId = cliente2.Id,
+                CorreoCliente = cliente2.Correo,
+                FechaDeInicio = DateTime.Today.AddDays(-30),
+                FechaDeFin = DateTime.Today.AddDays(-25),
+                Precio = 6500,
+                InmuebleId = 1,
+                Pagado = true
+            };
+
+            context.Alquileres.AddRange(alquiler1, alquiler2, alquiler3);
             inmueble.Alquileres.Add(alquiler1);
             inmueble.Alquileres.Add(alquiler2);
+            inmueble.Alquileres.Add(alquiler3);
 
             context.SaveChanges();
            

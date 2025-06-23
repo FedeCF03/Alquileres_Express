@@ -16,4 +16,5 @@ public interface IRepositorioInmueble
     public bool SeRepiteNombre(Inmueble inmueble);
     public List<Valoracion> ObtenerValoracionesPorInmueble(int idInmueble);
     public void EditarValoracion(Valoracion valoracion);
+    public Task<bool> EliminarValoracion(Valoracion valoracion);
 }

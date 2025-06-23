@@ -147,10 +147,20 @@
                                 {
                                     <AuthorizeView Roles="Cliente">
                                         <Authorized>
-                                            <button class="btn btn-review" @onclick="() => MostrarCalificacion(alquiler.Id, alquiler.InmuebleId)">
-                                                <i class="fas fa-star"></i> Calificar
-                                            </button> 
-                                            @if (mostrarFormularioCalificacion)
+                                            @if (!YaFueCalificado(alquiler.InmuebleId))
+{
+    <button class="btn btn-review" @onclick="() => MostrarCalificacion(alquiler.Id, alquiler.InmuebleId)">
+        <i class="fas fa-star"></i> Calificar
+    </button>
+}
+else
+{
+    <span class="text-success fw-semibold">
+        <i class="fas fa-check-circle"></i> Ya calificado
+    </span>
+}
+
+                                            @if (mostrarFormularioCalificacion && alquiler.Id == alquilerSeleccionadoId)
                                             {
                                                 <div class="card shadow p-4 mt-4">
                                                     <h4 class="text-primary mb-3">
@@ -334,6 +344,19 @@
         NavigationManager.NavigateTo($"/alquileres/{id}", true);    
 
     }
+    bool YaFueCalificado(int idInmueble)
+    {
+        Inmueble? inmueble = GetInmuebleById(idInmueble);
+        Valoracion? valoracion = inmueble!.Valoraciones!.FirstOrDefault(v => v.ClienteId == id && v.InmuebleId == idInmueble);
+        if (valoracion != null)
+        {
+            return true; // Ya fue calificado
+        }
+        else 
+        {
+            return false; // No fue calificado
+        }
+    }
 
     private void DejarResena( int id)
     {
@@ -411,7 +434,9 @@ void SeleccionarCalificacion(int valor)
         mensajeCalificacion = "¡Gracias! Tu reseña fue guardada.";
         await Task.Delay(1500).ContinueWith(_ => {
             mostrarFormularioCalificacion = false;  // ocultar form
+            NavigationManager.NavigateTo($"/alquileres/{id}");
         });
+        NavigationManager.NavigateTo($"/alquileres/{id}");
         StateHasChanged();             
     }
 

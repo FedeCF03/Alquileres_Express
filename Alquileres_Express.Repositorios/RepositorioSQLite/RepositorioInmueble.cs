@@ -106,7 +106,7 @@ public class RepositorioInmueble : IRepositorioInmueble
         Inmueble? inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Id == idInmueble).FirstOrDefault();
         return inmueble!.Valoraciones!;
     }
-    
+
     public void EditarValoracion(Valoracion valoracion)
     {
         using Alquileres_ExpressContext _context = new();
@@ -125,4 +125,19 @@ public class RepositorioInmueble : IRepositorioInmueble
         valoracionExistente.Comentario = valoracion.Comentario;
         _context.SaveChanges();
     }
+    
+    public Task<bool> EliminarValoracion(Valoracion valoracion)
+    {
+        using Alquileres_ExpressContext _context = new();
+        Inmueble? inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Id == valoracion.InmuebleId).FirstOrDefault();
+        Valoracion? valoracionExistente = inmueble!.Valoraciones?.FirstOrDefault(v => v.Id == valoracion.Id);
+        if (valoracionExistente != null)
+        {
+            inmueble!.Valoraciones!.Remove(valoracionExistente);
+            _context.Entry(inmueble).State = EntityState.Modified;
+            _context.SaveChanges();
+            return Task.FromResult(true);
+        }
+        return Task.FromResult(false);
+    }   
 }

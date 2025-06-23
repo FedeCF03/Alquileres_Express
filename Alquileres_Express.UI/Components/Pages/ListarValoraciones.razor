@@ -2,6 +2,7 @@
 @inject CasoDeUsoListarValoraciones casoDeUsoListarValoraciones
 @inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
 @inject CasoDeUsoEditarValoracion casoDeUsoEditarValoracion
+@inject CasoDeUsoEliminarValoracion casoDeUsoEliminarValoracion
 @inject AuthenticationStateProvider AuthStateProvider
 
 @if (valoraciones == null || !valoraciones.Any())
@@ -17,27 +18,41 @@ else
         @foreach (var v in valoraciones)
         {
             <div class="valoracion-card card mb-3 shadow-sm p-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="autor fw-bold">@v.NombreCliente @v.ApellidoCliente</div>
-                    <div class="estrellas">
-                        @for (int i = 1; i <= 5; i++)
-                        {
-                            <i class="fas fa-star @(i <= v.Calificacion ? "text-warning" : "text-secondary")"></i>
-                        }
-                    </div>
-                </div>
+    <!-- Encabezado: Nombre a la izquierda, fecha a la derecha -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="autor text-primary fw-semibold">
+            <i class="fas fa-user me-1"></i> @v.NombreCliente @v.ApellidoCliente
+        </div>
+        <div class="text-muted small">
+            @v.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+        </div>
+    </div>
 
-                @if (!string.IsNullOrWhiteSpace(v.Comentario))
-                {
-                    <p class="valoracion-texto mb-0 text-secondary">@v.Comentario</p>
-                }
+    <!-- Estrellas -->
+    <div class="mb-2 estrellas">
+        @for (int i = 1; i <= 5; i++)
+        {
+            <i class="fas fa-star @(i <= v.Calificacion ? "text-warning" : "text-secondary")"></i>
+        }
+    </div>
 
+    <!-- Comentario -->
+    @if (!string.IsNullOrWhiteSpace(v.Comentario))
+    {
+        <p class="valoracion-texto text-secondary">@v.Comentario</p>
+    }
+
+                <!-- Acciones si es del cliente -->
                 @if (clienteActual != null && v.ClienteId == clienteActual.Id)
                 {
-                    <button class="btn btn-sm btn-outline-primary mt-2"
-                            @onclick="() => ComenzarEdicion(v)">
-                        <i class="fas fa-edit"></i> Editar valoración
-                    </button>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => ComenzarEdicion(v)">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarValoracion(v)">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </button>
+                    </div>
                 }
             </div>
         }
@@ -128,6 +143,16 @@ else
 
             // Reset UI
             CancelarEdicion();
+        }
+    }
+
+    private async Task EliminarValoracion(Valoracion valoracion)
+    {
+        Valoracion? v = valoraciones.FirstOrDefault(v => v.Id == valoracion.Id);
+        if (v != null)
+        {
+            valoraciones.Remove(v);
+            await casoDeUsoEliminarValoracion.Ejecutar(v);
         }
     }
 }
