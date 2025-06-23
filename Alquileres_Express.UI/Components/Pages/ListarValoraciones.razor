@@ -1,0 +1,154 @@
+@rendermode InteractiveServer
+@inject CasoDeUsoListarValoraciones casoDeUsoListarValoraciones
+@inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+@inject CasoDeUsoEditarValoracion casoDeUsoEditarValoracion
+@inject AuthenticationStateProvider AuthStateProvider
+
+@if (valoraciones == null || !valoraciones.Any())
+{
+    <p class="sin-valoraciones mt-4 text-muted">
+        <i class="fas fa-comment-dots"></i>
+        Este inmueble aún no tiene valoraciones.
+    </p>
+}
+else
+{
+    <div class="valoraciones-container mt-4">
+        @foreach (var v in valoraciones)
+        {
+            <div class="valoracion-card card mb-3 shadow-sm p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="autor fw-bold">@v.NombreCliente @v.ApellidoCliente</div>
+                    <div class="estrellas">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <i class="fas fa-star @(i <= v.Calificacion ? "text-warning" : "text-secondary")"></i>
+                        }
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(v.Comentario))
+                {
+                    <p class="valoracion-texto mb-0 text-secondary">@v.Comentario</p>
+                }
+
+                @if (clienteActual != null && v.ClienteId == clienteActual.Id)
+                {
+                    <button class="btn btn-sm btn-outline-primary mt-2"
+                            @onclick="() => ComenzarEdicion(v)">
+                        <i class="fas fa-edit"></i> Editar valoración
+                    </button>
+                }
+            </div>
+        }
+    </div>
+}
+
+@if (valoracionEditando != null)
+{
+    <div class="card p-4 mt-3 mx-auto" style="max-width: 600px;">
+        <h5 class="mb-3 text-primary">
+            <i class="fas fa-pen"></i> Editar valoración
+        </h5>
+
+        <div class="d-flex mb-3 gap-1">
+            @for (int i = 1; i <= 5; i++)
+            {
+                int estrella = i;
+                <i class="fas fa-star fa-2x cursor-pointer
+                       @(estrella <= nuevaCalificacion ? "text-warning" : "text-secondary")"
+                   @onclick="@(() => nuevaCalificacion = estrella)">
+                </i>
+            }
+        </div>
+
+        <textarea class="form-control mb-3"
+                  @bind="nuevoComentario"
+                  placeholder="Escribe tu comentario..."></textarea>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-success"
+                    @onclick="GuardarCambiosValoracion">
+                <i class="fas fa-save"></i> Guardar
+            </button>
+            <button class="btn btn-outline-secondary"
+                    @onclick="CancelarEdicion">
+                Cancelar
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int InmuebleId { get; set; }
+
+    private List<Valoracion> valoraciones = new();
+    private Cliente? clienteActual;
+
+    private Valoracion? valoracionEditando;
+    private string nuevoComentario = "";
+    private int nuevaCalificacion = 0;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        valoraciones = casoDeUsoListarValoraciones.Ejecutar(InmuebleId);
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            string correo = user.Identity.Name!;
+            clienteActual = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
+        }
+    }
+
+    void ComenzarEdicion(Valoracion v)
+    {
+        valoracionEditando = v;
+        nuevoComentario = v.Comentario ?? "";
+        nuevaCalificacion = v.Calificacion;
+    }
+
+    void CancelarEdicion()
+    {
+        valoracionEditando = null;
+        nuevoComentario = "";
+        nuevaCalificacion = 0;
+    }
+
+    void GuardarCambiosValoracion()
+    {
+        if (valoracionEditando is not null)
+        {
+            valoracionEditando.Calificacion = nuevaCalificacion;
+            valoracionEditando.Comentario = nuevoComentario;
+            casoDeUsoEditarValoracion.Ejecutar(valoracionEditando);
+
+            // Reset UI
+            CancelarEdicion();
+        }
+    }
+}
+<style> 
+    .valoraciones-container {
+        max-width: 700px;
+    }
+
+    .valoracion-card {
+        border-radius: 6px;
+    }
+
+    .valoracion-card .autor {
+        font-size: 1rem;
+    }
+
+    .valoracion-card .estrellas i {
+        margin-left: 2px;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>

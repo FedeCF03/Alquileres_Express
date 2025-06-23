@@ -36,21 +36,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
         return precioTotal;
     }
 
-    // private RegistroDeLlave generarRegistroDeLlave(Personal personal, int idCliente, int idAlquier)
-    // {
-
-    //     RegistroDeLlave registro = new RegistroDeLlave
-    //     {
-    //         AlquilerId = idAlquier,
-    //         ClienteId = idCliente,
-    //         PersonalEntrega = personal,
-    //         FechayHoraRegistro = DateTime.Now
-    //     };
-
-    //     _context.Llaves.Add(registro);
-    //     _context.SaveChanges();
-    //     return registro;
-    // }
+    
 
     public void RegistrarPagoEnEfectivo(Alquiler alquiler, int idInmueble, DateTime fechaInicio, DateTime fechaFin)
     {
@@ -165,10 +151,10 @@ public class RepositorioAlquiler : IRepositorioAlquiler
         return [.. _context.Alquileres.Include(a => a.RegistrosDeLlave).Where(a => a.Id == idAlquiler)];
     }
 
-    public void CalificarAlquiler(int idInmueble, int idCliente, Valoracion valoracion)
+    public bool CalificarAlquiler(int idInmueble, int idCliente, Valoracion valoracion)
     {
         using Alquileres_ExpressContext _context = new();
-        Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == idInmueble);
+        Inmueble? inmueble = _context.Inmuebles.Include(i=>i.Valoraciones).FirstOrDefault(i => i.Id == idInmueble);
 
 
         if (inmueble == null)
@@ -177,12 +163,13 @@ public class RepositorioAlquiler : IRepositorioAlquiler
             
         Valoracion? v = inmueble.Valoraciones.FirstOrDefault(v => v.ClienteId == idCliente);
         //Console.WriteLine("Valoracion: " + v.ClienteId + v.ApellidoCliente);
-        if (v == null)
-            throw new InvalidOperationException("El cliente ya ha calificado este inmueble.");
-            
+        if (v != null){
+            return false;
+        }
         inmueble.Valoraciones.Add(valoracion);
         _context.Entry(inmueble).State = EntityState.Modified;
         _context.SaveChanges();
+        return true;
     }
 }
 

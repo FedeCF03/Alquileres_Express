@@ -3,6 +3,7 @@ namespace Alquileres_Express.Aplicacion.Interfaces
     using Alquileres_Express.Aplicacion.Entidades;
     using Alquileres_Express.Aplicacion.Enumerativo;
     using Alquileres_Express.Repositorios.Context;
+    using Microsoft.EntityFrameworkCore;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
@@ -53,11 +54,11 @@ namespace Alquileres_Express.Aplicacion.Interfaces
             List<Comentario>? comentarios;
             if (rolUsuario == RolUsuario.Cliente)
             {
-                comentarios = db.Comentarios.Where(c => c.ClienteId == usuarioId).ToList();
+                comentarios = db.Comentarios.Include(c => c.Respuestas).Where(c => c.ClienteId == usuarioId).ToList();
             }
             else
             {
-                comentarios = db.Comentarios.Where(c => c.PersonalId == usuarioId).ToList();
+                comentarios = db.Comentarios.Include(c => c.Respuestas).Where(c => c.PersonalId == usuarioId).ToList();
             }
             return Task.FromResult(comentarios)!;
 
@@ -66,7 +67,7 @@ namespace Alquileres_Express.Aplicacion.Interfaces
         public Task<List<Comentario>> ObtenerComentariosPorInmuebleIdAsync(int inmuebleId)
         {
             using var db = new Alquileres_ExpressContext();
-            return Task.FromResult(db.Comentarios.Where(c => c.InmuebleId == inmuebleId).ToList());
+            return Task.FromResult(db.Comentarios.Include(c => c.Respuestas).Where(c => c.InmuebleId == inmuebleId).ToList());
         }
     }
 }

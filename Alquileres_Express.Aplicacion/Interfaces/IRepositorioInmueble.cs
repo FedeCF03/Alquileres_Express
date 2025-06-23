@@ -14,4 +14,6 @@ public interface IRepositorioInmueble
     public List<Inmueble> ObtenerInmueblesDisponibles();
     public List<Inmueble> ObtenerLosInmueblesNoDisponibles();
     public bool SeRepiteNombre(Inmueble inmueble);
+    public List<Valoracion> ObtenerValoracionesPorInmueble(int idInmueble);
+    public void EditarValoracion(Valoracion valoracion);
 }

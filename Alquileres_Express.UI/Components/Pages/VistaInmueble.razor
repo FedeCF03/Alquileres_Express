@@ -8,12 +8,14 @@
 @using BlazorDateRangePicker
 @inject ServicioVerificarPago _servicioVerificarPago
 @inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+@using Alquileres_Express.UI.Components.Pages // Replace with the actual namespace of ListarValoraciones
 
 @using Microsoft.AspNetCore.Components.Authorization
 @using Alquileres_Express.Aplicacion.Enumerativo
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 @inject IRepositorioAlquiler repositorioAlquiler
+@inject CasoDeUsoListarValoraciones casoDeUsoListarValoraciones
 
 <div class="property-page">
     <!-- Hero Section -->
@@ -219,7 +221,9 @@
                     </div>
                 </div>
             </div>
-            <ListarComentarios InmuebleId="@Id" Correo="@correo"/>
+            <ListarComentarios InmuebleId="@Id" Correo="@correo"/>          
+            
+            <ListarValoraciones InmuebleId="@Id" />
         </div>
     </div>
 </div>
@@ -241,6 +245,8 @@
     Personal? personal { get; set; }
     Cliente? cliente { get; set; }
 
+    List<Valoracion> ListaValoraciones { get; set; } = new List<Valoracion>();
+
     private List<RangoDeFechas> FechasReservadas { get; set; } = [];
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
@@ -255,7 +261,8 @@
             rol = user.FindFirst(ClaimTypes.Role)?.Value!;
             personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
             cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
-        
+            inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            ListaValoraciones = casoDeUsoListarValoraciones.Ejecutar(Id);
         }
     }
 
@@ -358,8 +365,8 @@
         return 0;
     }
 
+    
 }
-
 <style>
     .hidden-picker {
         position: absolute;

@@ -66,6 +66,7 @@ builder.Services
     .AddTransient<CasoDeUsoAñadirLlave>()
 
 
+
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
     .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
 
@@ -85,6 +86,8 @@ builder.Services
     .AddTransient<CasoDeUsoEliminarComentario>()
     .AddTransient<CasoDeUsoListarComentarios>()
     .AddTransient<CasoDeUsoCalificarInmueble>()
+    .AddTransient<CasoDeUsoListarValoraciones>()
+    .AddTransient<CasoDeUsoEditarValoracion>()
 
 
     .AddTransient<ValidadorComentario>()
