@@ -5,6 +5,10 @@
 @inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
 @inject CasoDeUsoBuscarPersonalPorId casoDeUsoBuscarPersonalPorId
 @attribute [Authorize (Roles = "Administrador, Gerente, Empleado")]
+@inject CasoDeUsoPersonalDescenderGerente casoDeUsoBuscarPersonalDescenderGerente
+
+@inject CasoDeUsoAscenderAGerente casoDeUsoBuscarPersonalAscenderAGerente
+@inject CasoDeUsoEliminarPersonal casoDeUsoEliminarPersonal
 
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
@@ -26,9 +30,31 @@
         @if (usuario.Rol == RolUsuario.Cliente)
         {
             <div class="botones">
-                @* <button class="btn-editar" @onclick="CambiarContraseña">Cambiar contraseña</button>*@
+                    <button class="btn-editar" @onclick="() => CambiarContraseña(usuario.Id)">Cambiar contraseña</button>
                 <button @onclick="@(() => NavigationManager.NavigateTo($"/alquileres/{ClienteId}"))"class="btn-navlink">
                     <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Ver alquileres
+                        <AuthorizeView Roles="Gerente">
+                            <Authorized>
+                                @if (usuario.Rol == RolUsuario.Gerente)
+                                {
+                                    <button class="btn btn-sm btn-outline-primary" @onclick="() => DescenderGerente(usuario.Id)">
+                                        <i class="fas fa-eye"></i> Descender a Empleado
+                                    </button>
+                                }
+                                @if (usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado)
+                                {
+                                    <button class="btn btn-sm btn-outline-primary" @onclick="() => DarDeBaja(usuario.Id)">
+                                        <i class="fas fa-eye"></i> Dar de baja
+                                    </button>
+                                }
+                                @if (usuario.Rol == RolUsuario.Empleado)
+                                {
+                                    <button class="btn btn-sm btn-outline-primary" @onclick="() => AscenderAGerente(usuario.Id)">
+                                        <i class="fas fa-eye"></i> Ascender a Gerente
+                                    </button>
+                                }
+                            </Authorized>
+                        </AuthorizeView>
                 </button>
             </div>
         }
@@ -83,5 +109,23 @@
         }
         
     }
-
+    void DescenderGerente(int id)
+    {
+        casoDeUsoBuscarPersonalDescenderGerente.Ejecutar(id);
+        NavigationManager.NavigateTo("/listadoUsuario", true);
+    }
+    void DarDeBaja(int id)
+    {
+        casoDeUsoEliminarPersonal.Ejecutar(id);
+        NavigationManager.NavigateTo("/listadoUsuario", true);
+    }
+    void AscenderAGerente(int id)
+    {
+        casoDeUsoBuscarPersonalAscenderAGerente.Ejecutar(id);
+        NavigationManager.NavigateTo("/listadoUsuario", true);
+    }
+    void CambiarContraseña(int id)
+    {
+        NavigationManager.NavigateTo($"/cambiarContrasena/{id}");
+    }
 }

@@ -122,15 +122,6 @@
 </script>
 </div> 
 
-<InputFile accept=".jpg,.png,.jpeg" id="input" @key=@(inputFileId) OnChange="CaptureFiles" multiple/>
-<button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
-<p> Fotos subidas: @fotos.Count</p>
-@if (errorPorFaltaDeFotos != string.Empty)
-    {
-        <div class="alert alert-danger">
-            <p>@errorPorFaltaDeFotos</p>
-        </div>
-    }
 
         <div class="mt-4">
             <label class="form-label fw-bold">Fotos del inmueble</label>
@@ -173,22 +164,6 @@
         }
     </div>
 </div>
-
-@foreach (var error in errores)
-{
-    <div class="alert alert-danger">
-    <p>@error</p>
-    </div>
-}
-
-@foreach (var error in erroresDeFotos)
-{
-    <div class="alert alert-danger">
-    <p>@error</p>
-    </div>
-}
-        
-
 
 
 @code {
