@@ -7,7 +7,7 @@ public interface IRepositorioPersonal
 
     public bool ModificarPersonal(Personal c);
 
-    public void EliminarPersonal(Personal c);
+    public void EliminarPersonal(int id);
     public Personal ObtenerPersonalPorId(int id);
     public Personal ObtenerPersonalPorDNI(string dni);
     public Personal? ObtenerPersonalPorMail(string mail);
@@ -20,4 +20,6 @@ public interface IRepositorioPersonal
     public Personal? ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad);
     public bool SeRepiteDNI(Personal p);
     public bool SeRepiteCorreo(Personal p);
+    public void AscenderAGerente(int id);
+    public void DescenderGerente(int id);
 }

@@ -434,9 +434,9 @@ void SeleccionarCalificacion(int valor)
         mensajeCalificacion = "¡Gracias! Tu reseña fue guardada.";
         await Task.Delay(1500).ContinueWith(_ => {
             mostrarFormularioCalificacion = false;  // ocultar form
-            NavigationManager.NavigateTo($"/alquileres/{id}");
+            NavigationManager.NavigateTo($"/alquileres/{id}", true);
         });
-        NavigationManager.NavigateTo($"/alquileres/{id}");
+        NavigationManager.NavigateTo($"/alquileres/{id}",true );
         StateHasChanged();             
     }
 

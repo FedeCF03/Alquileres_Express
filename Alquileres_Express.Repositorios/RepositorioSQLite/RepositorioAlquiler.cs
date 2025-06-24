@@ -43,7 +43,6 @@ public class RepositorioAlquiler : IRepositorioAlquiler
         using Alquileres_ExpressContext _context = new();
         if (!EstaDisponible(idInmueble, fechaInicio, fechaFin))
             throw new InvalidOperationException("El inmueble no está disponible para el período seleccionado.");
-
         {
             alquiler.Pagado = true;
             guardarAlquilerEnBaseDeDatos(alquiler);

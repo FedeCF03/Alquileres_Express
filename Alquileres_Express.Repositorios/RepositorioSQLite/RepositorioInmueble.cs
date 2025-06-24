@@ -51,40 +51,40 @@ public class RepositorioInmueble : IRepositorioInmueble
     public Inmueble ObtenerInmueblePorId(int id)
     {
         using var _context = new Alquileres_ExpressContext();
-        var inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Id == id) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+        var inmueble = _context.Inmuebles.Include(i=>i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Id == id) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
         return inmueble;
     }
 
     public Inmueble ObtenerInmueblePorNombre(string nombre)
     {
         using var _context = new Alquileres_ExpressContext();
-        var inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Nombre!.Equals(nombre)) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+        var inmueble = _context.Inmuebles.Include(i=>i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Nombre!.Equals(nombre)) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
         return inmueble;
     }
 
     public List<Inmueble> ObtenerInmueblesPorTipo(TipoDeInmueble tipo)
     {
         using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.TipoInmueble == tipo)];
+        return [.. _context.Inmuebles.Include(i=>i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.TipoInmueble == tipo)];
     }
 
 
     public List<Inmueble> ObtenerTodosLosInmuebles()
     {
         using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos)];
+        return [.. _context.Inmuebles.Include(i=>i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos)];
     }
 
     public List<Inmueble> ObtenerInmueblesDisponibles()
     {
         using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Disponible)];
+        return [.. _context.Inmuebles.Include(i=>i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Disponible)];
     }
 
     public List<Inmueble> ObtenerLosInmueblesNoDisponibles()
     {
         using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => !i.Disponible)];
+        return [.. _context.Inmuebles.Include(i=>i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => !i.Disponible)];
     }
 
     public bool SeRepiteNombre(Inmueble inmueble)

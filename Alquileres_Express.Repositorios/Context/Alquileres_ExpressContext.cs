@@ -23,6 +23,16 @@ public class Alquileres_ExpressContext : DbContext
     {
         modelBuilder.Entity<RegistroDeLlave>()
             .HasKey(c => new { c.AlquilerId, c.EsEntrega });
+        modelBuilder.Entity<Inmueble>()
+            .HasMany(i => i.Comentarios)
+            .WithOne()
+            .HasForeignKey(c => c.InmuebleId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Comentario>()
+            .HasMany(c => c.Respuestas)
+            .WithOne()
+            .HasForeignKey(c => c.ComentarioId)
+            .OnDelete(DeleteBehavior.Cascade);
         
 }
 

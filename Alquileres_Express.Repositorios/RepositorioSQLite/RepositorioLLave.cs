@@ -28,4 +28,8 @@ public class RepositorioLlave : IRepositorioLlave
         _context.Llaves.Add(registroDeLlave);
         _context.SaveChanges();
     }
+
+
+
+    
 }

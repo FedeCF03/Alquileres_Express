@@ -1,10 +1,21 @@
 @page "/listadoUsuario"
-@rendermode InteractiveServer   
+@rendermode InteractiveServer
 @inject CasoDeUsoListarUsuarios casoDeUsoListarUsuarios
 @inject CasoDeUsoListarRestringido casoDeUsoListarRestringido
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@attribute [Authorize(Roles = "Administrador,Gerente,Empleado")]  
+@attribute [Authorize(Roles = "Administrador,Gerente,Empleado")]
+@page "/search"
+@inject CasoDeUsoPersonalDescenderGerente casoDeUsoBuscarPersonalDescenderGerente
+
+@inject CasoDeUsoAscenderAGerente casoDeUsoBuscarPersonalAscenderAGerente
+@inject CasoDeUsoEliminarPersonal casoDeUsoEliminarPersonal
+
+<div class="search-container">
+    <input type="text" @bind="searchTerm" @onkeypress="OnKeyPress" placeholder="Buscar..." class="search-input" />
+    <button @onclick="PerformSearch" class="search-button">Buscar</button>
+</div>
+
 
 <div class="container mt-4">
     <div class="card shadow p-4">
@@ -33,7 +44,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var usuario in _lista)
+                    @foreach (var usuario in _listaBusqueda)
                     {
                         <tr>
                             <td>@usuario.Nombre</td>
@@ -44,7 +55,8 @@
                                 <span class="badge @(GetBadgeClass(usuario.Rol))">@usuario.Rol</span>
                             </td>
                             <td>
-                                @if (usuario.Rol == RolUsuario.Empleado || usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Administrador)
+                                @if (usuario.Rol == RolUsuario.Empleado || usuario.Rol == RolUsuario.Gerente || usuario.Rol ==
+                                                        RolUsuario.Administrador)
                                 {
                                     <span class="fw-bold text-success">@usuario.Id</span>
                                 }
@@ -54,12 +66,40 @@
                                 }
                             </td>
                             <td>
-                                <NavLink class="nav-link" href="@($"/verUsuario/?{(usuario.Rol == RolUsuario.Cliente ? "clienteid" : "personalid")}={usuario.Id}")">
+                                <NavLink class="nav-link"
+                                    href="@($"/verUsuario/?{(usuario.Rol == RolUsuario.Cliente ? "clienteid" : "personalid")}={usuario.Id}")">
                                     <button class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-eye"></i> Ver usuario
                                     </button>
                                 </NavLink>
                             </td>
+                            <td>
+                                <AuthorizeView Roles="Gerente">
+                                    <Authorized>
+                                        @if (usuario.Rol == RolUsuario.Gerente)
+                                        {
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                @onclick="() => DescenderGerente(usuario.Id)">
+                                                <i class="fas fa-eye"></i> Descender a Empleado
+                                            </button>
+                                        }
+                                        @if (usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado)
+                                        {
+                                            <button class="btn btn-sm btn-outline-primary" @onclick="() => DarDeBaja(usuario.Id)">
+                                                <i class="fas fa-eye"></i> Dar de baja
+                                            </button>
+                                        }
+                                        @if (usuario.Rol == RolUsuario.Empleado)
+                                        {
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                @onclick="() => AscenderAGerente(usuario.Id)">
+                                                <i class="fas fa-eye"></i> Ascender a Gerente
+                                            </button>
+                                        }
+                                    </Authorized>
+                                </AuthorizeView>
+                            </td>
+
                         </tr>
                     }
                 </tbody>
@@ -70,13 +110,39 @@
 
 @code {
     List<Usuario> _lista = new List<Usuario>();
-    string? ErrorMessage;
+    List<Usuario> _listaBusqueda = new List<Usuario>();
 
+    string? ErrorMessage;
+    private string searchTerm = "";
+
+    private void PerformSearch()
+    {
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            _listaBusqueda = _lista
+            .Where(item => item.Nombre.Contains(searchTerm,
+            StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        else
+        {
+            _listaBusqueda.Clear();
+            _listaBusqueda.AddRange(_lista);
+        }
+    }
+
+    private void OnKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            PerformSearch();
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        
+        var correo = authState.User.Identity.Name;
+
         if (user.Identity is not null && user.Identity.IsAuthenticated)
         {
             if (user.IsInRole("Administrador") || user.IsInRole("Gerente"))
@@ -96,6 +162,9 @@
         {
             ErrorMessage = "Debe iniciar sesión para acceder a esta funcionalidad.";
         }
+        _lista = _lista
+        .Where(item => item.Correo != correo).ToList();
+        _listaBusqueda.AddRange(_lista);
     }
 
     private string GetBadgeClass(RolUsuario rol)
@@ -108,4 +177,21 @@
             _ => "bg-secondary"
         };
     }
+
+    void DescenderGerente(int id)
+    {
+        casoDeUsoBuscarPersonalDescenderGerente.Ejecutar(id);
+        NavigationManager.NavigateTo("/listadoUsuario", true);
+    }
+    void DarDeBaja(int id)
+    {
+        casoDeUsoEliminarPersonal.Ejecutar(id);
+        NavigationManager.NavigateTo("/listadoUsuario", true);
+    }
+    void AscenderAGerente(int id)
+    {
+        casoDeUsoBuscarPersonalAscenderAGerente.Ejecutar(id);
+        NavigationManager.NavigateTo("/listadoUsuario", true);
+    }
+
 }
