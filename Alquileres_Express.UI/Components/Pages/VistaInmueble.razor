@@ -16,6 +16,7 @@
 @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 @inject IRepositorioAlquiler repositorioAlquiler
 @inject CasoDeUsoListarValoraciones casoDeUsoListarValoraciones
+@inject CasoDeUsoPromedioValoracion casoDeUsoPromedioValoracion
 
 <div class="property-page">
     <!-- Hero Section -->
@@ -76,6 +77,34 @@
                 <div class="header-content">
                     <div class="property-info">
                         <h1 class="property-title">@inmueble.Nombre</h1>
+                        @if (inmueble.Valoraciones != null && inmueble.Valoraciones.Any())
+                        {
+                            <div class="property-rating mt-1">
+                                <div class="d-flex align-items-center">
+                                    <span class="promedio-numero ms-2">
+                                        @promedioValoracion.ToString("0.0")
+                                    </span>
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="fas fa-star @(i <= promedioValoracion
+                                        ? "text-warning" 
+                                        : "text-secondary") me-1"></i>
+
+                                    }
+
+                                    <span class="ms-2 text-secondary small">
+                                        (@inmueble.Valoraciones.Count valoración@(inmueble.Valoraciones.Count > 1 ? "es" : ""))
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mt-1 text-muted small fst-italic">
+                                <i class="fas fa-star-half-alt me-1"></i> 
+                                Este inmueble todavía no cuenta con valoraciones
+                            </div>
+                        }
                         <div class="property-location">
                             <i class="fas fa-map-marker-alt"></i>
                             <span>@inmueble.Direccion, @inmueble.Ciudad</span>
@@ -244,6 +273,8 @@
     String rol { get; set; } = string.Empty;
     Personal? personal { get; set; }
     Cliente? cliente { get; set; }
+    private int promedioValoracion;
+
 
     List<Valoracion> ListaValoraciones { get; set; } = new List<Valoracion>();
 
@@ -261,9 +292,12 @@
             rol = user.FindFirst(ClaimTypes.Role)?.Value!;
             personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
             cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
-            inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            
             ListaValoraciones = casoDeUsoListarValoraciones.Ejecutar(Id);
         }
+        inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+        promedioValoracion = obtenerPromedioValoracion(inmueble.Id);
+
     }
 
     void FotoSiguiente()
@@ -354,7 +388,14 @@
         mensajeError = string.Empty;
         podesPagar = true;
     }
+    public int obtenerPromedioValoracion(int idInmueble)
+    {
+        casoDeUsoPromedioValoracion.Ejecutar(idInmueble);
+        Inmueble inmueble = casoDeUsoObtenerInmueble.Ejecutar(idInmueble);
+        //Console.WriteLine($"[DEBUG] Promedio para inmueble {idInmueble}: {inmueble.PromedioCalificacion}");
+        return (int)Math.Round(inmueble.PromedioCalificacion);
 
+    }
     private decimal calcularPrecio()
     {
         if ((StartDate != null && EndDate != null))
@@ -368,6 +409,19 @@
     
 }
 <style>
+    .property-rating i {
+        font-size: 1rem;
+    }
+
+    .property-rating .text-secondary {
+        font-size: 0.9rem;
+    }
+    .promedio-numero {
+        font-size: 1.25rem; /* o probá con 1.3rem si querés más presencia */
+        font-weight: 600;
+        color: #343a40; /* o el color que combine con tu estética */
+    }
+
     .hidden-picker {
         position: absolute;
         top: 0;

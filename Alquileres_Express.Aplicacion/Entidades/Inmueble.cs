@@ -25,19 +25,20 @@ namespace Alquileres_Express.Aplicacion.Entidades;
         public List<Alquiler>? Alquileres { get; set; } = [];
         public List<Comentario>? Comentarios { get; set; } = [];
         public List<Valoracion>? Valoraciones { get; set; } = new List<Valoracion>();
+        public double PromedioCalificacion { get; set; }
 
         public override bool Equals(object? obj)
-    {
-        if (obj == null)
         {
+            if (obj == null)
+            {
+                return false;
+            }
+            if (obj is Inmueble inmueble)
+            {
+                return Id == inmueble.Id;
+            }
             return false;
         }
-        if (obj is Inmueble inmueble)
-        {
-            return Id == inmueble.Id;
-        }
-        return false;
-    }
 
 
         public Inmueble()
