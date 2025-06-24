@@ -85,11 +85,6 @@ public class RepositorioInmueble : IRepositorioInmueble
         using var _context = new Alquileres_ExpressContext();
         return [.. _context.Inmuebles.Include(i=>i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => !i.Disponible)];
     }
-
-    public List <Inmueble> ObtenerLosInmueblesNoDisponibles(){
-        using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => !i.Disponible)];
-    }
     
     public bool SeRepiteNombre(Inmueble inmueble)
     {
