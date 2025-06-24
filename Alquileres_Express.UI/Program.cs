@@ -65,6 +65,7 @@ builder.Services
     .AddTransient<CasoDeUsoBuscarPersonalPorId>()
     .AddTransient<CasoDeUsoAñadirLlave>()
 
+    .AddTransient<CasoDeUsoAscenderAGerente>()
 
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
     .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
@@ -91,6 +92,9 @@ builder.Services
     .AddTransient<ValidadorComentario>()
 
 
+    .AddTransient<CasoDeUsoListarLlaves>()
+    .AddTransient<CasoDeUsoPersonalDescenderGerente>()
+    .AddTransient<CasoDeUsoEliminarPersonal>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddScoped<CasoDeUsoPagarEfectivo>()
     .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()

@@ -23,8 +23,23 @@ public class RepositorioPersonal : IRepositorioPersonal
             _context.SaveChanges();
         }
 
-    public void EliminarPersonal(Personal c)
+    public void EliminarPersonal(int id)
     {
+        using Alquileres_ExpressContext _context = new();
+        var personal = _context.Personal.Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Id == id);
+        if (personal != null)
+        {
+            if (personal.RegistrosDeLlave.Count > 0)
+            {
+                //  _context.RegistroDeLlave.where(r => r.PersonalId == id).ToList().ForEach(r => _context.RegistrosDeLlave.PersonalId = null);
+            }
+            _context.Personal.Remove(personal);
+            _context.SaveChanges();
+        }
+        else
+        {
+            throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
+        }
 
     }
     public Personal ObtenerPersonalPorId(int id)
@@ -131,5 +146,34 @@ public class RepositorioPersonal : IRepositorioPersonal
         using Alquileres_ExpressContext _context = new();
         return _context.Clientes.FirstOrDefault(c => c.Correo.ToLower().Equals(cliente.Correo.ToLower())) != null ||
         _context.Personal.FirstOrDefault(p => p.Correo.ToLower().Equals(cliente.Correo.ToLower()) && p.Id != cliente.Id) != null;
+    }
+
+    public void DescenderGerente(int id)
+    {
+        using Alquileres_ExpressContext _context = new();
+        var personal = _context.Personal.FirstOrDefault(p => p.Id == id);
+        if (personal != null)
+        {
+            personal.Rol = Aplicacion.Enumerativo.RolUsuario.Empleado;
+            _context.SaveChanges();
+        }
+        else
+        {
+            throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
+        }
+
+    }
+
+    public void AscenderAGerente(int id)
+    {
+        using Alquileres_ExpressContext _context = new();
+        var personal = _context.Personal.FirstOrDefault(p => p.Id == id);
+        if (personal != null)
+        {
+
+            personal.Rol = Aplicacion.Enumerativo.RolUsuario.Gerente;
+            _context.SaveChanges();
+        }
+
     }
 }

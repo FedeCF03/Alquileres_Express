@@ -90,15 +90,14 @@ public class RepositorioCliente : IRepositorioCliente
 
     }
 
-
     public bool SeRepiteDNI(Cliente cliente)
     {
         Usuario? u = _context.Clientes.FirstOrDefault(c => c.Dni.Equals(cliente.Dni) && c.Id != cliente.Id);
 
         Usuario? u2 = _context.Personal.FirstOrDefault(p => p.Dni.Equals(cliente.Dni));
         return u != null || u2 != null;
-
     }
+
     public bool SeRepiteCorreo(Cliente cliente)
     {
         return _context.Clientes.FirstOrDefault(c => c.Correo.ToLower().Equals(cliente.Correo.ToLower()) && c.Id != cliente.Id) != null ||
