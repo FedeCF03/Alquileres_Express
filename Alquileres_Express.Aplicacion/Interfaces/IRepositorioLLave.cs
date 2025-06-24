@@ -6,4 +6,6 @@ namespace Alquileres_Express.Aplicacion.Interfaces;
 public interface IRepositorioLlave
 {
     public RegistroDeLlave RegistrarEntregaLLavePresencial(int idAlquiler, int idPersonal, int idCliente);
+
+    public List<RegistroDeLlave> ListarRegistroLlaves(int idAlquiler, bool? esEntrega);
 }

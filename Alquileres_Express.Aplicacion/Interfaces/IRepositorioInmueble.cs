@@ -12,5 +12,6 @@ public interface IRepositorioInmueble
     public List<Inmueble> ObtenerTodosLosInmuebles();
     public List<Inmueble> ObtenerInmueblesPorTipo(TipoDeInmueble tipo);
     public List<Inmueble> ObtenerInmueblesDisponibles();
+    public List <Inmueble> ObtenerLosInmueblesNoDisponibles();
     public bool SeRepiteNombre(Inmueble inmueble);
 }

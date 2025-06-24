@@ -12,4 +12,9 @@ public class CasoDeUsoListarInmuebles(IRepositorioInmueble repo) : CasoDeUsoInmu
     {
         return repo.ObtenerTodosLosInmuebles();
     }
+
+    public List<Inmueble> ListarNoDisponibles()
+    {
+        return repo.ObtenerLosInmueblesNoDisponibles();
+    }
 }

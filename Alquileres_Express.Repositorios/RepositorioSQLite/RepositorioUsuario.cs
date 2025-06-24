@@ -7,11 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 public class RepositorioUsuario : IRepositorioUsuario
 {
-    readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
-
 
     public List<Usuario> ListarUsuarios()
     {
+        using Alquileres_ExpressContext _context = new();
         List<Usuario> users = [];
         List<Cliente> clientes = _context.Clientes.ToList();
         List<Personal> personal = _context.Personal.ToList();
@@ -25,6 +24,7 @@ public class RepositorioUsuario : IRepositorioUsuario
 
     public List<Usuario> ListarRestringido()
     {
+        using Alquileres_ExpressContext _context = new();
         List<Usuario> users = new List<Usuario>();
         List<Cliente> clientes = _context.Clientes.Where(p => p.Rol == RolUsuario.Cliente).ToList();
         List<Personal> empleados = _context.Personal.Where(p => p.Rol == RolUsuario.Empleado).ToList();

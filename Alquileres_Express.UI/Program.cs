@@ -63,7 +63,7 @@ builder.Services
     .AddTransient<CasoDeUsoObtenerAlquileresPorCorreo>()
     .AddTransient<CasoDeUsoAlquilerGetEstadoDeAlquiler>()
     .AddTransient<CasoDeUsoBuscarPersonalPorId>()
-
+    .AddTransient<CasoDeUsoAscenderAGerente>()
 
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
     .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
@@ -76,8 +76,9 @@ builder.Services
     .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
     .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
     .AddScoped<IRepositorioLlave, RepositorioLlave>()
-
-
+    .AddTransient<CasoDeUsoListarLlaves>()
+    .AddTransient<CasoDeUsoPersonalDescenderGerente>()
+    .AddTransient<CasoDeUsoEliminarPersonal>()
     .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
     .AddTransient<CasoDeUsoRegistrarEntregaPresencial>()
     .AddScoped<CasoDeUsoPagarEfectivo>()

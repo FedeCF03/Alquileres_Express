@@ -1,0 +1,80 @@
+@page "/ListarLlaves/<idAlquiler:int>"
+@inject CasoDeUsoListarLlaves CasoDeUsoListarLlaves
+
+<h3>Listado de Llaves del Alquiler: @idAlquiler</h3>
+
+<h4>Entregas</h4>
+@if (listaEntrega != null && listaEntrega.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID Registro</th>
+                <th>Personal ID</th>
+                <th>Cliente ID</th>
+                <th>Fecha y Hora Registro</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var registro in listaEntrega)
+            {
+                <tr>
+                    <td>@registro.Id</td>
+                    <td>@registro.PersonalId</td>
+                    <td>@registro.ClienteId</td>
+                    <td>@registro.FechayHoraRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else 
+{
+    <p>No se han registrado entregas.</p>
+}
+
+<h4>Devoluciones</h4>
+@if (listaDevolucion != null && listaDevolucion.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID Registro</th>
+                <th>Personal ID</th>
+                <th>Cliente ID</th>
+                <th>Fecha y Hora Registro</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var registro in listaDevolucion)
+            {
+                <tr>
+                    <td>@registro.Id</td>
+                    <td>@registro.PersonalId</td>
+                    <td>@registro.ClienteId</td>
+                    <td>@registro.FechayHoraRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Todavía no fue devuelta.</p>
+}
+
+@code {
+    [Parameter]
+    public int idAlquiler { get; set; }
+
+    private List<RegistroDeLlave> listaEntrega;
+    private List<RegistroDeLlave> listaDevolucion;
+
+    protected override void OnInitialized()
+    {
+        // Se obtienen las llaves de entrega y de devolución usando el caso de uso
+        listaEntrega = CasoDeUsoListarLlaves.Ejecutar(idAlquiler, true);
+        listaDevolucion = CasoDeUsoListarLlaves.Ejecutar(idAlquiler, false);
+    }
+}
+

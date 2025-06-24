@@ -7,7 +7,7 @@ public interface IRepositorioPersonal
 
     public Boolean ModificarPersonal(Personal c);
 
-    public void EliminarPersonal(Personal c);
+    public void EliminarPersonal(int id);
     public Personal ObtenerPersonalPorId(int id);
     public Personal ObtenerPersonalPorDNI(string dni);
     public Personal ObtenerPersonalPorMail(string mail);
@@ -19,5 +19,9 @@ public interface IRepositorioPersonal
     public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad);
 
     public Personal ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad);
+    public bool SeRepiteDNI(Personal p);
+    public void DescenderGerente(int id);
+    public bool SeRepiteCorreo(Personal p);
 
+    public void AscenderAGerente(int id);
 }
