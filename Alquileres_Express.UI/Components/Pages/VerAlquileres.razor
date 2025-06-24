@@ -71,6 +71,7 @@
             {
                 <span style="color: red;">Sin precio</span>
             }
+            
         </div>
         
                     </div>
@@ -103,8 +104,7 @@
                                 <span class="detail-value duration-highlight">@((alquiler.FechaDeFin - alquiler.FechaDeInicio).Days)
                                     Noches</span>
                             </div>
-                        </div>
-
+                        </div> 
                         <div class="rental-actions">
                          <AuthorizeView Roles="Administrador, Gerente, Empleado">
                             @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
@@ -136,68 +136,85 @@
                             @if (!alquiler.Cancelado)
                             {
                                 EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
-                            <button class="btn btn-review" @onclick="() => MostrarCalificacion(alquiler.InmuebleId)">
-                                <i class="fas fa-star"></i> Calificar
-                            </button>
+                                
                             @if (estado == EstadoDeAlquiler.Vigente)
                             {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
                                     <i class="fas fa-times"></i> Cancelar
                                 </button>
-                             }
-
+                            }
+                            
                                 @if (estado == EstadoDeAlquiler.Terminado)
                                 {
-                                    @if (mostrarFormularioCalificacion)
-                                    {
-                                        <div class="card shadow p-4 mt-4">
-                                            <h4 class="text-primary mb-3">
-                                            <i class="fas fa-star"></i> Calificar inmueble
-                                            </h4>                           
-                                            <!-- Estrellas 1-5 -->
-                                            <ul class="list-unstyled d-flex gap-1 mb-3">
-                                            @for (int i = 1; i <= 5; i++)
+                                    <AuthorizeView Roles="Cliente">
+                                        <Authorized>
+                                            @if (!YaFueCalificado(alquiler.InmuebleId))
+{
+    <button class="btn btn-review" @onclick="() => MostrarCalificacion(alquiler.Id, alquiler.InmuebleId)">
+        <i class="fas fa-star"></i> Calificar
+    </button>
+}
+else
+{
+    <span class="text-success fw-semibold">
+        <i class="fas fa-check-circle"></i> Ya calificado
+    </span>
+}
+
+                                            @if (mostrarFormularioCalificacion && alquiler.Id == alquilerSeleccionadoId)
                                             {
-                                                int estrella = i;                     <!-- ⚠️ copia local -->
-                                                <li>
-                                                    <i class="fas fa-star fa-2x cursor-pointer
-                                                        @(estrella <= calificacionSeleccionada
-                                                           ? "text-warning"
-                                                           : "text-secondary")"
-                                                       @onclick="@(() => SeleccionarCalificacion(estrella))">
-                                                    </i>
-                                                </li>
-                                            }
-                                            </ul>       
+                                                <div class="card shadow p-4 mt-4">
+                                                    <h4 class="text-primary mb-3">
+                                                    <i class="fas fa-star"></i> Calificar inmueble
+                                                    </h4>                           
+                                                    <!-- Estrellas 1-5 -->
+                                                    <ul class="list-unstyled d-flex gap-1 mb-3">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        int estrella = i;                     <!-- ⚠️ copia local -->
+                                                        <li>
+                                                            <i class="fas fa-star fa-2x cursor-pointer
+                                                                @(estrella <= calificacionSeleccionada
+                                                                   ? "text-warning"
+                                                                   : "text-secondary")"
+                                                               @onclick="@(() => SeleccionarCalificacion(estrella))">
+                                                            </i>
+                                                        </li>
+                                                    }
+                                                    </ul>       
 
 
-                                            <!-- Comentario -->
-                                                <textarea class="form-control mb-3"
-                                                placeholder="Comentario (opcional)" rows="3"
-                                                @bind="comentario"></textarea>
+                                                    <!-- Comentario -->
+                                                    <textarea class="form-control mb-3"
+                                                        placeholder="Comentario (opcional)" rows="3"
+                                                        @bind="comentario">
+                                                    </textarea>
 
-                                            <!-- Botones -->
-                                        <div class="d-flex gap-2">
-                                    <button class="btn btn-review" @onclick="() => EnviarCalificacion()">
-                                        <i class="fas fa-star"></i> Guardar
-                                    </button>
-                                    <button class="btn btn-outline-secondary"
-                                            @onclick="() => mostrarFormularioCalificacion = false">
-                                        Cancelar
-                                    </button>
-                                            </div>
+                                                    <!-- Botones -->
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-review" @onclick="() => EnviarCalificacion()">
+                                                            <i class="fas fa-star"></i> Guardar
+                                                        </button>
+                                                        <button class="btn btn-outline-secondary"
+                                                                @onclick="() => mostrarFormularioCalificacion = false">
+                                                            Cancelar
+                                                        </button>
+                                                    </div>
 
-                                        @if (!string.IsNullOrEmpty(mensajeCalificacion))
-                                        {
-                                            <div class="alert alert-success mt-3">@mensajeCalificacion</div>
-                                        }
-                                        </div>
-                                    <div class="card shadow p-4 mt-4 mx-auto" style="max-width: 600px;"></div>
-                                }   
+                                                    @if (!string.IsNullOrEmpty(mensajeCalificacion))
+                                                    {
+                                                        <div class="alert alert-success mt-3">@mensajeCalificacion</div>
+                                                    }
+                                                </div>
+                                                <div class="card shadow p-4 mt-4 mx-auto" style="max-width: 600px;"></div>
+                                            }   
 
 
-                                    <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
-                                        <i class="fas fa-star"></i> Dejar Reseña
-                                    </button> 
+                                            <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
+                                                <i class="fas fa-star"></i> Dejar Reseña
+                                            </button> 
+                                            
+                                        </Authorized>
+                                    </AuthorizeView>
                                     <span class="status-label terminado">
                                         <i class="fas fa-check"></i> Terminado
                                     </span>
@@ -327,6 +344,19 @@
         NavigationManager.NavigateTo($"/alquileres/{id}", true);    
 
     }
+    bool YaFueCalificado(int idInmueble)
+    {
+        Inmueble? inmueble = GetInmuebleById(idInmueble);
+        Valoracion? valoracion = inmueble!.Valoraciones!.FirstOrDefault(v => v.ClienteId == id && v.InmuebleId == idInmueble);
+        if (valoracion != null)
+        {
+            return true; // Ya fue calificado
+        }
+        else 
+        {
+            return false; // No fue calificado
+        }
+    }
 
     private void DejarResena( int id)
     {
@@ -352,16 +382,18 @@
     int    calificacionSeleccionada      = 5;
     string comentario                    = "";
     string mensajeCalificacion           = "";
+    private int alquilerSeleccionadoId = 0;  
 
     /* ---------- abre el form ---------- */
-    void MostrarCalificacion(int idInmueble)
-{
-    idInmuebleAReseñar       = idInmueble;
-    calificacionSeleccionada = 0;   // ← arranca sin ninguna estrella
-    comentario               = "";
-    mensajeCalificacion      = "";
-    mostrarFormularioCalificacion = true;
-}
+    void MostrarCalificacion(int idAlquiler, int idInmueble)
+    {
+        alquilerSeleccionadoId    = idAlquiler;
+        idInmuebleAReseñar       = idInmueble;
+        calificacionSeleccionada = 0;   // ← arranca sin ninguna estrella
+        comentario               = "";
+        mensajeCalificacion      = "";
+        mostrarFormularioCalificacion = true;
+    }
 
 void SeleccionarCalificacion(int valor)
 {
@@ -402,7 +434,9 @@ void SeleccionarCalificacion(int valor)
         mensajeCalificacion = "¡Gracias! Tu reseña fue guardada.";
         await Task.Delay(1500).ContinueWith(_ => {
             mostrarFormularioCalificacion = false;  // ocultar form
+            NavigationManager.NavigateTo($"/alquileres/{id}", true);
         });
+        NavigationManager.NavigateTo($"/alquileres/{id}",true );
         StateHasChanged();             
     }
 

@@ -81,11 +81,12 @@ public class RepositorioInmueble : IRepositorioInmueble
         return [.. _context.Inmuebles.Include(i=>i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Disponible)];
     }
 
-    public List <Inmueble> ObtenerLosInmueblesNoDisponibles(){
+    public List<Inmueble> ObtenerLosInmueblesNoDisponibles()
+    {
         using var _context = new Alquileres_ExpressContext();
         return [.. _context.Inmuebles.Include(i=>i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => !i.Disponible)];
     }
-    
+
     public bool SeRepiteNombre(Inmueble inmueble)
     {
         try
@@ -99,4 +100,44 @@ public class RepositorioInmueble : IRepositorioInmueble
         }
 
     }
+    public List<Valoracion> ObtenerValoracionesPorInmueble(int idInmueble)
+    {
+        Alquileres_ExpressContext _context = new();
+        Inmueble? inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Id == idInmueble).FirstOrDefault();
+        return inmueble!.Valoraciones!;
+    }
+
+    public void EditarValoracion(Valoracion valoracion)
+    {
+        using Alquileres_ExpressContext _context = new();
+        Inmueble? inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Id == valoracion.InmuebleId).FirstOrDefault();
+        if (inmueble == null)
+        {
+            throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+        }
+
+        Valoracion? valoracionExistente = inmueble.Valoraciones?.FirstOrDefault(v => v.Id == valoracion.Id);
+        if (valoracionExistente == null)
+        {
+            throw new KeyNotFoundException($"Error: No existe la valoracion.");
+        }
+        valoracionExistente.Calificacion = valoracion.Calificacion;
+        valoracionExistente.Comentario = valoracion.Comentario;
+        _context.SaveChanges();
+    }
+    
+    public Task<bool> EliminarValoracion(Valoracion valoracion)
+    {
+        using Alquileres_ExpressContext _context = new();
+        Inmueble? inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Id == valoracion.InmuebleId).FirstOrDefault();
+        Valoracion? valoracionExistente = inmueble!.Valoraciones?.FirstOrDefault(v => v.Id == valoracion.Id);
+        if (valoracionExistente != null)
+        {
+            inmueble!.Valoraciones!.Remove(valoracionExistente);
+            _context.Entry(inmueble).State = EntityState.Modified;
+            _context.SaveChanges();
+            return Task.FromResult(true);
+        }
+        return Task.FromResult(false);
+    }   
 }

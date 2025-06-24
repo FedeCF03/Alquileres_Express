@@ -26,7 +26,7 @@ public class Crear
             {
                 Nombre = "Mario",
                 Apellido = "Castro",
-                Correo = "castrotomasandres05@gmail.com",
+                Correo = "gonzalo@gmail.com",
                 Dni = "12312312",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Falsa 123",
@@ -35,10 +35,9 @@ public class Crear
                 ,
             });
 
-            
-            context.Add(new Inmueble
+            Inmueble inmueble = new Inmueble
             {
-                Nombre = "Departamento en la playa",                    //para probar sin inmuebles
+                Nombre = "Casa en la playa",
                 Direccion = "Avenida del Mar 123",
                 CoordLat = -34.6037,
                 CoordLong = -58.3816,
@@ -48,7 +47,8 @@ public class Crear
                 Precio = 800,
                 CantidadDeCamas = 2,
                 TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda
-            });
+            };
+            context.Add(inmueble);
             context.SaveChanges();
             context.Add(new Foto
             {
@@ -60,27 +60,72 @@ public class Crear
                 Url = "/images/fotosInmuebles/3p43bsam.png",
                 InmuebleId = 1
             });
-            context.Add(new Inmueble
-            {
-                Nombre = "Casa en la montaña",
-                Direccion = "Calle de la Montaña 456",
-                CoordLat = -34.6037,
-                CoordLong = -58.3816,
-                Banios = 2,
-                Disponible = true,
-                Ciudad = "Bariloche",
-                Precio = 1200,
-                CantidadDeCamas = 4,
-                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda
-            });
             context.SaveChanges();
-            context.Add(new Foto
-            {
-                Url = "/images/fotosInmuebles/05gvcetk.png",
-                InmuebleId = 2
-            });
 
-        
+            var cliente = new Cliente
+            {
+                Nombre = "Lucas",
+                Apellido = "Pérez",
+                Correo = "prueba@gmail.com",
+                Dni = "22222222",
+                Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
+                Direccion = "Calle Real 456",
+                FechaNacimiento = new DateTime(1995, 5, 15),
+                Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
+            };
+            context.Add(cliente);
+            var cliente2 = new Cliente
+            {
+                Nombre = "Juan",
+                Apellido = "Sanchez",
+                Correo = "prueba2@gmail.com",
+                Dni = "22222211",
+                Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
+                Direccion = "Calle Real 456",
+                FechaNacimiento = new DateTime(1995, 5, 15),
+                Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
+            };
+            context.Add(cliente2);
+            context.SaveChanges(); // para generar el Id
+
+            var alquiler1 = new Alquiler
+            {
+                ClienteId = cliente.Id,
+                CorreoCliente = cliente.Correo,
+                FechaDeInicio = DateTime.Today.AddDays(-10),
+                FechaDeFin = DateTime.Today.AddDays(-5),
+                Precio = 5000,
+                InmuebleId = 1,
+                Pagado = true
+            };
+
+            var alquiler2 = new Alquiler
+            {
+                ClienteId = cliente.Id,
+                CorreoCliente = cliente.Correo,
+                FechaDeInicio = DateTime.Today.AddDays(-20),
+                FechaDeFin = DateTime.Today.AddDays(-15),
+                Precio = 6500,
+                InmuebleId = 1,
+                Pagado = true
+            };
+
+            var alquiler3 = new Alquiler
+            {
+                ClienteId = cliente2.Id,
+                CorreoCliente = cliente2.Correo,
+                FechaDeInicio = DateTime.Today.AddDays(-30),
+                FechaDeFin = DateTime.Today.AddDays(-25),
+                Precio = 6500,
+                InmuebleId = 1,
+                Pagado = true
+            };
+
+            context.Alquileres.AddRange(alquiler1, alquiler2, alquiler3);
+            inmueble.Alquileres.Add(alquiler1);
+            inmueble.Alquileres.Add(alquiler2);
+            inmueble.Alquileres.Add(alquiler3);
+
             context.SaveChanges();
            
         }

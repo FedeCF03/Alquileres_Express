@@ -67,6 +67,7 @@ builder.Services
 
     .AddTransient<CasoDeUsoAscenderAGerente>()
 
+
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
     .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
 
@@ -87,6 +88,9 @@ builder.Services
     .AddTransient<CasoDeUsoListarComentarios>()
     .AddTransient<CasoDeUsoBuscarRespuestas>()
     .AddTransient<CasoDeUsoCalificarInmueble>()
+    .AddTransient<CasoDeUsoListarValoraciones>()
+    .AddTransient<CasoDeUsoEditarValoracion>()
+    .AddTransient<CasoDeUsoEliminarValoracion>()
 
 
     .AddTransient<ValidadorComentario>()
