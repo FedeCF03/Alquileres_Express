@@ -14,7 +14,7 @@
 @inject ServicioGenerarCodigo servicioGenerarCodigo
 @inject ServicioEnviarEmail servicioEnviarEmail
 
-@if (codigo)
+@if (!codigo)
 {
 
     <div class="login-container">
@@ -45,13 +45,40 @@
 
 
 
-            @foreach (var error in errores)
-            {
-                <div class="alert alert-danger mt-2">@error</div>
-            }
+       
         </div>
     </div>
 }
+else{
+    
+    <div class="login-container">
+        <div class="login-card">
+
+            <h3 class="login-title">Iniciar sesión</h3>
+
+            <EditForm Model="@user" OnValidSubmit="CambiarContraseña" FormName="passWord"> >
+                <DataAnnotationsValidator/>
+                <div class="form-group">
+                    <label for="password">Contraseña nueva</label>
+                    <InputText id="password" @bind-Value="user.CodigoVerificacion" type="text" class="form-control"
+                        placeholder="Ingrese el codigo" />
+                </div>
+                <button type="submit" class="btn-primary">Ingresar</button>
+
+            </EditForm>
+
+
+
+       
+        </div>
+    </div>
+}
+
+
+     @foreach (var error in errores)
+            {
+                <div class="alert alert-danger mt-2">@error</div>
+            }
 @code {
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
@@ -59,7 +86,6 @@
     private PasswordResetModel user { get; set; } = new();
     private List<string> errores { get; set; } = [];
     private bool codigo = false;
-    private string codigoVerificacion { get; set; } = string.Empty;
 
     private void CambiarContraseña()
     {
@@ -76,6 +102,8 @@
         [EmailAddress(ErrorMessage = "Formato de email inválido")]
         public string Correo { get; set; } = "";
         public string Contraseña { get; set; } = "";
+|       private string CodigoVerificacion { get; set; } = "";
+
     }
 
 
