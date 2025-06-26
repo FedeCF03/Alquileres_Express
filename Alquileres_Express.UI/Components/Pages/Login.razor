@@ -6,6 +6,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @using System.Security.Claims
+@using System.ComponentModel.DataAnnotations
 @inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
 @inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
 @inject CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion
@@ -14,6 +15,7 @@
 @inject ServicioEnviarEmail servicioEnviarEmail
 <div class="login-container">
     <div class="login-card">
+
         <h3 class="login-title">Iniciar sesión</h3>
 
         <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
@@ -36,6 +38,9 @@
             <button type="submit" class="btn-primary">Ingresar</button>
 
         </EditForm>
+
+
+
         @foreach (var error in errores)
         {
             <div class="alert alert-danger mt-2">@error</div>
@@ -48,6 +53,9 @@
     [SupplyParameterFromForm]
     private LoginModel user { get; set; } = new();
     private List<string> errores { get; set; } = [];
+    private bool cambiarContraseña { get; set; } = false;
+
+    private PasswordResetModel passwordResetModel { get; set; } = new();
     private async Task IniciarSesionComoGerenteFake()
     {
         user.Correo = "marfacucosas@gmail.com";
@@ -60,7 +68,7 @@
         errores.Clear();
         if (string.IsNullOrEmpty(user.Correo))
         {
-            errores.Add("Por favor, ingrese un correo.");   
+            errores.Add("Por favor, ingrese un correo.");
         }
         else if (!user.Correo.Contains('@'))
         {
@@ -113,18 +121,31 @@
 
 
     }
+    private void VolverALogin()
+    {
+        cambiarContraseña = false;
+        user = new LoginModel();
+        errores.Clear();
+    }
+
 
     private async Task guardarEnCookie(string nombre)
     {
 
         var claims = new List<Claim> {
-        new Claim(ClaimTypes.Name, user.Correo),
-        new Claim(ClaimTypes.Role, user.Rol.ToString())
-        };
+new Claim(ClaimTypes.Name, user.Correo),
+new Claim(ClaimTypes.Role, user.Rol.ToString())
+};
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         await HttpContext.SignInAsync(principal);
         NavigationManager.NavigateTo($"/?mensaje=¡Hola {nombre} Bienvenido/a.");
+
+    }
+
+    private async Task EnviarInstruccionesCambioContraseña()
+    {
+
 
     }
     public class LoginModel
@@ -133,6 +154,14 @@
         public RolUsuario Rol { get; set; }
         public string? Correo { get; set; }
     }
+
+    public class PasswordResetModel
+    {
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "Formato de email inválido")]
+        public string Correo { get; set; } = "";
+    }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -143,4 +172,5 @@
             NavigationManager.NavigateTo("/");
         }
     }
+
 }
