@@ -150,19 +150,28 @@ public class RepositorioAlquiler : IRepositorioAlquiler
         return [.. _context.Alquileres.Include(a => a.RegistrosDeLlave).Where(a => a.Id == idAlquiler)];
     }
 
+    public decimal ObtenerValorDeAlquileresEntreFechas(DateTime fechaInicio, DateTime fechaFin)
+    {
+        using Alquileres_ExpressContext _context = new();
+        decimal num = 0;
+        num = _context.Alquileres.Where(a => a.FechaDeInicio >= fechaInicio && a.FechaDeFin <= fechaFin).Where(a => a.Pagado).Sum(a => a.Precio);
+        return num;
+    }
+
     public bool CalificarAlquiler(int idInmueble, int idCliente, Valoracion valoracion)
     {
         using Alquileres_ExpressContext _context = new();
-        Inmueble? inmueble = _context.Inmuebles.Include(i=>i.Valoraciones).FirstOrDefault(i => i.Id == idInmueble);
+        Inmueble? inmueble = _context.Inmuebles.Include(i => i.Valoraciones).FirstOrDefault(i => i.Id == idInmueble);
 
 
         if (inmueble == null)
             throw new InvalidOperationException("El inmueble no existe.");
 
-            
+
         Valoracion? v = inmueble.Valoraciones.FirstOrDefault(v => v.ClienteId == idCliente);
         //Console.WriteLine("Valoracion: " + v.ClienteId + v.ApellidoCliente);
-        if (v != null){
+        if (v != null)
+        {
             return false;
         }
         inmueble.Valoraciones.Add(valoracion);

@@ -14,6 +14,8 @@ public interface IRepositorioAlquiler
 
     public List<Alquiler> ObtenerAlquileresPorCorreo(string correoCliente);
 
+    public decimal ObtenerValorDeAlquileresEntreFechas(DateTime fechaInicio, DateTime fechaFin);
+
     public List<Alquiler> ObtenerTodosLosAlquileres();
     public EstadoDeAlquiler GetEstadoDeAlquiler(int idAlquiler);
     public void cancelarAlquiler(int idAlquiler);
