@@ -1,4 +1,5 @@
 @rendermode InteractiveServer
+@inject NavigationManager navegationManager
 @inject CasoDeUsoListarValoraciones casoDeUsoListarValoraciones
 @inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
 @inject CasoDeUsoEditarValoracion casoDeUsoEditarValoracion
@@ -140,7 +141,7 @@ else
             valoracionEditando.Calificacion = nuevaCalificacion;
             valoracionEditando.Comentario = nuevoComentario;
             casoDeUsoEditarValoracion.Ejecutar(valoracionEditando);
-
+            navegationManager.NavigateTo($"inmueble/{InmuebleId}", true);
             // Reset UI
             CancelarEdicion();
         }
@@ -153,6 +154,7 @@ else
         {
             valoraciones.Remove(v);
             await casoDeUsoEliminarValoracion.Ejecutar(v);
+            navegationManager.NavigateTo($"inmueble/{InmuebleId}", true);
         }
     }
 }

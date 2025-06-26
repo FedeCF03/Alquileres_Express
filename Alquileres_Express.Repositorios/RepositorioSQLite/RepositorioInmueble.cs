@@ -147,4 +147,24 @@ public class RepositorioInmueble : IRepositorioInmueble
         decimal num = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).FirstOrDefault(i => i.Id == id).Alquileres.Where(a => a.Pagado).Sum(a => a.Precio);
         return num;
     }
+    public void PromedioValoracion(int idInmueble)
+    {
+        using Alquileres_ExpressContext _context = new();
+        Inmueble? inmuebleExistente = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Id == idInmueble);
+        if (inmuebleExistente == null)
+        {
+            throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+        }
+
+        if (inmuebleExistente.Valoraciones != null && inmuebleExistente.Valoraciones.Count > 0)
+        {
+            double promedio = inmuebleExistente.Valoraciones.Average(v => v.Calificacion);
+            //Console.WriteLine($"[DEBUG] Promedio manual: {promedio}");
+
+            inmuebleExistente.PromedioCalificacion = promedio;
+            Console.WriteLine($"[DEBUG] Promedio GUARDADO¿: {inmuebleExistente.PromedioCalificacion}");
+
+            _context.SaveChanges();
+        }
+    }
 }
