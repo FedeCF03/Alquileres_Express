@@ -8,12 +8,13 @@
 @using BlazorDateRangePicker
 @inject ServicioVerificarPago _servicioVerificarPago
 @inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
-@using Alquileres_Express.UI.Components.Pages 
+@using Alquileres_Express.UI.Components.Pages
 
 @using Microsoft.AspNetCore.Components.Authorization
 @using Alquileres_Express.Aplicacion.Enumerativo
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject CasoDeUsoObtenerIngresosDeInmueble CasoDeUsoObtenerIngresosDeInmueble
 @inject IRepositorioAlquiler repositorioAlquiler
 @inject CasoDeUsoListarValoraciones casoDeUsoListarValoraciones
 @inject CasoDeUsoPromedioValoracion casoDeUsoPromedioValoracion
@@ -87,21 +88,22 @@
                                     @for (int i = 1; i <= 5; i++)
                                     {
                                         <i class="fas fa-star @(i <= promedioValoracion
-                                        ? "text-warning" 
-                                        : "text-secondary") me-1"></i>
+                                                                                                                              ? "text-warning" 
+                                                                                                                              : "text-secondary") me-1"></i>
 
-                                    }
+                                                                }
 
                                     <span class="ms-2 text-secondary small">
-                                        (@inmueble.Valoraciones.Count valoración@(inmueble.Valoraciones.Count > 1 ? "es" : ""))
-                                    </span>
-                                </div>
+                                        (@inmueble.Valoraciones.Count valoración@(inmueble.Valoraciones.Count > 1 ? "es" :
+                                                                            ""))
+                                </span>
                             </div>
-                        }
+                        </div>
+                                                }
                         else
                         {
                             <div class="mt-1 text-muted small fst-italic">
-                                <i class="fas fa-star-half-alt me-1"></i> 
+                                <i class="fas fa-star-half-alt me-1"></i>
                                 Este inmueble todavía no cuenta con valoraciones
                             </div>
                         }
@@ -126,7 +128,7 @@
                         <div class="property-features">
                             <div class="feature">
                                 <i class="fas fa-bed"></i>
-                                <span>@inmueble.CantidadDeCamas Camas</span>                                                         
+                                <span>@inmueble.CantidadDeCamas Camas</span>
                             </div>
                             <div class="feature">
                                 <i class="fas fa-bath"></i>
@@ -140,7 +142,7 @@
                                 <i class="fas fa-home"></i>
                                 <span>@inmueble.TipoInmueble</span>
                             </div>
-                        </div> 
+                        </div>
                     </div>
                     <!-- Map Section -->
                     <div class="map-section">
@@ -245,13 +247,21 @@
                                     </NavLink>
                                 </div>
                             </Authorized>
-                        </AuthorizeView>
 
+                        </AuthorizeView>
+                        <AuthorizeView Roles="Gerente">
+                            <Authorized>
+                                <button class="reserve-btn" @onclick="MostrarIngresos">
+                                    <i class="fas fa-credit-card"></i>
+                                    Ingresos de alquiler
+                                </button>
+                            </Authorized>
+                        </AuthorizeView>
                     </div>
                 </div>
             </div>
-            <ListarComentarios InmuebleId="@Id" Correo="@correo"/>          
-            
+            <ListarComentarios InmuebleId="@Id" Correo="@correo" />
+
             <ListarValoraciones InmuebleId="@Id" />
         </div>
     </div>
@@ -262,8 +272,8 @@
 @code {
     [Parameter]
     public int Id { get; set; }
-    DateTimeOffset? StartDate { get; set; } 
-    DateTimeOffset? EndDate { get; set; } 
+    DateTimeOffset? StartDate { get; set; }
+    DateTimeOffset? EndDate { get; set; }
     private Inmueble inmueble = new Inmueble();
     private bool podesPagar { get; set; } = false;
     private string mensajeError = string.Empty;
@@ -292,7 +302,7 @@
             rol = user.FindFirst(ClaimTypes.Role)?.Value!;
             personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
             cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
-            
+
             ListaValoraciones = casoDeUsoListarValoraciones.Ejecutar(Id);
         }
         inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
@@ -324,7 +334,7 @@
         {
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
             CrearRangosDeFechaReservados(inmueble.Alquileres);
-            imagenes = inmueble.Fotos != null ? inmueble.Fotos.Select(f=>f.Url).ToArray() : new string[0];
+            imagenes = inmueble.Fotos != null ? inmueble.Fotos.Select(f => f.Url).ToArray() : new string[0];
         }
         catch (Exception)
         {
@@ -335,14 +345,18 @@
     private async Task IniciarCompra()
     {
         decimal precio = calcularPrecio();
-        Alquiler alquiler = new Alquiler(correo!, StartDate!.Value.Date, EndDate!.Value.Date, precio, inmueble.Id){ClienteId = cliente!.Id};
+        Alquiler alquiler = new Alquiler(correo!, StartDate!.Value.Date, EndDate!.Value.Date, precio, inmueble.Id)
+        {
+            ClienteId =
+        cliente!.Id
+        };
         if (!repositorioAlquiler.EstaDisponible(Id, StartDate.Value.Date, EndDate.Value.Date))
         {
             mensajeError = "El inmueble no está disponible en las fechas seleccionadas.";
             podesPagar = false;
             return;
         }
-        
+
         var url = await MPService.CrearPreferenciaAsync(inmueble.Nombre!, alquiler);
         NavigationManager.NavigateTo(url, forceLoad: true);
     }
@@ -394,6 +408,10 @@
         Inmueble inmueble = casoDeUsoObtenerInmueble.Ejecutar(idInmueble);
         //Console.WriteLine($"[DEBUG] Promedio para inmueble {idInmueble}: {inmueble.PromedioCalificacion}");
         return (int)Math.Round(inmueble.PromedioCalificacion);
+}
+private void MostrarIngresos()
+    {
+        mensajeError = "$" + @CasoDeUsoObtenerIngresosDeInmueble.Ejecutar(Id).ToString();
 
     }
     private decimal calcularPrecio()
@@ -406,7 +424,7 @@
         return 0;
     }
 
-    
+
 }
 <style>
     .property-rating i {
@@ -416,10 +434,13 @@
     .property-rating .text-secondary {
         font-size: 0.9rem;
     }
+
     .promedio-numero {
-        font-size: 1.25rem; /* o probá con 1.3rem si querés más presencia */
+        font-size: 1.25rem;
+        /* o probá con 1.3rem si querés más presencia */
         font-weight: 600;
-        color: #343a40; /* o el color que combine con tu estética */
+        color: #343a40;
+        /* o el color que combine con tu estética */
     }
 
     .hidden-picker {

@@ -19,6 +19,7 @@ public class Crear
                 Dni = "11111111",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Falsa 123",
+                FechaCreacionCuenta = DateTime.Now,
                 FechaNacimiento = new DateTime(1990, 1, 1),
                 Rol = Aplicacion.Enumerativo.RolUsuario.Gerente,
             });

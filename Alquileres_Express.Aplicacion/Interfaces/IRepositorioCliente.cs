@@ -9,6 +9,8 @@ public interface IRepositorioCliente
     public Cliente? ObtenerClientePorId(int id);
     public Cliente ObtenerClientePorDNI(string dni);
     public Cliente? ObtenerClientePorMail(string mail);
+
+    public int ObtenerCantidadDeClientesEntreFechas(DateTime fechaInicio, DateTime fechaFin);
     public List<Cliente> ObtenerClientes();
     public Cliente? ObtenerClientePorMailYContraseña(string mail, string contraseña);
     public bool SeRepiteDNI(Cliente cliente);

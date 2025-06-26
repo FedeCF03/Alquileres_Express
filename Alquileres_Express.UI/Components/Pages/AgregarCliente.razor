@@ -90,8 +90,7 @@
 
         }
 
-        _cliente.FechaNacimiento = selectedDate.Value.DateTime;
-
+            _cliente.FechaNacimiento = selectedDate.Value.DateTime;
             _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
 
         bool ok = casoDeUsoAltaCliente.Ejecutar(_cliente, out errores);

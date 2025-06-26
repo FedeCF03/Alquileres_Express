@@ -10,6 +10,7 @@ public abstract class Usuario
     public string Nombre { get; set; } = "";
     public string Apellido { get; set; } = "";
     public string Direccion { get; set; } = "";
+    public DateTime FechaCreacionCuenta { get; set; }
     public DateTime FechaNacimiento { get; set; }
     public List<RegistroDeLlave>? RegistrosDeLlave { get; set; }
     public List<Comentario>? Comentarios { get; set; }
