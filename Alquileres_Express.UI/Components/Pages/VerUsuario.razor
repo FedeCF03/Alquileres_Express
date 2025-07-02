@@ -17,7 +17,7 @@
 @if (usuario != null && rol != null)
 {
 <div class="perfil-contenedor">
-    <h2 class="titulo">Hola @usuario.Nombre</h2>
+    <h2 class="titulo">@usuario.Nombre</h2>
 
     <div class="perfil-card">
         <div><strong>@(usuario.Rol.Equals(RolUsuario.Cliente) ? "Número de cliente" : "Número de personal"):</strong> @usuario.Id</div>
