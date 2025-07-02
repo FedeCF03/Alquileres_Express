@@ -20,7 +20,12 @@ public class RepositorioLlave : IRepositorioLlave
         // Ordenar por fecha (más reciente primero)
         return llave.OrderByDescending(l => l.FechayHoraRegistro).ToList();
     }
-    public void AñadirRegistroDeLlave( RegistroDeLlave registroDeLlave)
+    public List<RegistroDeLlave> ListarTodosLosRegistrosDeLlaves()
+    {
+        using Alquileres_ExpressContext _context = new();
+        return _context.Llaves.OrderByDescending(l => l.FechayHoraRegistro).ToList();
+    }
+    public void AñadirRegistroDeLlave(RegistroDeLlave registroDeLlave)
     {
         using Alquileres_ExpressContext _context = new();
         if (!_context.Alquileres.Any(a => a.Id == registroDeLlave.AlquilerId))
