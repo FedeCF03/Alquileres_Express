@@ -7,4 +7,5 @@ public interface IRepositorioLlave
 {
     public List<RegistroDeLlave> ListarRegistroLlaves(int idAlquiler, bool? esEntrega);
     public void AñadirRegistroDeLlave(RegistroDeLlave registroDeLlave);
+    public List<RegistroDeLlave> ListarTodosLosRegistrosDeLlaves();
 }

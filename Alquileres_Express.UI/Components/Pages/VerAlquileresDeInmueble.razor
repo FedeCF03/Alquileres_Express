@@ -1,0 +1,250 @@
+@page "/alquileres-de-inmueble/{Id:int}"
+@attribute [Authorize(Roles = "Gerente, Empleado")]
+@using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Nav
+@inject CasoDeUsoObtenerAlquileresPorCorreo casoDeUsoObtenerAlquileresPorCorreo
+@inject CasoDeUsoObtenerTodosLosAlquileres casoDeUsoObtenerTodosLosAlquileres
+@inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
+@inject CasoDeUsoAlquilerCancelarAlquiler casoDeUsoAlquilerCancelarAlquiler
+@inject CasoDeUsoAlquilerGetEstadoDeAlquiler casoDeUsoAlquilerGetEstadoDeAlquiler
+@inject CasoDeUsoObtenerAlquilerPorId casoDeUsoObtenerAlquilerPorId
+@inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
+@inject CasoDeUsoAñadirLlave casoDeUsoAlquilerAñadirLlave
+@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject CasoDeUsoCalificarInmueble casoDeUsoCalificarInmueble
+@inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
+@inject CasoDeUsoListarLlaves casoDeUsoListarLlaves
+
+@rendermode InteractiveServer
+
+@if (!string.IsNullOrEmpty(mensajeLlave))
+{
+    <div class="alert alert-success text-center mt-3" role="alert">
+        @mensajeLlave
+    </div>
+}
+
+    <div class="page-header">
+        <h1><i class="fas fa-home"></i> Alquileres del inmueble @inmueble.Nombre</h1>
+        <p>Gestiona las reservas de manera fácil y rápida</p>
+    </div>
+
+
+<div class="rental-grid">
+    @if (alquileres != null && alquileres.Count > 0)
+    {
+        @foreach (var alquiler in alquileres)
+        {
+                <div class="rental-card">
+                    <div class="rental-image">
+                        <NavLink href="@($"/inmueble/{alquiler.InmuebleId}")">
+                            <img src="@inmueble.Fotos![0].Url" alt="@inmueble.Nombre" href />
+                        </NavLink>
+                        <div class="price-badge">
+            @if (alquiler.Precio > 0)
+            {
+                <i class="fas fa-dollar-sign"></i> @alquiler.Precio.ToString("N0")
+            }
+            else
+            {
+                <span style="color: red;">Sin precio</span>
+            }
+            
+        </div>
+        
+        </div>
+        <div class="rental-content">
+            <div class="rental-header">
+                <h3>@inmueble.Nombre</h3>
+            </div>
+            <div class="rental-details">
+                <div class="detail-item">
+                    <i class="fas fa-map-marker-alt detail-icon"></i>
+                    <span class="detail-label">Dirección:</span>
+                    <span class="detail-value">@inmueble.Direccion</span>
+                </div>
+
+                <div class="detail-item">
+                    <i class="fas fa-calendar-check detail-icon"></i>
+                    <span class="detail-label">Check-in:</span>
+                    <span class="detail-value">@alquiler.FechaDeInicio.ToString("dd/MM/yyyy")</span>
+                </div>
+
+                <div class="detail-item">
+                    <i class="fas fa-calendar-times detail-icon"></i>
+                    <span class="detail-label">Check-out:</span>
+                    <span class="detail-value">@alquiler.FechaDeFin.ToString("dd/MM/yyyy")</span>
+                </div>
+
+                <div class="detail-item">
+                    <i class="fas fa-clock detail-icon"></i>
+                    <span class="detail-label">Duración:</span>
+                    <span class="detail-value duration-highlight">@((alquiler.FechaDeFin - alquiler.FechaDeInicio).Days)
+                        Noches</span>
+                </div>
+                <NavLink class="nav-link" href="@($"/verUsuario/?clienteid={alquiler.ClienteId}")">
+                            <button class="btn btn-sm btn-primary">
+                                <i class="fas fa-user-check"></i> Ver cliente
+                            </button>
+                        </NavLink>
+            </div> 
+            <div class="rental-actions">
+                <AuthorizeView Roles="Administrador, Gerente, Empleado">
+                @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
+                {
+                    <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
+                        <i class= "fas fa-times" > </i> Registrar entrega 
+                    </button>
+                    
+                } 
+                else 
+                {
+                    <a class="btn btn-primary btn-sm shadow-sm d-flex align-items-center gap-2" 
+                        href="@($"/ListarLlaves/{alquiler.Id}")">
+                        <i class="fas fa-list"></i> Historial de llaves
+                    </a>                                
+                    if(alquiler.RegistrosDeLlave.Count == 2)
+                    {
+                        <p><i class= "fas fa-check" > </i> Entrega y devolución registrada</p>
+                    }
+                    else
+                    {
+                        <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, false)" >
+                                <i class= "fas fa-times" > </i> Registrar devolucion 
+                        </button >
+                    }
+                        
+                }
+                </AuthorizeView>
+                @if (!alquiler.Cancelado)
+                {
+                    EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
+                    
+                @if (estado == EstadoDeAlquiler.Vigente)
+                {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                }
+                
+                @if (estado == EstadoDeAlquiler.Terminado)
+                {
+                    <span class="status-label terminado">
+                            <i class="fas fa-check"></i> Terminado
+                    </span>
+                }
+                else 
+                if (estado == EstadoDeAlquiler.EnProceso)
+                    {
+                        <span class="status-label en-proceso">
+                            <i class="fas fa-spinner"></i> En Proceso
+                        </span>
+                    }
+                    
+                }
+                else
+                {
+                    <span class="status-label" style="background: #e74c3c; color: white;">
+                        <i class="fas fa-ban"></i> Cancelado
+                    </span>
+                        @* <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
+                            <i class="fas fa-star"> Dejar Reseña</i>
+                        </button>  *@
+                }
+            </div>
+        </div>
+    </div>
+        }
+    }
+    
+    else
+    {
+        <div class="no-rentals">
+            <div class="no-rentals-icon">
+                <i class="fas fa-home" style="font-size: 4rem; opacity: 0.7; margin-bottom: 1rem;"></i>
+            </div>
+            <h3>No tienes alquileres</h3>
+            <p>Aún no has realizado ninguna reserva.</p>
+        </div>
+    }
+</div> 
+
+        <div class="alert alert-success mt-3 text-center" role="alert"
+            style="display: @(string.IsNullOrEmpty(mensajeLlave) ? "none" : "block")">
+            @mensajeLlave
+        </div>
+@code {
+    private string correo = "";
+    private string rol = "";
+    private List<Alquiler>? alquileres = new ();
+    private Inmueble inmueble = new();
+    private string mensajeLlave = string.Empty;
+
+    [Parameter]
+    public int id { get; set; } = 0;
+    Personal? personal;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity!.IsAuthenticated)
+        {
+            correo = user.Identity.Name!;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value!;
+            personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+            if (personal == null)
+            {
+                Nav.NavigateTo("/login");
+                return;
+            }
+        }
+        else
+        {
+            Nav.NavigateTo("/login");
+        }
+    }
+    private void CancelarReserva(int Alquilerid)
+    {
+        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(Alquilerid);
+        Nav.NavigateTo($"/alquileres-de-inmueble/{id}", true);    
+
+    }
+    protected override void OnParametersSet()
+    {
+            try
+            {
+                inmueble = casoDeUsoObtenerInmueble.Ejecutar(id);
+                alquileres = inmueble.Alquileres?.GroupJoin(casoDeUsoListarLlaves.Ejecutar(), 
+                    alquiler => alquiler.Id, 
+                    llave => llave.AlquilerId, 
+                    (alquiler, llavesCollection) => new Alquiler 
+                    {
+                        Id = alquiler.Id,
+                        InmuebleId = alquiler.InmuebleId,
+                        ClienteId = alquiler.ClienteId,
+                        FechaDeInicio = alquiler.FechaDeInicio,
+                        FechaDeFin = alquiler.FechaDeFin,
+                        Precio = alquiler.Precio,
+                        Cancelado = alquiler.Cancelado,
+                        RegistrosDeLlave = llavesCollection.ToList()
+                    }).ToList();
+            }
+            catch (Exception ex)
+            {
+                Nav.NavigateTo($"/?mensaje={ex.Message}&esMensajeDeError=true", true);
+            }
+    }
+
+    public async Task AñadirLlave(int alquilerId,  int clienteId, bool esEntrega )
+    {
+        RegistroDeLlave registroDeLlave = new(alquilerId, personal!.Id, clienteId,esEntrega);
+
+        casoDeUsoAlquilerAñadirLlave.Ejecutar(registroDeLlave);
+        mensajeLlave = esEntrega
+        ? "✔️ Entrega registrada correctamente."
+        : "🔄 Devolución registrada correctamente.";
+        await Task.Delay(1500);
+
+        Nav.NavigateTo($"/alquileres-de-inmueble/{id}", true);
+    }
+}
