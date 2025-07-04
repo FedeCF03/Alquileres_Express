@@ -243,8 +243,7 @@
             }
             if (rol == "Cliente" && cliente.Correo != correo)
             {
-                
-                        NavigationManager.NavigateTo("/?mensaje=No tenes permisos papi&EsMensajeError=true");
+                NavigationManager.NavigateTo("/?mensaje=No tenes permisos papi&EsMensajeError=true");
             }
             if (rol == "Administrador" || rol == "Gerente" || rol == "Empleado")
             {
