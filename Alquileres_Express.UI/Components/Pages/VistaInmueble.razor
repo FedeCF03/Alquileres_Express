@@ -274,7 +274,7 @@
     public int Id { get; set; }
     DateTimeOffset? StartDate { get; set; }
     DateTimeOffset? EndDate { get; set; }
-    private Inmueble inmueble = new Inmueble();
+    private Inmueble? inmueble = new Inmueble();
     private bool podesPagar { get; set; } = false;
     private string mensajeError = string.Empty;
     private int fotoActual = 0;
@@ -333,7 +333,7 @@
         try
         {
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
-            CrearRangosDeFechaReservados(inmueble.Alquileres);
+            CrearRangosDeFechaReservados(inmueble.Alquileres!);
             imagenes = inmueble.Fotos != null ? inmueble.Fotos.Select(f => f.Url).ToArray() : new string[0];
         }
         catch (Exception)

@@ -55,7 +55,7 @@ builder.Services
     .AddTransient<CasoDeUsoObtenerInmueble>()
     .AddTransient<CasoDeUsoVerInmueble>()
     .AddTransient<CasoDeUsoObtenerIngresosDeInmueble>()
-    
+
     .AddTransient<CasoDeUsoAltaPersonal>()
     .AddTransient<CasoDeUsoModificarPersonal>()
     .AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>()
@@ -69,8 +69,7 @@ builder.Services
     .AddTransient<CasoDeUsoAñadirLlave>()
 
     .AddTransient<CasoDeUsoAscenderAGerente>()
-
-
+    
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
     .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
 

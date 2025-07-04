@@ -36,9 +36,13 @@
 
     <!-- Botones -->
     <div class="d-flex gap-2">
-      <button class="btn btn-review" @onclick="EnviarCalificacion">
+      @* <button class="btn btn-review" @onclick="() => EnviarCalificacion()">
         <i class="fas fa-star"></i> Guardar
-      </button>
+      </button> *@
+      <button class="btn btn-success"
+                    @onclick="() => EnviarCalificacion()">
+                <i class="fas fa-save"></i> Guardar
+            </button>
       <button class="btn btn-outline-secondary" @onclick="Cerrar">
         Cancelar
       </button>
