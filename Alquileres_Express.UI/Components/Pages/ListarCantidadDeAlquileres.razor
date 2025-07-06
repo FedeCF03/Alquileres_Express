@@ -1,0 +1,115 @@
+@page "/cantidadDeAlquileres"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@using BlazorDateRangePicker
+@inject CasoDeUsoListarInmuebles CasoDeUsoListarInmuebles
+
+    <div class="date-picker-section">
+        <div class="date-picker-container">
+            <div class="date-fields">
+                <div class="date-field">
+                    <label>Comienzo</label>
+                    <div class="date-value">@(StartDate?.ToString("dd/M/yyyy") ?? "Seleccionar")
+                    </div>
+                </div>
+                <div class="date-separator"></div>
+                    <div class="date-field">
+                        <label>Fin</label>
+                        <div class="date-value">@(EndDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
+                    </div>
+                    <DateRangePicker StartDatePlaceholder="Comienzo" EndDatePlaceholder="Fin"
+                    @bind-StartDate="StartDate" @bind-EndDate="EndDate"
+                    DaysEnabledFunction="(d) => NoEsHabil(d)" class="hidden-picker"
+                    placeholder="Select dates..." OnRangeSelect="Filtrar" />
+                </div>   
+        </div>
+    </div>
+        <div class="card shadow p-4">
+            <table class="table table-hover table-striped align-middle text-center">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Cantidad de veces alquilado</th>
+                    </tr>
+                </thead>
+                <tbody id="rentalsTableBody">
+                    @for (int i = 0; i < inmuebles.Count; i++)
+                    {
+                        <tr>
+                            <td>@inmuebles[i].Nombre</td>
+                            <td>@cantAlquileres[i]</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+
+@code{
+    DateTimeOffset? StartDate { get; set; } 
+    DateTimeOffset? EndDate { get; set; } 
+
+    private List<Inmueble> inmuebles = new List<Inmueble>();
+    private List<int> cantAlquileres = new List<int>();
+
+    protected override void OnParametersSet()
+    {
+        inmuebles = CasoDeUsoListarInmuebles.ListarDisponibles();
+        foreach(var inmueble in inmuebles){
+            cantAlquileres.Add(inmueble.Alquileres.Count);
+        }
+    }
+
+
+    private void Filtrar()
+    {
+        DateTime fecha1 = StartDate?.UtcDateTime ?? DateTime.MinValue;
+        DateTime fecha2 = EndDate?.UtcDateTime ?? DateTime.MinValue;
+        for(var i = 0; i < inmuebles.Count; i++)
+        {
+            cantAlquileres[i] = 0; 
+            foreach(var alquiler in inmuebles[i].Alquileres)
+            {
+                if(alquiler.FechaDeCreacion >= fecha1 && alquiler.FechaDeCreacion <= fecha2)
+                {
+                    cantAlquileres[i]++;
+                }
+            }
+        }
+        StateHasChanged();
+    }
+
+    private bool NoEsHabil(DateTimeOffset date)
+    {
+        return true;
+    }
+
+}
+
+<style>
+    .property-rating i {
+        font-size: 1rem;
+    }
+
+    .property-rating .text-secondary {
+        font-size: 0.9rem;
+    }
+
+    .promedio-numero {
+        font-size: 1.25rem;
+        /* o probá con 1.3rem si querés más presencia */
+        font-weight: 600;
+        color: #343a40;
+        /* o el color que combine con tu estética */
+    }
+
+    .hidden-picker {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+</style>

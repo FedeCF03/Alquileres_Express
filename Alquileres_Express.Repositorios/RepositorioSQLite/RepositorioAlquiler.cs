@@ -73,6 +73,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
         if (inmueble.Alquileres == null)
             inmueble.Alquileres = new List<Alquiler>();
 
+        alquiler.FechaDeCreacion = DateTime.Now;
         inmueble.Alquileres.Add(alquiler);
 
         //Marcar el inmueble como modificado

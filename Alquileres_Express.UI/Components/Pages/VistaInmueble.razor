@@ -250,12 +250,13 @@
 
                         </AuthorizeView>
                         <AuthorizeView Roles="Gerente">
-                            <Authorized>
-                                <button class="reserve-btn" @onclick="MostrarIngresos">
-                                    <i class="fas fa-credit-card"></i>
-                                    Ingresos de alquiler
-                                </button>
-                            </Authorized>
+                            <div class="booking-actions mt-3">
+                                <NavLink class="nav-link" href="@($"/listadoIngresos/{Id}")">
+                                    <button class="btn btn-sm btn-primary">
+                                        <i class="fas fa-user-check"></i> Ingresos del inmueble
+                                    </button>
+                                </NavLink>
+                            </div>
                         </AuthorizeView>
                     </div>
                 </div>
