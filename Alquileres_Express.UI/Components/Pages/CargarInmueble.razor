@@ -141,7 +141,7 @@
                         <div class="card">
                             <img class="card-img-top" src="@foto.Url" />
                             <div class="card-body text-center">
-                                <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarFoto(foto.Nombre)">Eliminar</button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarFoto(foto)">Eliminar</button>
                             </div>
                         </div>
                     </div>
@@ -226,15 +226,12 @@
     }
 
 
-    private void EliminarFoto(string nombre)
+    private void EliminarFoto(Foto foto)
     {
-        var foto = fotos.FirstOrDefault(f => f.Nombre == nombre);
-        if (foto != null)
-        {
-            fotos.Remove(foto);
-            File.Delete(Path.Combine(ServicioFotos.DevolverPathDelDirectorio(), nombre));
-            StateHasChanged();
-        }
+
+        fotos.Remove(foto);
+        File.Delete(Path.Combine(ServicioFotos.DevolverPathDelDirectorio(), foto.Nombre));
+        StateHasChanged();
     }
     
     private void GuardarFotos()
