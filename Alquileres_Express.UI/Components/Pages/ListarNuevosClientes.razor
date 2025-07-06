@@ -61,7 +61,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var cliente in clientes)
+                    @foreach (var cliente in clientesFiltrados)
                     {
                         <tr>
                             <td>@cliente.FechaCreacionCuenta.ToString("dd/MM/yyyy")</td>
@@ -80,7 +80,8 @@
     DateTimeOffset? StartDate { get; set; } 
     DateTimeOffset? EndDate { get; set; } 
 
-    public List<Cliente>? clientes { get; set; }
+    public List<Cliente> clientes { get; set; } = [];
+    public List<Cliente> clientesFiltrados { get; set; } = [];
     public int cantidadDeClientes { get; set; }
 
     Boolean mostrar;
@@ -91,16 +92,11 @@
     {
         clientes = CasoDeUsoObtenerTodos.Ejecutar();
         mostrar = false;
+        clientesFiltrados.AddRange(clientes);
     }
 
     private int totalClientes(){
-        if(clientes.Count == 0)
-        {
-            return 0;
-        }
-        else{
-            return clientes.Count;
-        }
+       return clientesFiltrados.Count;
     }
 
 
@@ -108,19 +104,14 @@
     {
         DateTime fecha1 = StartDate?.UtcDateTime ?? DateTime.MinValue;
         DateTime fecha2 = EndDate?.UtcDateTime ?? DateTime.MinValue;
-        List<Cliente> clientesFiltrados = new List<Cliente>();
-        bool rangoValido;
+        clientesFiltrados.Clear();
         foreach (var cliente in clientes)
         {
-            rangoValido = false;
-            rangoValido = cliente.FechaCreacionCuenta >= fecha1 && cliente.FechaCreacionCuenta <= fecha2;
-            if (rangoValido)
+            if (cliente.FechaCreacionCuenta >= fecha1 && cliente.FechaCreacionCuenta <= fecha2)
             {
                 clientesFiltrados.Add(cliente);
             }
         }
-        clientes.Clear();
-        clientes.AddRange(clientesFiltrados);
         cantidadDeClientes = totalClientes();
         mostrar = true;
         StateHasChanged();

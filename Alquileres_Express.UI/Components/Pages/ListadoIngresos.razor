@@ -19,9 +19,9 @@
                     </div>
                     <DateRangePicker StartDatePlaceholder="Comienzo" EndDatePlaceholder="Fin"
                     @bind-StartDate="StartDate" @bind-EndDate="EndDate"
-                    DaysEnabledFunction="(d) => NoEsHabil(d)" class="hidden-picker"
+                    class="hidden-picker"
                     placeholder="Select dates..." OnRangeSelect="Filtrar" />
-                </div>   
+            </div>   
         </div>
     </div>
         <div class="card shadow p-4">
@@ -77,11 +77,6 @@
         }
         alquileres.AddRange(alquileresFiltrados);
         StateHasChanged();
-    }
-
-    private bool NoEsHabil(DateTimeOffset date)
-    {
-        return true;
     }
 
 }
