@@ -94,6 +94,7 @@ public class Crear
                 Dni = "22222222",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Real 456",
+                FechaCreacionCuenta = new DateTime(2014,3,19),
                 FechaNacimiento = new DateTime(1995, 5, 15),
                 Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
             };
@@ -106,6 +107,7 @@ public class Crear
                 Dni = "22222211",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Real 456",
+                FechaCreacionCuenta = new DateTime(2023,6,16),
                 FechaNacimiento = new DateTime(1995, 5, 15),
                 Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
             };
@@ -116,6 +118,7 @@ public class Crear
             {
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
+                FechaDeCreacion = DateTime.Now,
                 FechaDeInicio = DateTime.Today.AddDays(-10),
                 FechaDeFin = DateTime.Today.AddDays(-5),
                 Precio = 5000,
@@ -127,6 +130,7 @@ public class Crear
             {
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
+                FechaDeCreacion = DateTime.Now,
                 FechaDeInicio = DateTime.Today.AddDays(-20),
                 FechaDeFin = DateTime.Today.AddDays(-15),
                 Precio = 6500,
@@ -138,6 +142,7 @@ public class Crear
             {
                 ClienteId = cliente2.Id,
                 CorreoCliente = cliente2.Correo,
+                FechaDeCreacion = DateTime.Now,
                 FechaDeInicio = DateTime.Today.AddDays(-30),
                 FechaDeFin = DateTime.Today.AddDays(-25),
                 Precio = 6500,
@@ -148,6 +153,7 @@ public class Crear
             {
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
+                FechaDeCreacion = DateTime.Now,
                 FechaDeInicio = DateTime.Today.AddDays(-10),
                 FechaDeFin = DateTime.Today.AddDays(-5),
                 Precio = 5000,

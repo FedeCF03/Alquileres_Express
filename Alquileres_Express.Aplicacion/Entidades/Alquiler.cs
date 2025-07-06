@@ -8,6 +8,7 @@ public class Alquiler
     public int Id { get; set; }
     public string CorreoCliente { get; set; } //Cambiar por id
     public int ClienteId { get; set; } 
+    public DateTime FechaDeCreacion { get; set; } 
     public DateTime FechaDeInicio { get; set; }
     public DateTime FechaDeFin { get; set; }
     public decimal Precio { get; set; }

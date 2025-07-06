@@ -71,6 +71,7 @@ builder.Services
     .AddTransient<CasoDeUsoAscenderAGerente>()
     
     .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
+    .AddTransient<CasoDeUsoObtenerTodos>()
     .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
 
 
