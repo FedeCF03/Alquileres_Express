@@ -235,10 +235,6 @@
             File.Delete(Path.Combine(ServicioFotos.DevolverPathDelDirectorio(), nombre));
             StateHasChanged();
         }
-        if (fotos.Count == 0)
-        {
-            browser = null;
-        }
     }
     
     private void GuardarFotos()
