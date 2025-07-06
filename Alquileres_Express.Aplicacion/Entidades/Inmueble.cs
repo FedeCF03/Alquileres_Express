@@ -12,6 +12,7 @@ namespace Alquileres_Express.Aplicacion.Entidades;
         public string? Direccion { get; set; }
         public double CoordLong { get; set; }
         public double CoordLat { get; set; }
+        public bool Borrado { get; set; } = false;
 
         public string? Ciudad { get; set; }
         public decimal Precio { get; set; }

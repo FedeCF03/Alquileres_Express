@@ -118,7 +118,7 @@ public class Crear
             {
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
-                FechaDeCreacion = DateTime.Now,
+                FechaDeCreacion = new DateTime(2014,9,12),
                 FechaDeInicio = DateTime.Today.AddDays(-10),
                 FechaDeFin = DateTime.Today.AddDays(-5),
                 Precio = 5000,
@@ -130,7 +130,7 @@ public class Crear
             {
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
-                FechaDeCreacion = DateTime.Now,
+                FechaDeCreacion = new DateTime(2015,1,1),
                 FechaDeInicio = DateTime.Today.AddDays(-20),
                 FechaDeFin = DateTime.Today.AddDays(-15),
                 Precio = 6500,
@@ -142,7 +142,7 @@ public class Crear
             {
                 ClienteId = cliente2.Id,
                 CorreoCliente = cliente2.Correo,
-                FechaDeCreacion = DateTime.Now,
+                FechaDeCreacion = new DateTime(2013,8,1),
                 FechaDeInicio = DateTime.Today.AddDays(-30),
                 FechaDeFin = DateTime.Today.AddDays(-25),
                 Precio = 6500,
@@ -153,7 +153,7 @@ public class Crear
             {
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
-                FechaDeCreacion = DateTime.Now,
+                FechaDeCreacion = new DateTime(2010,3,3),
                 FechaDeInicio = DateTime.Today.AddDays(-10),
                 FechaDeFin = DateTime.Today.AddDays(-5),
                 Precio = 5000,

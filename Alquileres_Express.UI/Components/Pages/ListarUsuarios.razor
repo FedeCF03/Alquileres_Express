@@ -56,7 +56,7 @@
                             </td>
                             <td>
                                 @if (usuario.Rol == RolUsuario.Empleado || usuario.Rol == RolUsuario.Gerente || usuario.Rol ==
-                                                        RolUsuario.Administrador)
+                                                        RolUsuario.Administrador && !usuario.Borrado)
                                 {
                                     <span class="fw-bold text-success">@usuario.Id</span>
                                 }
@@ -76,20 +76,20 @@
                             <td>
                                 <AuthorizeView Roles="Gerente">
                                     <Authorized>
-                                        @if (usuario.Rol == RolUsuario.Gerente)
+                                        @if (usuario.Rol == RolUsuario.Gerente && !usuario.Borrado)
                                         {
                                             <button class="btn btn-sm btn-outline-primary"
                                                 @onclick="() => DescenderGerente(usuario.Id)">
                                                 <i class="fas fa-eye"></i> Descender a Empleado
                                             </button>
                                         }
-                                        @if (usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado)
+                                        @if ((usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado) && !usuario.Borrado)
                                         {
                                             <button class="btn btn-sm btn-outline-primary" @onclick="() => DarDeBaja(usuario.Id)">
                                                 <i class="fas fa-eye"></i> Dar de baja
                                             </button>
                                         }
-                                        @if (usuario.Rol == RolUsuario.Empleado)
+                                        @if (usuario.Rol == RolUsuario.Empleado && !usuario.Borrado)
                                         {
                                             <button class="btn btn-sm btn-outline-primary"
                                                 @onclick="() => AscenderAGerente(usuario.Id)">

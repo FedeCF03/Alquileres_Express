@@ -124,7 +124,7 @@
             Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == Id);
             if (cliente == null)
                 throw new InvalidOperationException("El correo no esta vinculado a ningun cliente.");
-            if (personal == null)
+            if (personal == null || personal.Borrado)
                 throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
             if (inmueble == null)
                 throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");

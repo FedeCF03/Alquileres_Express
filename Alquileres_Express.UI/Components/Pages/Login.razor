@@ -98,7 +98,7 @@
 
         Cliente? cliente = null;
         Personal? personal = casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
-        if (personal != null)
+        if (personal != null && !personal.Borrado)
         {
             user.Rol = personal.Rol;
             if (personal.Rol == RolUsuario.Gerente || personal.Rol == RolUsuario.Administrador)

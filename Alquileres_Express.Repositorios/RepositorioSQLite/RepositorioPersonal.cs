@@ -33,7 +33,7 @@ public class RepositorioPersonal : IRepositorioPersonal
             {
                 //  _context.RegistroDeLlave.where(r => r.PersonalId == id).ToList().ForEach(r => _context.RegistrosDeLlave.PersonalId = null);
             }
-            _context.Personal.Remove(personal);
+            personal.Borrado = true;
             _context.SaveChanges();
         }
         else
