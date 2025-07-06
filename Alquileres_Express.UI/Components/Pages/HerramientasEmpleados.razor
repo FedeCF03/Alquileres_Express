@@ -66,54 +66,6 @@
     </div>
 </div>
 
-@if (mostrarTarjeta)
-{
-    <div class="mini-container">
-        <h4>📌 Elija una fecha inicial y una fecha limite</h4>
-        <div class="date-picker-section">
-            <div class="date-picker-container">
-                <div class="date-fields">
-                    <div class="date-field">
-                        <label>fecha inicio</label>
-                        <div class="date-value">@(StartDate?.ToString("dd/M/yyyy") ?? "Seleccionar")
-                        </div>
-                    </div>
-                    <div class="date-separator"></div>
-                    <div class="date-field">
-                        <label>fecha limite</label>
-                        <div class="date-value">@(EndDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
-                    </div>
-                </div>
-                <DateRangePicker StartDatePlaceholder="CHECK-IN" EndDatePlaceholder="CHECK-OUT" @bind-StartDate="StartDate"
-                    @bind-EndDate="EndDate" DaysEnabledFunction="(d) => true" class="hidden-picker"
-                    placeholder="Select dates..." OnRangeSelect="VerificarFechas" />
-            </div>
-            @if (!string.IsNullOrEmpty(mensajeError))
-            {
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    @mensajeError
-                </div>
-            }
-        </div>
-        @if (esParaClientes && StartDate != null && EndDate != null)
-        {
-            <div class="price-breakdown">
-                <div class="breakdown-total">
-                    <span>Clientes que se registraron en esas fechas: @cantidadClientes().ToString()</span>
-                </div>
-            </div>
-        }
-        else if (esParaInmuebles && StartDate != null && EndDate != null)
-        {
-            <div class="price-breakdown">
-                <div class="breakdown-total">
-                    <span>Total $@totalAlquileres().ToString()</span>
-                </div>
-            </div>
-        }
-
-
     <script>
         // Funciones para cada operación
         function registrarEntrega() {
@@ -156,7 +108,6 @@
                     #nullable restore
                     #line(8, 12) - (8, 65) "C:\Users\Mar\Desktop\Alquileres_Express\Alquileres_Express.UI\Components\Pages\HerramientasEmpleados.razor"
         </script>
-    </div>
 
 @code {
 

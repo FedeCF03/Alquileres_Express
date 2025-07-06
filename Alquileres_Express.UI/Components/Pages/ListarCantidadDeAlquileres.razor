@@ -30,6 +30,7 @@
                     <tr>
                         <th>Nombre</th>
                         <th>Cantidad de veces alquilado</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="rentalsTableBody">
@@ -38,6 +39,10 @@
                         <tr>
                             <td>@inmuebles[i].Nombre</td>
                             <td>@cantAlquileres[i]</td>
+                            <a class="operation-btn historial" href="/alquileres-de-inmueble/@inmuebles[i].Id">
+                                <span class="btn-icon">🔑</span>
+                                    Ver todos los alquileres
+                                </a>
                         </tr>
                     }
                 </tbody>

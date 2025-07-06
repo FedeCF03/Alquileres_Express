@@ -9,14 +9,20 @@
 @inject NavigationManager NavigationManager
 
 @using Microsoft.AspNetCore.Components.Authorization
+@inject CasoDeUsoBuscarPersonalPorId CasoDeUsoBuscarPersonalPorId
+@inject CasoDeUsoBuscarClientePorId CasoDeUsoBuscarClientePorId
 
 <div class="comentario-card">
     <div class="comentario-header">
-        <span class="autor">@Comentario.NombreUsuario 
+        <span class="autor">@Comentario.NombreUsuario
             @if (Comentario.Editado)
             {
                 <span class="editado">(Editado)</span>
             }
+            @if (autor.Borrado)
+            {
+                <span class="editado">(Usuario borrado)</span>
+            } 
         </span>
         <span class="fecha">@Comentario.Fecha.ToString("dd/MM/yyyy HH:mm")</span>
     </div>
@@ -106,6 +112,7 @@
     private Comentario respuesta = new ();
     private bool esAutorDelComentario;
     private bool puedeEliminar;
+    private Usuario autor = null!;
     protected override void OnParametersSet()
     {
         if (InmuebleId != null && InmuebleId <= 0)
@@ -116,6 +123,8 @@
         usuario = (Usuario?)CasoDeUsoBuscarClientePorCorreo.Ejecutar(Correo) ??
                  (Usuario?) CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(Correo);
         nuevoComentario = InicializarComentario();
+        autor = (Usuario?) CasoDeUsoBuscarClientePorId.Ejecutar(Comentario.ClienteId ?? 0) ??
+                (Usuario?) CasoDeUsoBuscarPersonalPorId.Ejecutar(Comentario.PersonalId ?? 0)!;
         esAutorDelComentario =
         (usuario != null && 
          ((usuario.Rol == RolUsuario.Cliente && Comentario.ClienteId == usuario.Id) ||

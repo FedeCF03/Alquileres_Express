@@ -22,7 +22,8 @@ public class RepositorioInmueble : IRepositorioInmueble
     {
         using var _context = new Alquileres_ExpressContext();
         Inmueble inmueble = _context.Inmuebles.Find(id) ?? throw new KeyNotFoundException($"No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
-        _context.Inmuebles.Remove(inmueble);
+        inmueble.Borrado = true; // Marcamos el inmueble como borrado
+        _context.Entry(inmueble).State = EntityState.Modified; // Actualizamos el estado del inmueble
         _context.SaveChanges();
     }
 
@@ -72,19 +73,19 @@ public class RepositorioInmueble : IRepositorioInmueble
     public List<Inmueble> ObtenerTodosLosInmuebles()
     {
         using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos)];
+        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Borrado  == false)];
     }
 
     public List<Inmueble> ObtenerInmueblesDisponibles()
     {
         using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Disponible)];
+        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Disponible && i.Borrado == false)];
     }
 
     public List<Inmueble> ObtenerLosInmueblesNoDisponibles()
     {
         using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => !i.Disponible)];
+        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => !i.Disponible && i.Borrado == false)];
     }
 
     public bool SeRepiteNombre(Inmueble inmueble)
@@ -144,7 +145,7 @@ public class RepositorioInmueble : IRepositorioInmueble
     public decimal obtenerIngresosDeInmueble(int id)
     {
         using var _context = new Alquileres_ExpressContext();
-        decimal num = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).FirstOrDefault(i => i.Id == id).Alquileres.Where(a => a.Pagado).Sum(a => a.Precio);
+        decimal num = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).FirstOrDefault(i => i.Id == id).Alquileres.Where(a => a.Pagado ).Sum(a => a.Precio );
         return num;
     }
     public void PromedioValoracion(int idInmueble)

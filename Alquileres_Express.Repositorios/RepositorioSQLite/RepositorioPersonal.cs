@@ -45,18 +45,18 @@ public class RepositorioPersonal : IRepositorioPersonal
     public Personal ObtenerPersonalPorId(int id)
     {
         using Alquileres_ExpressContext _context = new();
-        return _context.Personal.Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Id == id) ?? throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
+        return _context.Personal.Where(i => i.Borrado == false).Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Id == id) ?? throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
     }
     public List<Personal> ObtenerTodosElPersonal()
     {
         using Alquileres_ExpressContext _context = new();
-        return _context.Personal.Include(c => c.RegistrosDeLlave).ToList();
+        return _context.Personal.Where(i => i.Borrado == false).Include(c => c.RegistrosDeLlave).ToList();
     }
 
     public Personal ObtenerPersonalPorDNI(string dni)
     {
         using Alquileres_ExpressContext _context = new();
-        var per = _context.Personal.Include(p => p.RegistrosDeLlave).FirstOrDefault(p => p.Dni == dni);
+        var per = _context.Personal.Where(i => i.Borrado == false).Include(p => p.RegistrosDeLlave).FirstOrDefault(p => p.Dni == dni);
         if (per != null)
         {
             return per;
@@ -68,7 +68,7 @@ public class RepositorioPersonal : IRepositorioPersonal
     {
         using Alquileres_ExpressContext _context = new();
         var per = _context.Personal.Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
-        if (per != null)
+           if (per != null)
         {
             return per;
         }

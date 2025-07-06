@@ -46,6 +46,10 @@
                 <tbody>
                     @foreach (var usuario in _listaBusqueda)
                     {
+                        if (usuario.Borrado)
+                        {
+                            continue;
+                        }
                         <tr>
                             <td>@usuario.Nombre</td>
                             <td>@usuario.Apellido</td>
@@ -55,7 +59,7 @@
                                 <span class="badge @(GetBadgeClass(usuario.Rol))">@usuario.Rol</span>
                             </td>
                             <td>
-                                @if (usuario.Rol == RolUsuario.Empleado || usuario.Rol == RolUsuario.Gerente && !usuario.Borrado)
+                                @if (usuario.Rol == RolUsuario.Empleado || usuario.Rol == RolUsuario.Gerente)
                                 {
                                     <span class="fw-bold text-success">@usuario.Id</span>
                                 }
@@ -75,20 +79,20 @@
                             <td>
                                 <AuthorizeView Roles="Gerente">
                                     <Authorized>
-                                        @if (usuario.Rol == RolUsuario.Gerente && !usuario.Borrado)
+                                        @if (usuario.Rol == RolUsuario.Gerente)
                                         {
                                             <button class="btn btn-sm btn-outline-primary"
                                                 @onclick="() => DescenderGerente(usuario.Id)">
                                                 <i class="fas fa-eye"></i> Descender a Empleado
                                             </button>
                                         }
-                                        @if ((usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado) && !usuario.Borrado)
+                                        @if ((usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado))
                                         {
                                             <button class="btn btn-sm btn-outline-primary" @onclick="() => DarDeBaja(usuario.Id)">
                                                 <i class="fas fa-eye"></i> Dar de baja
                                             </button>
                                         }
-                                        @if (usuario.Rol == RolUsuario.Empleado && !usuario.Borrado)
+                                        @if (usuario.Rol == RolUsuario.Empleado)
                                         {
                                             <button class="btn btn-sm btn-outline-primary"
                                                 @onclick="() => AscenderAGerente(usuario.Id)">
@@ -98,7 +102,6 @@
                                     </Authorized>
                                 </AuthorizeView>
                             </td>
-
                         </tr>
                     }
                 </tbody>
@@ -124,6 +127,8 @@
                 </thead>
                 <tbody>
                 @foreach (var usuario in _listaBusqueda)
+                {
+                    if (usuario.Borrado)
                     {
                         <tr>
                             <td>@usuario.Nombre</td>
@@ -144,35 +149,9 @@
                                     </button>
                                 </NavLink>
                             </td>
-                            <td>
-                                <AuthorizeView Roles="Gerente">
-                                    <Authorized>
-                                        @if (usuario.Rol == RolUsuario.Gerente && !usuario.Borrado)
-                                        {
-                                            <button class="btn btn-sm btn-outline-primary"
-                                                @onclick="() => DescenderGerente(usuario.Id)">
-                                                <i class="fas fa-eye"></i> Descender a Empleado
-                                            </button>
-                                        }
-                                        @if ((usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado) && !usuario.Borrado)
-                                        {
-                                            <button class="btn btn-sm btn-outline-primary" @onclick="() => DarDeBaja(usuario.Id)">
-                                                <i class="fas fa-eye"></i> Dar de baja
-                                            </button>
-                                        }
-                                        @if (usuario.Rol == RolUsuario.Empleado && !usuario.Borrado)
-                                        {
-                                            <button class="btn btn-sm btn-outline-primary"
-                                                @onclick="() => AscenderAGerente(usuario.Id)">
-                                                <i class="fas fa-eye"></i> Ascender a Gerente
-                                            </button>
-                                        }
-                                    </Authorized>
-                                </AuthorizeView>
-                            </td>
-
                         </tr>
                     }
+                }
                 </tbody>
           </table>
     </div>
@@ -255,6 +234,7 @@
     void DarDeBaja(int id)
     {
         casoDeUsoEliminarPersonal.Ejecutar(id);
+        
         NavigationManager.NavigateTo("/listadoUsuario", true);
     }
     void AscenderAGerente(int id)

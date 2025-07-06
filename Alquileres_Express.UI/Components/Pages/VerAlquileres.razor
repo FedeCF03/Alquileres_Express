@@ -269,7 +269,7 @@
     {
         try
         {
-            inmuebles = casoDeUsoListarInmuebles.ListarDisponibles();
+            inmuebles = casoDeUsoListarInmuebles.ListarTodos();
             inmuebles = inmuebles.FindAll(i => alquileres!.Any(a => a.InmuebleId == i.Id));
         }
         catch (Exception ex)
