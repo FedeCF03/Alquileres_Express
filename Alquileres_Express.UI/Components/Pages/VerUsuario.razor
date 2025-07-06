@@ -4,7 +4,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
 @inject CasoDeUsoBuscarPersonalPorId casoDeUsoBuscarPersonalPorId
-@attribute [Authorize (Roles = "Administrador, Gerente, Empleado")]
+@attribute [Authorize(Roles = "Gerente, Empleado")]
 @inject CasoDeUsoPersonalDescenderGerente casoDeUsoBuscarPersonalDescenderGerente
 
 @inject CasoDeUsoAscenderAGerente casoDeUsoBuscarPersonalAscenderAGerente
@@ -19,20 +19,21 @@
 <div class="perfil-contenedor">
     <h2 class="titulo">@usuario.Nombre</h2>
 
-    <div class="perfil-card">
-        <div><strong>@(usuario.Rol.Equals(RolUsuario.Cliente) ? "Número de cliente" : "Número de personal"):</strong> @usuario.Id</div>
-        <div><strong>Apellido:</strong> @usuario.Apellido</div>
-        <div><strong>DNI:</strong> @usuario.Dni</div>
-        <div><strong>Correo:</strong> @usuario.Correo</div>
-        <div><strong>Dirección:</strong> @usuario.Direccion</div>
-        <div><strong>Fecha de Nacimiento:</strong> @usuario.FechaNacimiento.ToString("dd/MM/yyyy")</div>
-        <div><strong>Rol:</strong> @usuario.Rol</div>
-        @if (usuario.Rol == RolUsuario.Cliente)
-        {
-            <div class="botones">
+        <div class="perfil-card">
+            <div><strong>@(usuario.Rol.Equals(RolUsuario.Cliente) ? "Número de cliente" : "Número de personal"):</strong>
+                @usuario.Id</div>
+            <div><strong>Apellido:</strong> @usuario.Apellido</div>
+            <div><strong>DNI:</strong> @usuario.Dni</div>
+            <div><strong>Correo:</strong> @usuario.Correo</div>
+            <div><strong>Dirección:</strong> @usuario.Direccion</div>
+            <div><strong>Fecha de Nacimiento:</strong> @usuario.FechaNacimiento.ToString("dd/MM/yyyy")</div>
+            <div><strong>Rol:</strong> @usuario.Rol</div>
+            @if (usuario.Rol == RolUsuario.Cliente)
+            {
+                <div class="botones">
                     <button class="btn-editar" @onclick="() => CambiarContraseña(usuario.Id)">Cambiar contraseña</button>
-                <button @onclick="@(() => NavigationManager.NavigateTo($"/alquileres/{ClienteId}"))"class="btn-navlink">
-                    <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Ver alquileres
+                    <button @onclick="@(() => NavigationManager.NavigateTo($"/alquileres/{ClienteId}"))" class="btn-navlink">
+                        <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Ver alquileres
                         <AuthorizeView Roles="Gerente">
                             <Authorized>
                                 @if (usuario.Rol == RolUsuario.Gerente)
@@ -55,21 +56,21 @@
                                 }
                             </Authorized>
                         </AuthorizeView>
-                </button>
-            </div>
-        }
-        else if (usuario.Rol == RolUsuario.Gerente && rol.Equals("Administrador"))
-        {
-            //descender gerente
-        }
-        else if (usuario.Rol == RolUsuario.Empleado && ((rol.Equals("Administrador") || rol.Equals("Gerente"))))
-        {
-            // ascender empleado 
-            //eliminar empleado
-        }
-        
+                    </button>
+                </div>
+            }
+            else if (usuario.Rol == RolUsuario.Gerente && rol.Equals("Gerente"))
+            {
+                //descender gerente
+            }
+            else if (usuario.Rol == RolUsuario.Empleado && rol.Equals("Gerente"))
+            {
+                // ascender empleado
+                //eliminar empleado
+            }
+
+        </div>
     </div>
-</div>
 
 }
 
@@ -101,13 +102,14 @@
             if (usuario == null)
             {
                 NavigationManager.NavigateTo($"/?mensaje=Usuario no encontrado&EsMensajeDeError=true");
+                return;
             }
-            if (rol!.Equals("Empleado") && (usuario!.Rol.Equals(RolUsuario.Administrador) || usuario.Rol.Equals(RolUsuario.Gerente)))
+            if (rol!.Equals("Empleado") && usuario.Rol.Equals(RolUsuario.Gerente))
             {
                 NavigationManager.NavigateTo($"/?mensaje=No tienes permiso para ver este usuario&EsMensajeDeError=true");
             }
         }
-        
+
     }
     void DescenderGerente(int id)
     {

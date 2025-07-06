@@ -4,7 +4,7 @@
 @inject CasoDeUsoListarRestringido casoDeUsoListarRestringido
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@attribute [Authorize(Roles = "Administrador,Gerente,Empleado")]
+@attribute [Authorize(Roles = "Gerente,Empleado")]
 @page "/search"
 @inject CasoDeUsoPersonalDescenderGerente casoDeUsoBuscarPersonalDescenderGerente
 
@@ -55,8 +55,7 @@
                                 <span class="badge @(GetBadgeClass(usuario.Rol))">@usuario.Rol</span>
                             </td>
                             <td>
-                                @if (usuario.Rol == RolUsuario.Empleado || usuario.Rol == RolUsuario.Gerente || usuario.Rol ==
-                                                        RolUsuario.Administrador && !usuario.Borrado)
+                                @if (usuario.Rol == RolUsuario.Empleado || usuario.Rol == RolUsuario.Gerente && !usuario.Borrado)
                                 {
                                     <span class="fw-bold text-success">@usuario.Id</span>
                                 }
@@ -106,7 +105,77 @@
             </table>
         }
     </div>
-    
+</div>
+
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <h2 class="text-center text-primary">📋 Listado de Usuarios eliminados</h2>
+        <table class="table table-striped table-hover text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>NOMBRE</th>
+                        <th>APELLIDO</th>
+                        <th>CORREO</th>
+                        <th>FECHA DE NACIMIENTO</th>
+                        <th>ROL</th>
+                        <th>NÚMERO DE PERSONAL</th>
+                        <th>ACCIÓN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var usuario in _listaBusqueda)
+                    {
+                        <tr>
+                            <td>@usuario.Nombre</td>
+                            <td>@usuario.Apellido</td>
+                            <td>@usuario.Correo</td>
+                            <td>@usuario.FechaNacimiento.ToShortDateString()</td>
+                            <td>
+                                <span class="badge @(GetBadgeClass(usuario.Rol))">@usuario.Rol</span>
+                            </td>
+                            <td>
+                                 <span class="fw-bold text-success">@usuario.Id</span>
+                            </td>
+                            <td>
+                                <NavLink class="nav-link"
+                                    href="@($"/verUsuario/?{(usuario.Rol == RolUsuario.Cliente ? "clienteid" : "personalid")}={usuario.Id}")">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> Ver usuario
+                                    </button>
+                                </NavLink>
+                            </td>
+                            <td>
+                                <AuthorizeView Roles="Gerente">
+                                    <Authorized>
+                                        @if (usuario.Rol == RolUsuario.Gerente && !usuario.Borrado)
+                                        {
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                @onclick="() => DescenderGerente(usuario.Id)">
+                                                <i class="fas fa-eye"></i> Descender a Empleado
+                                            </button>
+                                        }
+                                        @if ((usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado) && !usuario.Borrado)
+                                        {
+                                            <button class="btn btn-sm btn-outline-primary" @onclick="() => DarDeBaja(usuario.Id)">
+                                                <i class="fas fa-eye"></i> Dar de baja
+                                            </button>
+                                        }
+                                        @if (usuario.Rol == RolUsuario.Empleado && !usuario.Borrado)
+                                        {
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                @onclick="() => AscenderAGerente(usuario.Id)">
+                                                <i class="fas fa-eye"></i> Ascender a Gerente
+                                            </button>
+                                        }
+                                    </Authorized>
+                                </AuthorizeView>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+          </table>
+    </div>
 </div>
 
 @code {
@@ -146,7 +215,7 @@
 
         if (user.Identity is not null && user.Identity.IsAuthenticated)
         {
-            if (user.IsInRole("Administrador") || user.IsInRole("Gerente"))
+            if (user.IsInRole("Gerente"))
             {
                 _lista = casoDeUsoListarUsuarios.Ejecutar();
             }
@@ -172,7 +241,6 @@
     {
         return rol switch
         {
-            RolUsuario.Administrador => "bg-danger",
             RolUsuario.Gerente => "bg-warning text-dark",
             RolUsuario.Empleado => "bg-info text-dark",
             _ => "bg-secondary"

@@ -30,9 +30,9 @@ public class ValidadorUsuario
         else
             if (!u.Correo.Contains('@'))
             _errores.Add("El correo ingresado no es válido.");
-            else
-                u.Correo = u.Correo.ToLower();
-        
+        else
+            u.Correo = u.Correo.ToLower();
+
         if (string.IsNullOrWhiteSpace(u.Contraseña))
             _errores.Add("La contraseña no puede estar vacía.");
         else
@@ -59,7 +59,7 @@ public class ValidadorUsuario
     private void ValidarDni(string dni)
     {
         if (!Regex.IsMatch(dni, @"^\d{7,8}$"))
-           _errores.Add("El DNI debe tener entre 7 y 8 dígitos.");
+            _errores.Add("El DNI debe tener entre 7 y 8 dígitos.");
     }
 
 }

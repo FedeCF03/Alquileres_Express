@@ -6,7 +6,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ServicioEnviarEmail servicioEnviarEmail
 @inject ValidadorUsuario validadorUsuario
-@attribute [Authorize (Roles = "Cliente,Gerente,Administrador")]
+@attribute [Authorize(Roles = "Cliente,Gerente")]
 @using BlazorDateRangePicker
 
 <div class="login-card">
@@ -40,10 +40,8 @@
     <div class="mb-2">
         <label>Fecha de Nacimiento</label>
         <div class="d-flex">
-           <DateRangePicker @bind-EndDate="selectedDate" 
-           MinDate="minDate"
-           MaxDate ="DateTime.Now"
-           SingleDatePicker="true"/>
+            <DateRangePicker @bind-EndDate="selectedDate" MinDate="minDate" MaxDate="DateTime.Now"
+                SingleDatePicker="true" />
         </div>
     </div>
 </div>
@@ -84,22 +82,23 @@
         errores.Clear();
         if (selectedDate == null)
         {
-           errores = validadorUsuario.Ejecutar(_cliente);
-           errores.Add("Por favor, seleccioná una fecha de nacimiento.");
-           return;
+            errores = validadorUsuario.Ejecutar(_cliente);
+            errores.Add("Por favor, seleccioná una fecha de nacimiento.");
+            return;
 
         }
 
-            _cliente.FechaNacimiento = selectedDate.Value.DateTime;
-            _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
+        _cliente.FechaNacimiento = selectedDate.Value.DateTime;
+        _cliente.Contraseña = _cliente.Dni; // Asigna el DNI como contraseña por defecto
 
         bool ok = casoDeUsoAltaCliente.Ejecutar(_cliente, out errores);
         if (!ok)
         {
             return;
         }
-            servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado", 
-            "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ", _cliente.Dni);
+        servicioEnviarEmail.EnviarEmail(_cliente.Correo, "Usuario registrado",
+        "Su usuario ha sido registrado correctamente. Por favor cambie la contraseña lo antes posible. Constraseña: ",
+        _cliente.Dni);
         Navegador.NavigateTo("/?mensaje=Cliente registrado correctamente");
 
 

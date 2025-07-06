@@ -7,7 +7,7 @@
 @inject IJSRuntime JS
 @inject NavigationManager Nav
 @inject ValidadorInmueble ValidadorInmueble
-@attribute [Authorize(Roles = "Gerente,Administrador, Empleado")]
+@attribute [Authorize(Roles = "Gerente,Empleado")]
 
 <h1 class="form-label"> ¿Está disponible el inmueble?</h1>
 <input type="checkbox" @bind="disponible" class="form-check-input mb-2" />
@@ -35,13 +35,13 @@
         {
             Nav.NavigateTo("/?mensaje=Inmueble no encontrado&EsMensajeDeError=true");
         }
-        
+
     }
 
     private async Task GuardarCambios()
     {
         inmueble.Disponible = disponible;
-        casoDeUsoEditarInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out errores);
+        casoDeUsoEditarInmueble.Ejecutar(inmueble, RolUsuario.Gerente, out errores);
         Nav.NavigateTo($"/inmueble/{inmueble.Id}");
 
     }
