@@ -49,8 +49,23 @@ public class Crear
                 CantidadDeCamas = 2,
                 TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda
             };
+            Inmueble inmueble2 = new Inmueble
+            {
+                Nombre = "Casa en la ciudad",
+                Direccion = "Avenida 9 de Julio",
+                CoordLat = -34.6037,
+                CoordLong = -58.3816,
+                Banios = 1,
+                Disponible = true,
+                Ciudad = "Buenos Aires",
+                Precio = 1200,
+                CantidadDeCamas = 2,
+                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda
+            };
             context.Add(inmueble);
             context.SaveChanges();
+            context.Add(inmueble2);
+            context.SaveChanges();            
             context.Add(new Foto
             {
                 Url = "/images/fotosInmuebles/0com0pnv.png",
@@ -61,6 +76,14 @@ public class Crear
                 Url = "/images/fotosInmuebles/3p43bsam.png",
                 InmuebleId = 1
             });
+            context.Add(new Foto
+            {
+                Url = "/images/fotosInmuebles/otraFoto.png",
+                InmuebleId = inmueble2.Id
+            });
+            // o tantas como quieras...
+            context.SaveChanges();
+
             context.SaveChanges();
 
             var cliente = new Cliente
@@ -121,11 +144,23 @@ public class Crear
                 InmuebleId = 1,
                 Pagado = true
             };
+            var alquiler4 = new Alquiler
+            {
+                ClienteId = cliente.Id,
+                CorreoCliente = cliente.Correo,
+                FechaDeInicio = DateTime.Today.AddDays(-10),
+                FechaDeFin = DateTime.Today.AddDays(-5),
+                Precio = 5000,
+                InmuebleId = 1,
+                Pagado = true
+            };
 
-            context.Alquileres.AddRange(alquiler1, alquiler2, alquiler3);
-            inmueble.Alquileres.Add(alquiler1);
+            context.Alquileres.AddRange(alquiler1, alquiler2, alquiler3, alquiler4);
+            inmueble!.Alquileres!.Add(alquiler1);
             inmueble.Alquileres.Add(alquiler2);
             inmueble.Alquileres.Add(alquiler3);
+            inmueble2.Alquileres!.Add(alquiler4);
+            
 
             context.SaveChanges();
            

@@ -36,9 +36,13 @@
 
     <!-- Botones -->
     <div class="d-flex gap-2">
-      <button class="btn btn-review" @onclick="EnviarCalificacion">
+      @* <button class="btn btn-review" @onclick="() => EnviarCalificacion()">
         <i class="fas fa-star"></i> Guardar
-      </button>
+      </button> *@
+      <button class="btn btn-success"
+                    @onclick="() => EnviarCalificacion()">
+                <i class="fas fa-save"></i> Guardar
+            </button>
       <button class="btn btn-outline-secondary" @onclick="Cerrar">
         Cancelar
       </button>
@@ -61,7 +65,7 @@
   int calificacionSeleccionada = 0;
   string comentario = "";
   string mensaje = "";
-
+  bool esError = false;
   void SeleccionarCalificacion(int v)
     {
         calificacionSeleccionada = v;
@@ -69,40 +73,51 @@
     }
 
 
-  async Task EnviarCalificacion()
-  {
-    if (calificacionSeleccionada < 1) return;
-    Cliente? cliente = casoDeUsoBuscarClientePorId.Ejecutar(ClienteId);
-    
-    var modelo = new Valoracion
+    async Task EnviarCalificacion()
     {
-        InmuebleId       = InmuebleId,
-        ClienteId        = ClienteId,
-        Calificacion     = calificacionSeleccionada,
-        Comentario       = comentario,
-        NombreCliente = cliente!.Nombre,
-        ApellidoCliente = cliente!.Apellido
-    };
-    
+      if (calificacionSeleccionada < 1)
+    {
+        mensaje   = "Por favor selecciona una calificación.";
+        esError   = true;
+        return;
+    }
+
+      Cliente? cliente = casoDeUsoBuscarClientePorId.Ejecutar(ClienteId);
+      
+      var modelo = new Valoracion
+      {
+          InmuebleId       = InmuebleId,
+          ClienteId        = ClienteId,
+          Calificacion     = calificacionSeleccionada,
+          Comentario       = comentario,
+          NombreCliente = cliente!.Nombre,
+          ApellidoCliente = cliente!.Apellido
+      };
+      
     
 
     bool ok = casoCalificar.Ejecutar(InmuebleId, ClienteId, modelo);
-    mensaje = ok
-      ? "¡Gracias! Tu reseña fue guardada."
-      : "Error: No se pudo guardar la calificación.";
 
     if (ok)
     {
-      await Task.Delay(1200);
-      Cerrar();
-      navegationManager.NavigateTo($"/alquileres/{InmuebleId}",true );
-      OnClose.InvokeAsync(null);
+        mensaje = "¡Gracias! Tu reseña fue guardada.";
+        esError = false;
+        await Task.Delay(1200);
+        await Cerrar();
+        navegationManager.NavigateTo($"/alquileres/{ClienteId}", true);
+        await OnClose.InvokeAsync(null);
     }
+    else
+    {
+        mensaje = "Error: no se pudo guardar la calificación.";
+        esError = true;
+    }
+
   }
 
-  void Cerrar()
-  {
-    mostrar = false;
-    OnClose.InvokeAsync(null);
-  }
+    async Task Cerrar()
+{
+    mostrar = false;  
+    await OnClose.InvokeAsync(null);
+}
 }
