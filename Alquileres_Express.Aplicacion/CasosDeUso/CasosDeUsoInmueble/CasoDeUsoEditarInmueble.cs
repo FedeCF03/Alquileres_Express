@@ -1,4 +1,5 @@
 namespace Alquileres_Express.Aplicacion.CasosDeUso;
+
 using Alquileres_Express.Aplicacion.Entidades;
 using Alquileres_Express.Aplicacion.Enumerativo;
 using Alquileres_Express.Aplicacion.Interfaces;
@@ -11,7 +12,7 @@ public class CasoDeUsoEditarInmueble(IRepositorioInmueble RepoInmueble, Validado
         if (rolUsuario != RolUsuario.Gerente)
         {
             errores = [];
-            errores.Add("Solo los administradores o gerentes pueden agregar inmuebles.");
+            errores.Add("Solo los gerentes pueden agregar inmuebles.");
             return false;
         }
         errores = Validador.Ejecutar(inmueble);
@@ -24,9 +25,9 @@ public class CasoDeUsoEditarInmueble(IRepositorioInmueble RepoInmueble, Validado
             errores.Add("Ya existe un inmueble con el mismo nombre.");
             return false;
         }
-            RepoInmueble.ModificarInmueble(inmueble);
-            return true;
- 
+        RepoInmueble.ModificarInmueble(inmueble);
+        return true;
+
     }
 
 }

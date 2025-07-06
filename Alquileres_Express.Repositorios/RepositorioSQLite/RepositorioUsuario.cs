@@ -1,4 +1,5 @@
 namespace Alquileres_Express.Repositorios.RepositorioSQLite;
+
 using Alquileres_Express.Aplicacion.Entidades;
 using Alquileres_Express.Aplicacion.Enumerativo;
 using Alquileres_Express.Aplicacion.Interfaces;
@@ -17,7 +18,7 @@ public class RepositorioUsuario : IRepositorioUsuario
         users.AddRange(clientes);
         users.AddRange(personal);
         return users;
-        
+
 
         //return clientes.Concat<Personal>(personal).ToList();
     }
@@ -35,4 +36,22 @@ public class RepositorioUsuario : IRepositorioUsuario
         return users;
     }
 
+    public bool existeEmail(string email)
+    {
+        using Alquileres_ExpressContext _context = new();
+        return _context.Clientes.Any(c => c.Correo == email) || _context.Personal.Any(p => p.Correo == email);
+    }
+
+    public void CambiarContrasena(string correo, string nuevaContrasena)
+    {
+        using Alquileres_ExpressContext _context = new();
+        Usuario usuario = _context.Clientes.FirstOrDefault(c => c.Correo == correo) as Usuario ?? _context.Personal.FirstOrDefault(p => p.Correo == correo);
+        if (usuario != null)
+        {
+
+            usuario.Contraseña = BCrypt.Net.BCrypt.HashPassword(nuevaContrasena.Trim());
+            _context.Entry(usuario).State = EntityState.Modified;
+            _context.SaveChanges();
+        }
+    }
 }

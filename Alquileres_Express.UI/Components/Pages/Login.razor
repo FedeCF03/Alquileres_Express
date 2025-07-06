@@ -33,7 +33,7 @@
                     placeholder="Ingrese su contraseña" />
             </div>
             <div class="login-links">
-                <a href="/forgot-password" class="link-secondary">¿Olvidaste tu contraseña?</a>
+                <a href="/cambiar-contrasena" class="link-secondary">¿Olvidaste tu contraseña?</a>
             </div>
             <button type="submit" class="btn-primary">Ingresar</button>
 
@@ -89,7 +89,7 @@
         if (personal != null)
         {
             user.Rol = personal.Rol;
-            if (personal.Rol == RolUsuario.Gerente || personal.Rol == RolUsuario.Administrador)
+            if (personal.Rol == RolUsuario.Gerente)
             {
                 String codigo = servicioGenerarCodigo.GenerarCodigoAleatorio();
                 servicioEnviarEmail.EnviarEmail(personal.Correo, "Codigo de autenticacion", "Su codigo de autenticacion es : ", codigo);

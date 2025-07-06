@@ -7,7 +7,7 @@
 @inject IJSRuntime JS
 @inject NavigationManager Nav
 @inject ValidadorInmueble ValidadorInmueble
-@attribute [Authorize(Roles = "Gerente,Administrador, Empleado")]
+@attribute [Authorize(Roles = "Gerente,Empleado")]
 
 <h1 class="form-label">Nombre</h1>
 <input placeholder="@inmueble.Nombre" type="text" @bind="inmuebleAuxiliar.Nombre" class="form-control mb-2" />

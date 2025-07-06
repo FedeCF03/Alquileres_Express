@@ -227,17 +227,12 @@
                                 <p class="no-charge-text">No se realizará ningún cargo por ahora</p>
                             </div>
                         </AuthorizeView>
-                        <AuthorizeView Roles="Empleado,Gerente,Administrador">
+                        <AuthorizeView Roles="Empleado,Gerente">
                             <Authorized>
                                 <div class="booking-actions mt-3">
                                     <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
                                         <button class="btn btn-sm btn-primary">
                                             <i class="fas fa-user-check"></i> Registrar alquiler presencial
-                                        </button>
-                                    </NavLink>
-                                    <NavLink class="nav-link" href="@($"/editar-inmueble/{Id}")">
-                                        <button class="btn btn-sm btn-primary">
-                                            <i class="fas fa-user-check"></i> Editar inmueble
                                         </button>
                                     </NavLink>
                                     <NavLink class="nav-link" href="@($"/cambiar-estado-inmueble/{Id}")">
@@ -247,10 +242,14 @@
                                     </NavLink>
                                 </div>
                             </Authorized>
-
                         </AuthorizeView>
                         <AuthorizeView Roles="Gerente">
                             <Authorized>
+                                <NavLink class="nav-link" href="@($"/editar-inmueble/{Id}")">
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-user-check"></i> Editar inmueble
+                                        </button>
+                                </NavLink>
                                 <button class="reserve-btn" @onclick="MostrarIngresos">
                                     <i class="fas fa-credit-card"></i>
                                     Ingresos de alquiler

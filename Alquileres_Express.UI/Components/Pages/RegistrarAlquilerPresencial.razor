@@ -13,7 +13,7 @@
 @inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
 @inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
 @inject CasoDeUsoPagarEfectivo casoDeUsoPagarEfectivo
-@attribute [Authorize(Roles = "Administrador,Gerente,Empleado")]
+@attribute [Authorize(Roles = "Gerente,Empleado")]
 
 
 <div class="container mt-5">
@@ -31,9 +31,10 @@
             <div class="col-md-6">
                 <div class="form-group mb-3">
                     <label class="fw-bold">Correo del Cliente:</label>
-                    <input @bind="correoCliente" class="form-control form-control-lg" placeholder="Ingresa el correo..." />
+                    <input @bind="correoCliente" class="form-control form-control-lg"
+                        placeholder="Ingresa el correo..." />
                 </div>
-                
+
                 <div class="form-group mb-3">
                     <label class="fw-bold">Número de Personal:</label>
                     <InputNumber @bind-Value="numeroPersonal" class="form-control form-control-lg no-spinner" />
@@ -44,10 +45,8 @@
             <div class="col-md-6">
                 <label class="fw-bold mb-2">Seleccionar Fechas:</label>
                 <DateRangePicker @bind-StartDate="StartDate" @bind-EndDate="EndDate"
-                    DaysEnabledFunction="(d)=>!NoEsHabil(d)"
-                    class="form-control form-control-lg"
-                    placeholder="Selecciona fechas..."
-                    OnRangeSelect="VerificarFechas" />
+                    DaysEnabledFunction="(d)=>!NoEsHabil(d)" class="form-control form-control-lg"
+                    placeholder="Selecciona fechas..." OnRangeSelect="VerificarFechas" />
             </div>
         </div>
 
@@ -59,9 +58,10 @@
             }
             else
             {
-                <div class="text-success fs-5 fw-bold">💲 Precio total: $@calcularPrecio(StartDate.Value.DateTime, EndDate.Value.DateTime, inmueble.Precio).ToString("F2")</div>
-                <button class="btn btn-success btn-lg mt-3" @onclick="RegistrarPagoEfectivo">✅ Registrar alquiler</button>
-            }
+                <div class="text-success fs-5 fw-bold">💲 Precio total: $@calcularPrecio(StartDate.Value.DateTime,
+                                    EndDate.Value.DateTime, inmueble.Precio).ToString("F2")</div>
+            <button class="btn btn-success btn-lg mt-3" @onclick="RegistrarPagoEfectivo">✅ Registrar alquiler</button>
+                        }
         </div>
     </div>
 </div>
@@ -93,7 +93,7 @@
     {
         try
         {
-           inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
             CrearRangosDeFechaReservados(inmueble.Alquileres);
 
 
@@ -115,9 +115,10 @@
                 return;
             }
             //validando
-            
-            //casoDeUsoRegistrarAlquiler.Ejecutar(correoCliente, Id, StartDate.Value.DateTime, EndDate.Value.DateTime, numeroPersonal);
-            
+
+            //casoDeUsoRegistrarAlquiler.Ejecutar(correoCliente, Id, StartDate.Value.DateTime, EndDate.Value.DateTime,
+            //numeroPersonal);
+
             Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
             Cliente? cliente = _context.Clientes.FirstOrDefault(c => c.Correo.ToLower() == correoCliente.ToLower());
             Personal? personal = _context.Personal.FirstOrDefault(p => p.Id == numeroPersonal);
@@ -128,9 +129,11 @@
                 throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
             if (inmueble == null)
                 throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
-            
+
             decimal precio = calcularPrecio(StartDate.Value.DateTime, EndDate.Value.DateTime, inmueble!.Precio);
-            Alquiler alquiler = new Alquiler(correoCliente, StartDate.Value.DateTime, EndDate.Value.DateTime, precio, Id, personal.Nombre, personal.Apellido){ClienteId = cliente.Id};
+            Alquiler alquiler = new Alquiler(correoCliente, StartDate.Value.DateTime, EndDate.Value.DateTime, precio, Id,
+            personal.Nombre, personal.Apellido)
+            { ClienteId = cliente.Id };
             //RegistroDeLlave registro = casoDeUsoRegistrarEntrega.Ejecutar(alquiler.Id, personal.Id, cliente.Id);
             //alquiler.Entrega = registro;
 
@@ -179,4 +182,3 @@
         podesPagar = true;
     }
 }
-

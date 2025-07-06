@@ -8,20 +8,20 @@ namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
 public class RepositorioPersonal : IRepositorioPersonal
 {
-        public void AgregarPersonal(Personal p)
-        {
-            using Alquileres_ExpressContext _context = new();
-            bool existe = (_context.Clientes.Any(x => x.Correo.ToLower() == p.Correo.ToLower())) || (_context.Personal.Any(x => x.Correo.ToLower() == p.Correo.ToLower()));
-            if (existe)
-                throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
-            bool dniExiste = _context.Clientes.Any(x => x.Dni == p.Dni) || _context.Personal.Any(x => x.Dni == p.Dni);
-            if (dniExiste)
-                throw new InvalidOperationException("El DNI ya está registrado por otro usuario.");
-            p.Contraseña = BCrypt.Net.BCrypt.HashPassword(p.Contraseña.Trim());
-            p.Rol = Aplicacion.Enumerativo.RolUsuario.Empleado;
-            _context.Personal.Add(p);
-            _context.SaveChanges();
-        }
+    public void AgregarPersonal(Personal p)
+    {
+        using Alquileres_ExpressContext _context = new();
+        bool existe = (_context.Clientes.Any(x => x.Correo.ToLower() == p.Correo.ToLower())) || (_context.Personal.Any(x => x.Correo.ToLower() == p.Correo.ToLower()));
+        if (existe)
+            throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
+        bool dniExiste = _context.Clientes.Any(x => x.Dni == p.Dni) || _context.Personal.Any(x => x.Dni == p.Dni);
+        if (dniExiste)
+            throw new InvalidOperationException("El DNI ya está registrado por otro usuario.");
+        p.Contraseña = BCrypt.Net.BCrypt.HashPassword(p.Contraseña.Trim());
+        p.Rol = Aplicacion.Enumerativo.RolUsuario.Empleado;
+        _context.Personal.Add(p);
+        _context.SaveChanges();
+    }
 
     public void EliminarPersonal(int id)
     {
@@ -116,22 +116,22 @@ public class RepositorioPersonal : IRepositorioPersonal
 
 
     public bool ModificarPersonal(Personal personal)
-{
-    using Alquileres_ExpressContext _context = new();
-    var personalExistente = _context.Personal.FirstOrDefault(p => p.Id == personal.Id);
-    if (personalExistente == null)
-        return false; // O lanzar una excepción, según el caso
-    
-    personalExistente.Nombre = personal.Nombre;
-    personalExistente.Apellido = personal.Apellido;
-    personalExistente.Correo = personal.Correo;
-    personalExistente.Direccion = personal.Direccion;
-    personalExistente.Dni = personal.Dni;
-    personalExistente.FechaNacimiento = personal.FechaNacimiento;
+    {
+        using Alquileres_ExpressContext _context = new();
+        var personalExistente = _context.Personal.FirstOrDefault(p => p.Id == personal.Id);
+        if (personalExistente == null)
+            return false; // O lanzar una excepción, según el caso
 
-    _context.SaveChanges();
-    return true;
-}
+        personalExistente.Nombre = personal.Nombre;
+        personalExistente.Apellido = personal.Apellido;
+        personalExistente.Correo = personal.Correo;
+        personalExistente.Direccion = personal.Direccion;
+        personalExistente.Dni = personal.Dni;
+        personalExistente.FechaNacimiento = personal.FechaNacimiento;
+
+        _context.SaveChanges();
+        return true;
+    }
     public bool SeRepiteDNI(Personal cliente)
     {
         using Alquileres_ExpressContext _context = new();

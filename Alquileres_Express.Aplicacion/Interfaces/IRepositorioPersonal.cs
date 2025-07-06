@@ -22,4 +22,5 @@ public interface IRepositorioPersonal
     public bool SeRepiteCorreo(Personal p);
     public void AscenderAGerente(int id);
     public void DescenderGerente(int id);
+
 }

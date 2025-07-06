@@ -106,7 +106,7 @@
                             </div>
                         </div> 
                         <div class="rental-actions">
-                         <AuthorizeView Roles="Administrador, Gerente, Empleado">
+                         <AuthorizeView Roles="Gerente, Empleado">
                             @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
                             {
                                 <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
@@ -287,9 +287,9 @@ else
             if (rol == "Cliente" && cliente.Correo != correo)
             {
                 
-                                NavigationManager.NavigateTo("/?mensaje=No tenes permisos papi&EsMensajeError=true");
+                NavigationManager.NavigateTo("/?mensaje=No tenes permisos papi&EsMensajeError=true");
             }
-            if (rol == "Administrador" || rol == "Gerente" || rol == "Empleado")
+            if (rol == "Gerente" || rol == "Empleado")
             {
                 personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
             }

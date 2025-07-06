@@ -37,7 +37,7 @@ builder.Services
     .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
     .AddTransient<CasoDeUsoListarUsuarios>()
     .AddTransient<CasoDeUsoListarRestringido>()
-
+    .AddScoped<CasoDeUsoCambiarContrasena>()
     .AddTransient<CasoDeUsoAltaCliente>()
     .AddTransient<CasoDeUsoBuscarCliente>()
     .AddTransient<CasoDeUsoModificarCliente>()
@@ -47,15 +47,14 @@ builder.Services
     .AddTransient<CasoDeUsoBuscarClientePorId>()
     .AddTransient<CasoDeUsoObtenerCantidadDeClientesEntreFechas>()
     .AddTransient<CasoDeUsoObtenerValorDeAlquileresEntreFechas>()
-
     .AddTransient<CasoDeUsoModificarInmueble>()
     .AddTransient<CasoDeUsoAltaInmueble>()
-
+    .AddSingleton<ServicioCambiarContrasena>()
     .AddTransient<CasoDeUsoEliminarInmueble>()
     .AddTransient<CasoDeUsoObtenerInmueble>()
     .AddTransient<CasoDeUsoVerInmueble>()
     .AddTransient<CasoDeUsoObtenerIngresosDeInmueble>()
-    
+
     .AddTransient<CasoDeUsoAltaPersonal>()
     .AddTransient<CasoDeUsoModificarPersonal>()
     .AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>()
@@ -120,6 +119,8 @@ builder.Services
     .AddHttpContextAccessor()
     .AddCascadingAuthenticationState()
     .AddTransient<ServicioFotos>()
+    .AddTransient<CasoDeUsoBuscarEmail>()
+
     .AddTransient<CasoDeUsoAlquilerCancelarAlquiler>()
     .AddSingleton<ServicioVerificarPago>()
     .AddSingleton<MercadoPagoService>();
