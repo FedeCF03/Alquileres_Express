@@ -112,3 +112,93 @@
 .bloque-filtros, .bloque-busqueda {
     margin-top: 1rem;
 }
+.filtros-container {
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.filtros-titulo {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.filtros-opciones {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.filtro-bloque {
+    margin-bottom: 1.5rem;
+}
+
+.filtro-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #444;
+}
+
+.filtro-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+.filtro-rango {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.filtro-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    color: #555;
+}
+
+.filtro-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.boton-filtro {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.boton-filtro.primario {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.boton-filtro.secundario {
+    background-color: #6c757d;
+    color: white;
+}
+
+.boton-filtro.buscar {
+    width: 100%;
+    background-color: #198754;
+    color: white;
+    margin-top: 1rem;
+}
+
+.boton-filtro.deshabilitado {
+    background-color: #dee2e6;
+    color: #6c757d;
+    cursor: not-allowed;
+}

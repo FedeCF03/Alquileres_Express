@@ -9,14 +9,41 @@
 @inject ValidadorInmueble ValidadorInmueble
 @attribute [Authorize(Roles = "Gerente,Empleado")]
 
-<h1 class="form-label"> ¿Está disponible el inmueble?</h1>
-<input type="checkbox" @bind="disponible" class="form-check-input mb-2" />
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded-4">
+        <h2 class="mb-4 text-center text-primary">Cambiar disponibilidad del inmueble</h2>
 
-<button class="btn btn-primary" @onclick="GuardarCambios">Guardar cambios</button>
-<button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
+        <div class="form-check form-switch mb-4 d-flex align-items-center justify-content-center gap-3">
+            <input type="checkbox" class="form-check-input fs-4" id="disponibleSwitch" @bind="disponible" />
+            <label class="form-check-label fs-5" for="disponibleSwitch">
+                @(disponible ? "Disponible" : "No disponible")
+            </label>
+        </div>
 
-@code
-{
+        @if (errores.Any())
+        {
+            <div class="alert alert-danger" role="alert">
+                <ul class="mb-0">
+                    @foreach (var error in errores)
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <div class="d-flex justify-content-center gap-3 mt-3">
+            <button class="btn btn-success px-4" @onclick="GuardarCambios">
+                Guardar cambios
+            </button>
+            <button class="btn btn-outline-secondary px-4" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
     [Parameter]
     public int id { get; set; }
 
@@ -31,18 +58,20 @@
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(id);
             disponible = inmueble.Disponible;
         }
-        catch (Exception)
+        catch
         {
             Nav.NavigateTo("/?mensaje=Inmueble no encontrado&EsMensajeDeError=true");
         }
-
     }
 
     private async Task GuardarCambios()
     {
         inmueble.Disponible = disponible;
         casoDeUsoEditarInmueble.Ejecutar(inmueble, RolUsuario.Gerente, out errores);
-        Nav.NavigateTo($"/inmueble/{inmueble.Id}");
 
+        if (!errores.Any())
+        {
+            Nav.NavigateTo($"/?mensaje=Estado de inmueble modificado exitosamente");
+        }
     }
 }

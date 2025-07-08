@@ -36,7 +36,7 @@ public class Crear
                 ,
             });
 
-            Inmueble inmueble = new Inmueble
+            Inmueble inmueble = new()
             {
                 Nombre = "Casa en la playa",
                 Direccion = "Avenida del Mar 123",
@@ -47,9 +47,10 @@ public class Crear
                 Ciudad = "Mar del Plata",
                 Precio = 800,
                 CantidadDeCamas = 2,
-                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda
+                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda,
+                PromedioCalificacion = 3.5,
             };
-            Inmueble inmueble2 = new Inmueble
+            Inmueble inmueble2 = new ()
             {
                 Nombre = "Casa en la ciudad",
                 Direccion = "Avenida 9 de Julio",
@@ -60,7 +61,8 @@ public class Crear
                 Ciudad = "Buenos Aires",
                 Precio = 1200,
                 CantidadDeCamas = 2,
-                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda
+                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda,
+                PromedioCalificacion = 4.0,
             };
             context.Add(inmueble);
             context.SaveChanges();
