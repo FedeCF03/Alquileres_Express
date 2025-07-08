@@ -4,51 +4,78 @@
 @using BlazorDateRangePicker
 @inject CasoDeUsoListarInmuebles CasoDeUsoListarInmuebles
 
-    <div class="date-picker-section">
-        <div class="date-picker-container">
-            <div class="date-fields">
-                <div class="date-field">
-                    <label>Comienzo</label>
-                    <div class="date-value">@(StartDate?.ToString("dd/M/yyyy") ?? "Seleccionar")
+<body>
+    <div class="revenue-dashboard">
+        <div class="control-panel">
+            <div class="filter-controls">
+                <div class="date-filter-wrapper">
+                    <div class="filter-label">
+                        <i class="fas fa-calendar-range"></i>
+                        <span>Seleccionar rango de fechas</span>
+                    </div>
+                    <div class="date-picker-section">
+                        <div class="date-picker-container">
+                            <div class="date-fields">
+                                <div class="date-field">
+                                    <label>Comienzo</label>
+                                    <div class="date-value">@(StartDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
+                                </div>
+                                <div class="date-separator"></div>
+                                    <div class="date-field">
+                                        <label>Fin</label>
+                                        <div class="date-value">@(EndDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
+                                    </div>
+                                <DateRangePicker StartDatePlaceholder="Comienzo" EndDatePlaceholder="Fin"
+                                @bind-StartDate="StartDate" @bind-EndDate="EndDate"
+                                class="hidden-picker"
+                                placeholder="Select dates..." OnRangeSelect="Filtrar" OnCancel="Cancelar"/>
+                            </div>   
+                        </div>
                     </div>
                 </div>
-                <div class="date-separator"></div>
-                    <div class="date-field">
-                        <label>Fin</label>
-                        <div class="date-value">@(EndDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
-                    </div>
-                    <DateRangePicker StartDatePlaceholder="Comienzo" EndDatePlaceholder="Fin"
-                    @bind-StartDate="StartDate" @bind-EndDate="EndDate"
-                    DaysEnabledFunction="(d) => NoEsHabil(d)" class="hidden-picker"
-                    placeholder="Select dates..." OnRangeSelect="Filtrar" />
-                </div>   
-        </div>
-    </div>
-        <div class="card shadow p-4">
-            <table class="table table-hover table-striped align-middle text-center">
-                <thead class="table-primary">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Cantidad de veces alquilado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="rentalsTableBody">
-                    @for (int i = 0; i < inmuebles.Count; i++)
-                    {
-                        <tr>
-                            <td>@inmuebles[i].Nombre</td>
-                            <td>@cantAlquileres[i]</td>
-                            <a class="operation-btn historial" href="/alquileres-de-inmueble/@inmuebles[i].Id">
-                                <span class="btn-icon">🔑</span>
-                                    Ver todos los alquileres
-                                </a>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            </div>
         </div>
 
+        <div class="data-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-table"></i>
+                    <h3>Registro de cantidad de alquileres</h3>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="date-column">
+                                <div class="column-header">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span>Nombre</span>
+                                </div>
+                            </th>
+                            <th class="amount-column">
+                                <div class="column-header">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Cantidad de veces alquilado</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < inmuebles.Count; i++)
+                        {
+                            <tr>
+                                <td>@inmuebles[i].Nombre</td>
+                                <td>@cantAlquileres[i]</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
 
 @code{
     DateTimeOffset? StartDate { get; set; } 
@@ -84,9 +111,18 @@
         StateHasChanged();
     }
 
-    private bool NoEsHabil(DateTimeOffset date)
+
+    private void Cancelar()
     {
-        return true;
+        StartDate = null;
+        EndDate = null;
+        inmuebles.Clear();
+        cantAlquileres.Clear();
+        inmuebles = CasoDeUsoListarInmuebles.ListarDisponibles();
+        foreach(var inmueble in inmuebles){
+            cantAlquileres.Add(inmueble.Alquileres.Count);
+        }
+        StateHasChanged();
     }
 
 }
@@ -117,4 +153,7 @@
         opacity: 0;
         cursor: pointer;
     }
+    body {
+     background-image: linear-gradient(to right, rgb(222, 42, 42) , rgb(151, 37, 19)) !important;   /*esto es para el color del fondo y que no se ponga blanco  */
+}
 </style>

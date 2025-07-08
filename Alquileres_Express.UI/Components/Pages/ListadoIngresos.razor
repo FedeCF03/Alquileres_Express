@@ -5,54 +5,109 @@
 @inject CasoDeUsoObtenerInmueble CasoDeUsoObtenerInmueble
 
 
-
-
-
-    <div class="date-picker-section">
-        <div class="date-picker-container">
-            <div class="date-fields">
-                <div class="date-field">
-                    <label>Comienzo</label>
-                    <div class="date-value">@(StartDate?.ToString("dd/M/yyyy") ?? "Seleccionar")
+<body>
+    <div class="revenue-dashboard">
+        @if(mostrar){
+            <div class="hero-section">
+                <div class="revenue-summary-card">
+                    <div class="card-background-pattern"></div>
+                    <div class="revenue-content">
+                        <div class="revenue-header">
+                            <div class="revenue-icon-container">
+                                <i class="fas fa-chart-trending-up"></i>
+                            </div>
+                            <div class="revenue-details">
+                                <h2 class="revenue-label">Ingresos totales</h2>
+                                <div class="revenue-amount">@totalIngresos()</div>
+                            </div>
+                         </div>
+                        <div class="revenue-actions">
+                            <button class="action-button">
+                                <button class="btn btn-outline-secondary" @onclick="Ocultar">
+                                    <i class="fas fa-eye-slash me-1"></i>
+                                        Ocultar detalle
+                                </button>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="date-separator"></div>
-                    <div class="date-field">
-                        <label>Fin</label>
-                        <div class="date-value">@(EndDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
+            </div>
+        }
+        <div class="control-panel">
+            <div class="filter-controls">
+                <div class="date-filter-wrapper">
+                    <div class="filter-label">
+                        <i class="fas fa-calendar-range"></i>
+                        <span>Seleccionar rango de fechas</span>
                     </div>
-                    <DateRangePicker StartDatePlaceholder="Comienzo" EndDatePlaceholder="Fin"
-                    @bind-StartDate="StartDate" @bind-EndDate="EndDate"
-                    class="hidden-picker"
-                    placeholder="Select dates..." OnRangeSelect="Filtrar" />
-            </div>   
-        </div>
-    </div>
-        <div class="card shadow p-4">
-            <table class="table table-hover table-striped align-middle text-center">
-                <thead class="table-primary">
-                    <tr>
-                        <th>Fecha de pago</th>
-                        <th>Monto</th>
-                    </tr>
-                </thead>
-                <tbody id="rentalsTableBody">
-                    @foreach(var alquiler in alquileres)
-                    {
-                        <tr>
-                            <td>@alquiler.FechaDeCreacion.ToString("dd/MM/yyyy")</td>
-                            <td>@alquiler.Precio.ToString("C2")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                    <div class="date-picker-section">
+                        <div class="date-picker-container">
+                            <div class="date-fields">
+                                <div class="date-field">
+                                    <label>Comienzo</label>
+                                    <div class="date-value">@(StartDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
+                                </div>
+                                <div class="date-separator"></div>
+                                    <div class="date-field">
+                                        <label>Fin</label>
+                                        <div class="date-value">@(EndDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
+                                    </div>
+                                <DateRangePicker StartDatePlaceholder="Comienzo" EndDatePlaceholder="Fin"
+                                @bind-StartDate="StartDate" @bind-EndDate="EndDate"
+                                class="hidden-picker"
+                                placeholder="Select dates..." OnRangeSelect="Filtrar" OnCancel="Cancelar"/>
+                            </div>   
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <div class="data-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-table"></i>
+                    <h3>Registro de pagos</h3>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="date-column">
+                                <div class="column-header">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span>Fecha de pago</span>
+                                </div>
+                            </th>
+                            <th class="amount-column">
+                                <div class="column-header">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Monto</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var alquiler in alquileres)
+                        {
+                            <tr>
+                                <td>@alquiler.FechaDeCreacion.ToString("dd/MM/yyyy")</td>
+                                <td>@alquiler.Precio.ToString("C2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
 
 @code{
     [Parameter]
     public int Id { get; set; }
-
+    Boolean mostrar;
     DateTimeOffset? StartDate { get; set; } 
     DateTimeOffset? EndDate { get; set; } 
 
@@ -63,9 +118,12 @@
     {
         inmueble = CasoDeUsoObtenerInmueble.Ejecutar(Id);
         alquileres = new List<Alquiler>(inmueble.Alquileres);
+            mostrar = false;
     }
 
-
+     private decimal totalIngresos(){
+       return alquileres.Sum(a => a.Precio);
+    }
     private void Filtrar()
     {
         DateTime fecha1 = StartDate?.UtcDateTime ?? DateTime.MinValue;
@@ -80,6 +138,24 @@
             }
         }
         alquileres.AddRange(alquileresFiltrados);
+        mostrar = true;
+        StateHasChanged();
+    }
+
+
+       private void Ocultar()
+    {
+        mostrar = false;
+        StateHasChanged();
+    }
+
+    private void Cancelar()
+    {
+        StartDate = null;
+        EndDate = null;
+        alquileres.Clear();
+        alquileres.AddRange(inmueble.Alquileres);
+        mostrar = false;
         StateHasChanged();
     }
 
@@ -111,4 +187,13 @@
         opacity: 0;
         cursor: pointer;
     }
+
+
+/* ⬇️ estas clases existen sólo aquí, por lo que el cambio no afecta a otras rutas */
+
+/* si necesitas que el gradiente global vuelva a verse: */
+body {
+     background-image: linear-gradient(to right, rgb(222, 42, 42) , rgb(151, 37, 19)) !important;   /*esto es para el color del fondo y que no se ponga blanco  */
+}
+
 </style>
