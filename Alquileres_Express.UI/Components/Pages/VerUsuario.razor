@@ -101,7 +101,7 @@
             usuario ??= ClienteId != null ? casoDeUsoBuscarClientePorId.Ejecutar(ClienteId.Value) : null;
             if (usuario == null)
             {
-                NavigationManager.NavigateTo($"/?mensaje=Usuario no encontrado&EsMensajeDeError=true");
+                NavigationManager.NavigateTo($"/?mensaje=Usuario no encontrado&EsMensajeDeError=true", true);
                 return;
             }
             if (rol!.Equals("Empleado") && usuario.Rol.Equals(RolUsuario.Gerente))

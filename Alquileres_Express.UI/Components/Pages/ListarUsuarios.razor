@@ -1,16 +1,23 @@
 @page "/listadoUsuario"
-@rendermode InteractiveServer
 @inject CasoDeUsoListarUsuarios casoDeUsoListarUsuarios
 @inject CasoDeUsoListarRestringido casoDeUsoListarRestringido
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @attribute [Authorize(Roles = "Gerente,Empleado")]
-@page "/search"
+@using Microsoft.AspNetCore.WebUtilities
+
 @inject CasoDeUsoPersonalDescenderGerente casoDeUsoBuscarPersonalDescenderGerente
 
 @inject CasoDeUsoAscenderAGerente casoDeUsoBuscarPersonalAscenderAGerente
 @inject CasoDeUsoEliminarPersonal casoDeUsoEliminarPersonal
+@rendermode InteractiveServer
 
+@if (!String.IsNullOrEmpty(Mensaje))
+{
+        <div class="toast-message">
+            @Mensaje
+        </div>   
+}
 <div class="search-container">
     <input type="text" @bind="searchTerm" @onkeypress="OnKeyPress" placeholder="Buscar..." class="search-input" />
     <button @onclick="PerformSearch" class="search-button">Buscar</button>
@@ -158,6 +165,8 @@
 </div>
 
 @code {
+    [SupplyParameterFromQuery]
+    private string? Mensaje { get; set; } 
     List<Usuario> _lista = new List<Usuario>();
     List<Usuario> _listaBusqueda = new List<Usuario>();
 
@@ -170,7 +179,8 @@
         {
             _listaBusqueda = _lista
             .Where(item => item.Nombre.Contains(searchTerm,
-            StringComparison.OrdinalIgnoreCase)).ToList();
+            StringComparison.OrdinalIgnoreCase) || item.Apellido.Contains(searchTerm,
+            StringComparison.OrdinalIgnoreCase) || searchTerm.All(c => item.Nombre.Contains(c, StringComparison.OrdinalIgnoreCase))).ToList();
         }
         else
         {
@@ -229,18 +239,17 @@
     void DescenderGerente(int id)
     {
         casoDeUsoBuscarPersonalDescenderGerente.Ejecutar(id);
-        NavigationManager.NavigateTo("/listadoUsuario", true);
+        NavigationManager.NavigateTo("/listadoUsuario?mensaje=Operacion exitosa", true);
     }
     void DarDeBaja(int id)
     {
         casoDeUsoEliminarPersonal.Ejecutar(id);
-        
-        NavigationManager.NavigateTo("/listadoUsuario", true);
+        NavigationManager.NavigateTo("/listadoUsuario?mensaje=Baja exitosa", true);
     }
     void AscenderAGerente(int id)
     {
         casoDeUsoBuscarPersonalAscenderAGerente.Ejecutar(id);
-        NavigationManager.NavigateTo("/listadoUsuario", true);
+        NavigationManager.NavigateTo("/listadoUsuario?mensaje=Ascenso exitoso", true);
     }
 
 }
