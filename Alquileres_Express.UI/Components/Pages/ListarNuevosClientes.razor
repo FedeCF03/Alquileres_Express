@@ -149,6 +149,7 @@
             }
         }
         cantidadDeClientes = totalClientes();
+        clientesFiltrados.Sort((x, y) => x.FechaCreacionCuenta.CompareTo(y.FechaCreacionCuenta));
         mostrar = true;
         StateHasChanged();
     }
@@ -165,6 +166,7 @@
         EndDate = null;
         clientesFiltrados.Clear();
         clientesFiltrados.AddRange(clientes);
+        clientesFiltrados.Sort((x, y) => x.FechaCreacionCuenta.CompareTo(y.FechaCreacionCuenta));
         mostrar = false;
         StateHasChanged();
     }

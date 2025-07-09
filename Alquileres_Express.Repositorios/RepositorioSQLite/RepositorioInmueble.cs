@@ -73,7 +73,7 @@ public class RepositorioInmueble : IRepositorioInmueble
     public List<Inmueble> ObtenerTodosLosInmuebles()
     {
         using var _context = new Alquileres_ExpressContext();
-        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Borrado  == false)];
+        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Borrado == false)];
     }
 
     public List<Inmueble> ObtenerInmueblesDisponibles()
@@ -145,7 +145,7 @@ public class RepositorioInmueble : IRepositorioInmueble
     public decimal obtenerIngresosDeInmueble(int id)
     {
         using var _context = new Alquileres_ExpressContext();
-        decimal num = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).FirstOrDefault(i => i.Id == id).Alquileres.Where(a => a.Pagado ).Sum(a => a.Precio );
+        decimal num = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).FirstOrDefault(i => i.Id == id).Alquileres.Where(a => a.Pagado).Sum(a => a.Precio);
         return num;
     }
     public void PromedioValoracion(int idInmueble)
@@ -167,5 +167,9 @@ public class RepositorioInmueble : IRepositorioInmueble
 
             _context.SaveChanges();
         }
+    }
+    public bool TieneAlquileresVigentesOPendientes(int idInmueble)
+    {
+        return ObtenerInmueblePorId(idInmueble).Alquileres!.Any(a => a.GetEstadoDeAlquiler() == EstadoDeAlquiler.EnProceso || a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Vigente);
     }
 }

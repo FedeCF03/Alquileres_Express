@@ -118,6 +118,7 @@
     {
         inmueble = CasoDeUsoObtenerInmueble.Ejecutar(Id);
         alquileres = new List<Alquiler>(inmueble.Alquileres);
+        alquileres.Sort((a,b) => a.FechaDeCreacion.CompareTo(b.FechaDeCreacion));
             mostrar = false;
     }
 
@@ -138,6 +139,7 @@
             }
         }
         alquileres.AddRange(alquileresFiltrados);
+        alquileres.Sort((a,b) => a.FechaDeCreacion.CompareTo(b.FechaDeCreacion));
         mostrar = true;
         StateHasChanged();
     }
@@ -155,6 +157,7 @@
         EndDate = null;
         alquileres.Clear();
         alquileres.AddRange(inmueble.Alquileres);
+        alquileres.Sort((a,b) => a.FechaDeCreacion.CompareTo(b.FechaDeCreacion));
         mostrar = false;
         StateHasChanged();
     }

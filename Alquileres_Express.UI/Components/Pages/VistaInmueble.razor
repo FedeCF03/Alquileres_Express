@@ -18,6 +18,8 @@
 @inject IRepositorioAlquiler repositorioAlquiler
 @inject CasoDeUsoListarValoraciones casoDeUsoListarValoraciones
 @inject CasoDeUsoPromedioValoracion casoDeUsoPromedioValoracion
+@inject CasoDeUsoEliminarInmueble CasoDeUsoEliminarInmueble
+
 
 <div class="property-page">
     <!-- Hero Section -->
@@ -237,9 +239,10 @@
                                     </NavLink>
                                     <NavLink class="nav-link" href="@($"/alquileres-de-inmueble/{Id}")">
                                         <button class="btn btn-sm btn-primary">
-                                            <i class="fas fa-user-check"></i> Ver
+                                            <i class="fas fa-user-check"></i> Ver alquileres
                                         </button>
                                     </NavLink>
+                                    
                                     <NavLink class="nav-link" href="@($"/cambiar-estado-inmueble/{Id}")">
                                         <button class="btn btn-sm btn-primary">
                                             <i class="fas fa-user-check"></i> Cambiar estado de inmueble
@@ -261,6 +264,10 @@
                                         <i class="fas fa-user-check"></i> Editar inmueble
                                     </button>
                                 </NavLink>
+                                <button class="btn btn-sm btn-primary" @onclick="() => EliminarInmueble(Id)">
+                                    <i class="fas fa-user-check"></i> Eliminar inmueble
+                                </button>
+
                             </div>
                         </AuthorizeView>
                     </div>
@@ -414,8 +421,8 @@
         Inmueble inmueble = casoDeUsoObtenerInmueble.Ejecutar(idInmueble);
         //Console.WriteLine($"[DEBUG] Promedio para inmueble {idInmueble}: {inmueble.PromedioCalificacion}");
         return (int)Math.Round(inmueble.PromedioCalificacion);
-}
-private void MostrarIngresos()
+    }
+    private void MostrarIngresos()
     {
         mensajeError = "$" + @CasoDeUsoObtenerIngresosDeInmueble.Ejecutar(Id).ToString();
 
@@ -430,8 +437,18 @@ private void MostrarIngresos()
         return 0;
     }
 
-
+    private void EliminarInmueble(int id)
+    {
+        string mensajeError = string.Empty;
+        if (!CasoDeUsoEliminarInmueble.Ejecutar(Id, out mensajeError)){
+            NavigationManager.NavigateTo($"/?mensaje={mensajeError}&esMensajeDeError=true", true);
+            return;
+        }
+        
+        NavigationManager.NavigateTo("/?mensaje=Inmueble eliminado correctamente");    
+    }
 }
+
 <style>
     .property-rating i {
         font-size: 1rem;

@@ -86,9 +86,9 @@
 
     protected override void OnParametersSet()
     {
-        inmuebles = CasoDeUsoListarInmuebles.ListarDisponibles();
+        inmuebles = CasoDeUsoListarInmuebles.ListarTodos();
         foreach(var inmueble in inmuebles){
-            cantAlquileres.Add(inmueble.Alquileres.Count);
+            cantAlquileres.Add(inmueble!.Alquileres!.Count);
         }
     }
 
