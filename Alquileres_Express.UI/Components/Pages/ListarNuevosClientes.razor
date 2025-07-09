@@ -4,77 +4,112 @@
 @using BlazorDateRangePicker
 @inject CasoDeUsoObtenerTodos CasoDeUsoObtenerTodos
 
-  <div class="container py-4">
 
-    @if (mostrar)
-    {
-        <div class="card mb-4 shadow-sm total-card border-0">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-1">📌 Total de clientes</h5>
-                    <h2 class="fw-bold m-0">@totalClientes()</h2>
+<body>
+    <div class="revenue-dashboard">
+        @if(mostrar){
+            <div class="hero-section">
+                <div class="revenue-summary-card">
+                    <div class="card-background-pattern"></div>
+                    <div class="revenue-content">
+                        <div class="revenue-header">
+                            <div class="revenue-icon-container">
+                                <i class="fas fa-chart-trending-up"></i>
+                            </div>
+                            <div class="revenue-details">
+                                <h2 class="revenue-label">Total del clientes</h2>
+                                <div class="revenue-amount">@totalClientes()</div>
+                            </div>
+                         </div>
+                        <div class="revenue-actions">
+                            <button class="action-button">
+                                <button class="btn btn-outline-secondary" @onclick="Ocultar">
+                                    <i class="fas fa-eye-slash me-1"></i>
+                                        Ocultar detalle
+                                </button>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-
-                <button class="btn btn-outline-secondary" @onclick="Ocultar">
-                    <i class="fas fa-eye-slash me-1"></i>
-                    Ocultar detalle
-                </button>
+            </div>
+        }
+        <div class="control-panel">
+            <div class="filter-controls">
+                <div class="date-filter-wrapper">
+                    <div class="filter-label">
+                        <i class="fas fa-calendar-range"></i>
+                        <span>Seleccionar rango de fechas</span>
+                    </div>
+                    <div class="date-picker-section">
+                        <div class="date-picker-container">
+                            <div class="date-fields">
+                                <div class="date-field">
+                                    <label>Comienzo</label>
+                                    <div class="date-value">@(StartDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
+                                </div>
+                                <div class="date-separator"></div>
+                                    <div class="date-field">
+                                        <label>Fin</label>
+                                        <div class="date-value">@(EndDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
+                                    </div>
+                                <DateRangePicker StartDatePlaceholder="Comienzo" EndDatePlaceholder="Fin"
+                                @bind-StartDate="StartDate" @bind-EndDate="EndDate"
+                                class="hidden-picker"
+                                placeholder="Select dates..." OnRangeSelect="Filtrar" OnCancel="Cancelar"/>
+                            </div>   
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    }
 
-    <div class="card border-0 shadow-sm mx-auto mb-3" style="max-width: 260px;">
-    <div class="card-body p-3">   
-
-        <label class="form-label fw-semibold mb-2">Rango de fechas</label>
-
-      
-        <button class="btn btn-outline-primary btn-sm w-100 range-display"
-                @onclick="() => pickerVisible = true">
-            @if (StartDate is not null && EndDate is not null)
-            {
-                @($"{StartDate:dd/M/yyyy} ⟶ {EndDate:dd/M/yyyy}")
-            }
-            else
-            {
-                <span class="text-muted">Seleccionar rango…</span>
-            }
-        </button>
-
-        <DateRangePicker class="hidden-picker"
-                         style="@(pickerVisible ? "opacity:1;pointer-events:auto;" : string.Empty)"
-                         @bind-StartDate="StartDate"
-                         @bind-EndDate="EndDate"
-                         DaysEnabledFunction="(d) => NoEsHabil(d)"
-                         OnRangeSelect="Filtrar" />
-        </div>
-    </div>  
-
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <table class="table table-hover table-striped align-middle text-center mb-0">
-                <thead class="table-primary">
-                    <tr>
-                        <th style="width: 160px;">Fecha de registro</th>
-                        <th>Nombre completo</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var cliente in clientesFiltrados)
-                    {
+        <div class="data-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-table"></i>
+                    <h3>Registro de nuevos clientes </h3>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
                         <tr>
-                            <td>@cliente.FechaCreacionCuenta.ToString("dd/MM/yyyy")</td>
-                            <td class="text-start">@cliente.Nombre&nbsp;@cliente.Apellido</td>
-                            <td class="text-start">@cliente.Correo</td>
+                            <th class="date-column">
+                                <div class="column-header">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span>Fecha de registro</span>
+                                </div>
+                            </th>
+                            <th class="date-column">
+                                <div class="column-header">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span>Nombre completo</span>
+                                </div>
+                            </th>
+                            <th class="amount-column">
+                                <div class="column-header">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Email</span>
+                                </div>
+                            </th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var cliente in clientesFiltrados)
+                        {
+                            <tr>
+                                <td>@cliente.FechaCreacionCuenta.ToString("dd/MM/yyyy")</td>
+                                <td class="text-start">@cliente.Nombre&nbsp;@cliente.Apellido</td>
+                                <td class="text-start">@cliente.Correo</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
-
+</body>
 
 @code{
     DateTimeOffset? StartDate { get; set; } 
@@ -93,6 +128,7 @@
         clientes = CasoDeUsoObtenerTodos.Ejecutar();
         mostrar = false;
         clientesFiltrados.AddRange(clientes);
+        clientesFiltrados.Sort((x, y) => x.FechaCreacionCuenta.CompareTo(y.FechaCreacionCuenta));
     }
 
     private int totalClientes(){
@@ -123,10 +159,16 @@
         StateHasChanged();
     }
 
-    private bool NoEsHabil(DateTimeOffset date)
+    private void Cancelar()
     {
-        return true;
+        StartDate = null;
+        EndDate = null;
+        clientesFiltrados.Clear();
+        clientesFiltrados.AddRange(clientes);
+        mostrar = false;
+        StateHasChanged();
     }
+
 }
 
 <style>
@@ -155,4 +197,7 @@
         opacity: 0;
         cursor: pointer;
     }
+    body {
+     background-image: linear-gradient(to right, rgb(222, 42, 42) , rgb(151, 37, 19)) !important;   /*esto es para el color del fondo y que no se ponga blanco  */
+}
 </style>
