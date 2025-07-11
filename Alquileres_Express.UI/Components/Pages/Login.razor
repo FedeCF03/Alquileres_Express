@@ -19,7 +19,7 @@
 
         <h3 class="login-title">Iniciar sesión</h3>
 
-        <EditForm Model="@user" OnValidSubmit="IniciarSesionDeUna" FormName="loginForm">
+        <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -66,14 +66,15 @@
     }
     private async Task IniciarSesionDeUna()
     {
-        Usuario? user2 = (Usuario?) casoDeUsoBuscarCliente.Ejecutar(user.Correo, user.Contraseña) ?? (Usuario?) casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
+        Usuario? user2 = (Usuario?)casoDeUsoBuscarCliente.Ejecutar(user.Correo, user.Contraseña) ?? (Usuario?)
+        casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
         if (user2 == null)
         {
             return;
         }
         user.Rol = user2.Rol;
         await guardarEnCookie("jorge");
-        
+
     }
     private async Task IniciarSesion()
     {

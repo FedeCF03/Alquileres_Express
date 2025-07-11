@@ -101,7 +101,7 @@
                 else 
                 {
                     <a class="btn btn-primary btn-sm shadow-sm d-flex align-items-center gap-2" 
-                        href="@($"/ListarLlaves/{alquiler.Id}")">
+                        href="@($"/ListarLlaves/{alquiler.Id}/{alquiler.ClienteId}")">
                         <i class="fas fa-list"></i> Historial de llaves
                     </a>                                
                     if(alquiler.RegistrosDeLlave.Count == 2)
