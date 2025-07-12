@@ -25,28 +25,19 @@
 }
 
 <AuthorizeView Roles="Cliente">
-<Authorized>
-    <div class="page-header">
-        <h1><i class="fas fa-home"></i> Mis Alquileres</h1>
-        <p>Gestiona tus reservas de manera fácil y rápida</p>
-    </div>
-</Authorized>
-<NotAuthorized>
-    
-    <div class="page-header">
-        @if (id != 0)
-        {
+    <Authorized>
+        <div class="page-header">
+            <h1><i class="fas fa-home"></i> Mis Alquileres</h1>
+            <p>Gestiona tus reservas de manera fácil y rápida</p>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        
+        <div class="page-header">
             <h1><i class="fas fa-home"></i> Alquileres de @cliente?.Nombre</h1>
             <p>Gestiona los alquileres del cliente de manera fácil y rápida</p>
-        }
-        else
-        {
-            <h1><i class="fas fa-home"></i> Alquileres</h1>
-            <p>Gestiona los alquileres de todos los clientes</p>
-        }
-        
-    </div>
-</NotAuthorized>
+        </div>
+    </NotAuthorized>
 </AuthorizeView>
 
 <div class="rental-grid">
@@ -238,12 +229,12 @@
             cliente = casoDeUsoBuscarClientePorId.Ejecutar(id);
             if (cliente == null)
             {
-                NavigationManager.NavigateTo("/?mensaje=Cliente no encontrado&EsMensajeError=true");
+                NavigationManager.NavigateTo("/?mensaje=Cliente no encontrado&EsMensajeDeError=true");
                 return; 
             }
             if (rol == "Cliente" && cliente.Correo != correo)
             {
-                NavigationManager.NavigateTo("/?mensaje=No tenes permisos papi&EsMensajeError=true");
+                NavigationManager.NavigateTo("/?mensaje=No tenes permisos papi&EsMensajeDeError=true");
             }
             if (rol == "Gerente" || rol == "Empleado")
             {
