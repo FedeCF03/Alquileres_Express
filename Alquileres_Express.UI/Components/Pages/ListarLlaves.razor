@@ -1,6 +1,7 @@
 @page "/ListarLlaves/{idAlquiler:int}/{idCliente:int}"
 @inject CasoDeUsoListarLlaves CasoDeUsoListarLlaves
 @inject CasoDeUsoBuscarClientePorId CasoDeUsoBuscarClientePorId
+@inject CasoDeUsoBuscarPersonalPorId casoDeUsoBuscarPersonalPorId
 
 @attribute [Authorize(Roles = "Gerente,Empleado")]
 
@@ -21,6 +22,8 @@
                     <thead class="table-light">
                         <tr>
                             <th>Personal ID</th>
+                            <th>Nombre del Personal</th>
+                            <th>Apellido del Personal</th>
                             <th>Correo Cliente</th>
                             <th>Fecha y Hora</th>
                         </tr>
@@ -30,6 +33,8 @@
                         {
                             <tr>
                                 <td>@registro.PersonalId</td>
+                                <td>@personales[registro.PersonalId].Nombre</td>
+                                <td>@personales[registro.PersonalId].Apellido</td>
                                 <td>@cliente?.Correo</td>
                                 <td>@registro.FechayHoraRegistro.ToString("dd/MM/yyyy HH:mm")</td>
                             </tr>
@@ -51,6 +56,8 @@
                     <thead class="table-light">
                         <tr>
                             <th>Personal ID</th>
+                            <th>Nombre del Personal</th>
+                            <th>Apellido del Personal</th>
                             <th>Correo Cliente</th>
                             <th>Fecha y Hora</th>
                         </tr>
@@ -60,6 +67,8 @@
                         {
                             <tr>
                                 <td>@registro.PersonalId</td>
+                                <td>@personales[registro.PersonalId].Nombre</td>
+                                <td>@personales[registro.PersonalId].Apellido</td>
                                 <td>@cliente?.Correo</td>
                                 <td>@registro.FechayHoraRegistro.ToString("dd/MM/yyyy HH:mm")</td>
                             </tr>
@@ -80,15 +89,27 @@
     public int idAlquiler { get; set; }
     [Parameter]
     public int idCliente { get; set; }
-
     private List<RegistroDeLlave>? listaEntrega;
     private List<RegistroDeLlave>? listaDevolucion;
     public Cliente? cliente;
+    public Personal? personal;
+    private Dictionary<int, Personal> personales = new();
 
     protected override void OnParametersSet()
     {
         listaEntrega = CasoDeUsoListarLlaves.Ejecutar(idAlquiler, true);
         listaDevolucion = CasoDeUsoListarLlaves.Ejecutar(idAlquiler, false);
         cliente = CasoDeUsoBuscarClientePorId.Ejecutar(idCliente);
+        var todosIds = listaEntrega.Concat(listaDevolucion)
+                           .Select(r => r.PersonalId)
+                           .Distinct();
+
+        foreach (var id in todosIds)
+        {
+            var p = casoDeUsoBuscarPersonalPorId.Ejecutar(id);
+            if (p != null)
+            personales[id] = p;
+        }
     }
+    
 }

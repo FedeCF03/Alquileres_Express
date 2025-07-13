@@ -7,8 +7,8 @@ public class Alquiler
 {
     public int Id { get; set; }
     public string CorreoCliente { get; set; } //Cambiar por id
-    public int ClienteId { get; set; } 
-    public DateTime FechaDeCreacion { get; set; } 
+    public int ClienteId { get; set; }
+    public DateTime FechaDeCreacion { get; set; }
     public DateTime FechaDeInicio { get; set; }
     public DateTime FechaDeFin { get; set; }
     public decimal Precio { get; set; }
@@ -49,14 +49,18 @@ public class Alquiler
     public EstadoDeAlquiler GetEstadoDeAlquiler()
     {
         DateTime fechaDeHoy = DateTime.Today.AddHours(12);
-        DateTime horaLimite = FechaDeInicio.AddHours(14); 
-        if ((FechaDeInicio <= DateTime.Today  || (FechaDeInicio == DateTime.Today && DateTime.Now.Hour > 14)) && FechaDeFin >= DateTime.Today) //se puede cancelar el mismo día antes de las 3?
+        DateTime horaLimite = FechaDeInicio.AddHours(14);
+        if ((FechaDeInicio <= DateTime.Today || (FechaDeInicio == DateTime.Today && DateTime.Now.Hour > 14)) && FechaDeFin >= DateTime.Today) //se puede cancelar el mismo día antes de las 3?
             return EstadoDeAlquiler.EnProceso;
 
         if (FechaDeInicio > DateTime.Today)
             return EstadoDeAlquiler.Vigente;//Vigente se refiere a que el alquiler está activo y aún no ha comenzado.
-
         return EstadoDeAlquiler.Terminado;
+    }
+
+    public bool TieneDevolucion()
+    {
+        return RegistrosDeLlave?.Count == 2;
     }
 
 }
