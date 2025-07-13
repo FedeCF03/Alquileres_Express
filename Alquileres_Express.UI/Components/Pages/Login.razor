@@ -8,6 +8,7 @@
 @using System.Security.Claims
 @using System.ComponentModel.DataAnnotations
 @inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
+@inject CasoDeUsoBuscarClientePorCorreo casoDeUsoBuscarClientePorCorreo
 @inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
 @inject CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion
 @inject NavigationManager NavigationManager
@@ -33,7 +34,7 @@
                     placeholder="Ingrese su contraseña" />
             </div>
             <div class="login-links">
-                <a href="/forgot-password" class="link-secondary">¿Olvidaste tu contraseña?</a>
+                <a href="/cambiar-contrasena" class="link-secondary">¿Olvidaste tu contraseña?</a>
             </div>
             <button type="submit" class="btn-primary">Ingresar</button>
 
@@ -63,6 +64,18 @@
         await guardarEnCookie("jorge");
 
     }
+    private async Task IniciarSesionDeUna()
+    {
+        Usuario? user2 = (Usuario?)casoDeUsoBuscarCliente.Ejecutar(user.Correo, user.Contraseña) ?? (Usuario?)
+        casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
+        if (user2 == null)
+        {
+            return;
+        }
+        user.Rol = user2.Rol;
+        await guardarEnCookie("jorge");
+
+    }
     private async Task IniciarSesion()
     {
         errores.Clear();
@@ -86,10 +99,10 @@
 
         Cliente? cliente = null;
         Personal? personal = casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
-        if (personal != null)
+        if (personal != null && !personal.Borrado)
         {
             user.Rol = personal.Rol;
-            if (personal.Rol == RolUsuario.Gerente || personal.Rol == RolUsuario.Administrador)
+            if (personal.Rol == RolUsuario.Gerente)
             {
                 String codigo = servicioGenerarCodigo.GenerarCodigoAleatorio();
                 servicioEnviarEmail.EnviarEmail(personal.Correo, "Codigo de autenticacion", "Su codigo de autenticacion es : ", codigo);

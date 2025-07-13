@@ -6,7 +6,8 @@ public class ServicioEnviarEmail
 {
 
 
-    public void EnviarEmail(string email, string subject , string body , string cod)
+    public void EnviarEmail
+    (string email, string subject, string body, string cod)
     {
         MailMessage? mensaje = new();
         try

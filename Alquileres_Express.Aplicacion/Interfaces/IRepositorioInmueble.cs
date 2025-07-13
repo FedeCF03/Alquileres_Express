@@ -19,4 +19,5 @@ public interface IRepositorioInmueble
     public void EditarValoracion(Valoracion valoracion);
     public Task<bool> EliminarValoracion(Valoracion valoracion);
     public void PromedioValoracion(int idInmueble);
+    public bool TieneAlquileresVigentesOPendientes(int idInmueble);
 }

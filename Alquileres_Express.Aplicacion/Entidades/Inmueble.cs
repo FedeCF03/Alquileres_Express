@@ -12,6 +12,7 @@ namespace Alquileres_Express.Aplicacion.Entidades;
         public string? Direccion { get; set; }
         public double CoordLong { get; set; }
         public double CoordLat { get; set; }
+        public bool Borrado { get; set; } = false;
 
         public string? Ciudad { get; set; }
         public decimal Precio { get; set; }
@@ -24,7 +25,7 @@ namespace Alquileres_Express.Aplicacion.Entidades;
         public List<Foto>? Fotos { get; set; } = [];
         public List<Alquiler>? Alquileres { get; set; } = [];
         public List<Comentario>? Comentarios { get; set; } = [];
-        public List<Valoracion>? Valoraciones { get; set; } = new List<Valoracion>();
+        public List<Valoracion>? Valoraciones { get; set; } = [];
         public double PromedioCalificacion { get; set; }
 
         public override bool Equals(object? obj)

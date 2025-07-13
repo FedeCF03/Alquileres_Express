@@ -102,7 +102,7 @@
     {
         mensaje = "¡Gracias! Tu reseña fue guardada.";
         esError = false;
-        await Task.Delay(1200);
+        await Task.Delay(3000);
         await Cerrar();
         navegationManager.NavigateTo($"/alquileres/{ClienteId}", true);
         await OnClose.InvokeAsync(null);

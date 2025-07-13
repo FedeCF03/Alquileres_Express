@@ -30,11 +30,12 @@
     <div class="d-flex align-items-center gap-2">
         <AuthorizeView>
             <Authorized>
-                @if ((personal != null) && !string.Equals(currentRoute, "Herramientas", StringComparison.OrdinalIgnoreCase))    
+                @if ((personal != null) && !string.Equals(currentRoute, "Herramientas",
+                                StringComparison.OrdinalIgnoreCase))
                 {
                     <div class="nav-item px-3">
                         <NavLink class="nav-link d-flex align-items-center gap-2" href="/Herramientas">
-                        <i class="bi bi-tools" style="font-size: 1.2rem;"></i> 🛠️Herramientas
+                            <i class="bi bi-tools" style="font-size: 1.2rem;"></i> 🛠️Herramientas
                         </NavLink>
                     </div>
                 }
@@ -46,7 +47,7 @@
                             <NavLink class="nav-link" href="/Perfil">
                                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span><i
                                     class="fas fa-user"></i>@(cliente?.Nombre ?? "Perfil")
-                                
+
                             </NavLink>
                         </div>
                     }
@@ -82,12 +83,12 @@
                 </div>
             </Authorized>
             <NotAuthorized>
-    
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/registrarse">
-                            <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Registrarse
-                        </NavLink>
-                    </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/registrarse">
+                        <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Registrarse
+                    </NavLink>
+                </div>
             </NotAuthorized>
         </AuthorizeView>
 
@@ -101,14 +102,13 @@
 </div>
 @if (rol == null || rol == "Cliente")
 {
-    <main
-        class="@(currentRoute == "Contactos" ? "main-content-contactos" : "main-content") text-white py-4 px-3">
+    <main class="@(currentRoute == "Contactos" ? "main-content-contactos" : "main-content") text-white py-4 px-3">
         @Body
     </main>
 }
 else
 {
-    <AuthorizeView Roles="Gerente,Administrador,Empleado">
+    <AuthorizeView Roles="Gerente,Empleado">
         <Authorized>
             <main
                 class="@(currentRoute == "Contactos" ? "main-content-contactos" : "main-content red") text-white py-4 px-3">
@@ -116,8 +116,8 @@ else
             </main>
         </Authorized>
     </AuthorizeView>
-}            
-    
+}
+
 
 
 @code {
@@ -140,5 +140,5 @@ else
             personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
         }
     }
-    
+
 }

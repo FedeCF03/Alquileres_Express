@@ -12,7 +12,7 @@
 @inject ServicioFotos ServicioFotos
 @inject ValidadorInmueble ValidadorInmueble
 
-@attribute [Authorize (Roles = "Administrador, Gerente")]
+@attribute [Authorize (Roles = "Gerente")]
 @inject IJSRuntime JS
 
 
@@ -141,7 +141,7 @@
                         <div class="card">
                             <img class="card-img-top" src="@foto.Url" />
                             <div class="card-body text-center">
-                                <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarFoto(foto.Nombre)">Eliminar</button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarFoto(foto)">Eliminar</button>
                             </div>
                         </div>
                     </div>
@@ -150,7 +150,7 @@
         </div>
 
         <div class="text-center mt-4">
-            <button class="btn btn-success btn-lg w-50" @onclick="Cargar">Cargar Inmueble</button>
+            <button class="btn btn-success btn-lg w-50" @onclick="Cargar">Cargar inmueble</button>
         </div>
 
         @foreach (var error in errores)
@@ -226,19 +226,12 @@
     }
 
 
-    private void EliminarFoto(string nombre)
+    private void EliminarFoto(Foto foto)
     {
-        var foto = fotos.FirstOrDefault(f => f.Nombre == nombre);
-        if (foto != null)
-        {
-            fotos.Remove(foto);
-            File.Delete(Path.Combine(ServicioFotos.DevolverPathDelDirectorio(), nombre));
-            StateHasChanged();
-        }
-        if (fotos.Count == 0)
-        {
-            browser = null;
-        }
+
+        fotos.Remove(foto);
+        File.Delete(Path.Combine(ServicioFotos.DevolverPathDelDirectorio(), foto.Nombre));
+        StateHasChanged();
     }
     
     private void GuardarFotos()

@@ -6,53 +6,43 @@
 @inject CasoDeUsoObtenerCantidadDeClientesEntreFechas CasoDeUsoObtenerCantidadDeClientesEntreFechas
 @inject CasoDeUsoObtenerValorDeAlquileresEntreFechas CasoDeUsoObtenerValorDeAlquileresEntreFechas
 
-@attribute [Authorize(Roles = "Administrador,Gerente,Empleado")] 
+@attribute [Authorize(Roles = "Gerente,Empleado")]
 
-    <div class="decorative-elements">
-        <div class="circle"></div>
-        <div class="circle"></div>
-        <div class="circle"></div>
-    </div>
+<div class="decorative-elements">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+</div>
 
-    <div class="container">
-        <h1 class="title">Operaciones Disponibles</h1>
-        <div class="buttons-grid">
-     <!-- 
-            <button class="operation-btn entrega" onclick="registrarEntrega()">                                     
-                <span class="btn-icon">🔑</span>
-                Registrar Entrega de Llaves
-            </button>
-         
-            <button class="operation-btn devolucion" onclick="registrarDevolucion()">
-                <span class="btn-icon">🔄</span>
-                Registrar Devolución de Llaves
-            </button>  -->
-            <a class="operation-btn cliente" href="/registrar-cliente-presencial">
-                <span class="btn-icon">👷‍♂️</span>
-                Agregar cliente
-            </a> 
+<div class="container">
+    <h1 class="title">Operaciones Disponibles</h1>
+    <div class="buttons-grid">
+        <a class="operation-btn cliente" href="/registrar-cliente-presencial">
+            <span class="btn-icon">👷‍♂️</span>
+            Agregar cliente
+        </a>
 
-            <AuthorizeView Roles="Gerente, Administrador">
-                <Authorized>
-                    <a class="operation-btn empleado" href="/agregar-personal">
-                        <span class="btn-icon">👷‍♂️</span>
-                        Agregar empleado
-                    </a>  
+        <AuthorizeView Roles="Gerente">
+            <Authorized>
+                <a class="operation-btn empleado" href="/agregar-personal">
+                    <span class="btn-icon">👷‍♂️</span>
+                    Agregar empleado
+                </a>
 
-                 <a class="operation-btn historial" href = "/cargar-inmueble">
+                <a class="operation-btn historial" href="/cargar-inmueble">
                     <span class="btn-icon">📋</span>
                     Cargar inmueble
                 </a>
 
-                <button class="operation-btn ingresos" @onclick="MostrarIngresos">
-                    <span class="btn-icon">📈</span>
-                        Ingresos totales
-                    </button>
+                <a class="operation-btn listar" href = "/cantidadDeAlquileres">
+                  <span class="btn-icon">👥</span>
+                    Cantidad de alquileres
+                </a>
 
-                <button class="operation-btn clientes" @onclick="MostrarClientes">
-                    <span class="btn-icon">🔄</span>
-                        Nuevos clientes
-                </button>
+                <a class="operation-btn listar" href = "/listadoClientesNuevos">
+                  <span class="btn-icon">👥</span>
+                    Nuevos clientes
+                </a>
                 </Authorized>  
             </AuthorizeView>
 <!-- 
@@ -62,65 +52,19 @@
             </button>
 
             
-                                                                                -->     <!--                 LOS METODOS COMENTADOS SON PARA LA 2DA EMT O NO LOS TENEMOS IMPLEMENTADOS TODAVIA       -->
-            <a class="operation-btn listar" href = "/listadoUsuario">
-                  <span class="btn-icon">👥</span>
-                Listar usuarios
-            </a>
+                                                                                -->
+        <!--                 LOS METODOS COMENTADOS SON PARA LA 2DA EMT O NO LOS TENEMOS IMPLEMENTADOS TODAVIA       -->
+        <a class="operation-btn listar" href="/listadoUsuario">
+            <span class="btn-icon">👥</span>
+            Listar usuarios
+        </a>
 
-            <a class="operation-btn historial" href = "/InmueblesNoDisponibles">
-                    <span class="btn-icon">🔑</span>
-                    Inmuebles no disponibles
-                </a>
-        </div>
+        <a class="operation-btn historial" href="/InmueblesNoDisponibles">
+            <span class="btn-icon">🔑</span>
+            Inmuebles no disponibles
+        </a>
     </div>
-
-   @if(mostrarTarjeta){
-    <div class="mini-container">
-        <h4>📌 Elija una fecha inicial y una fecha limite</h4>
-        <div class="date-picker-section">
-            <div class="date-picker-container">
-                <div class="date-fields">
-                    <div class="date-field">
-                        <label>fecha inicio</label>
-                    <div class="date-value">@(StartDate?.ToString("dd/M/yyyy") ?? "Seleccionar")
-                </div>
-            </div>
-            <div class="date-separator"></div>
-                <div class="date-field">
-                    <label>fecha limite</label>
-                    <div class="date-value">@(EndDate?.ToString("dd/M/yyyy") ?? "Seleccionar")</div>
-                </div>
-            </div>
-                <DateRangePicker StartDatePlaceholder="CHECK-IN" EndDatePlaceholder="CHECK-OUT"
-                @bind-StartDate="StartDate" @bind-EndDate="EndDate"
-                DaysEnabledFunction="(d) => true" class="hidden-picker"
-                placeholder="Select dates..." OnRangeSelect="VerificarFechas" />
-            </div>
-                @if (!string.IsNullOrEmpty(mensajeError)){
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-triangle"></i>
-                            @mensajeError
-                    </div>
-                }
-        </div>
-       @if (esParaClientes && StartDate != null && EndDate != null)
-        {
-            <div class="price-breakdown">
-                <div class="breakdown-total">
-                    <span>Clientes que se registraron en esas fechas: @cantidadClientes().ToString()</span>
-                </div>
-            </div>
-        }
-        else if (esParaInmuebles && StartDate != null && EndDate != null)
-        {
-            <div class="price-breakdown">
-                <div class="breakdown-total">
-                    <span>Total $@totalAlquileres().ToString()</span>
-                </div>
-            </div>
-        }
-    }
+</div>
 
     <script>
         // Funciones para cada operación
@@ -130,84 +74,89 @@
             console.log('Ejecutando: Registrar Entrega de Llaves');
         }
 
-        function registrarDevolucion() {
-            // Lógica para registrar devolución de llaves
-            alert('Función: Registrar Devolución de Llaves');
-            console.log('Ejecutando: Registrar Devolución de Llaves');
-        }
+            function registrarDevolucion() {
+                // Lógica para registrar devolución de llaves
+                alert('Función: Registrar Devolución de Llaves');
+                console.log('Ejecutando: Registrar Devolución de Llaves');
+            }
 
-        function registrarEmpleado() {
-            // Lógica para registrar empleado
-            alert('Función: Registrar Empleado');
-            console.log('Ejecutando: Registrar Empleado');
-        }
+            function registrarEmpleado() {
+                // Lógica para registrar empleado
+                alert('Función: Registrar Empleado');
+                console.log('Ejecutando: Registrar Empleado');
+            }
 
-        function verHistorial() {
-            // Lógica para ver historial de llaves
-            alert('Función: Ver Historial de Llaves');
-            console.log('Ejecutando: Ver Historial de Llaves');
-        }
+            function verHistorial() {
+                // Lógica para ver historial de llaves
+                alert('Función: Ver Historial de Llaves');
+                console.log('Ejecutando: Ver Historial de Llaves');
+            }
 
-        function listarUsuarios() {
-            // Lógica para listar usuarios
-            alert('Función: Listar Usuarios');
-            console.log('Ejecutando: Listar Usuarios');
-        }
+            function listarUsuarios() {
+                // Lógica para listar usuarios
+                alert('Función: Listar Usuarios');
+                console.log('Ejecutando: Listar Usuarios');
+            }
 
-        // Efecto de entrada para los botones
-        document.addEventListener('DOMContentLoaded', function() {
-            const buttons = document.querySelectorAll('.operation-btn');
-            buttons.forEach((button, index) => {
-    using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
-#line default
-#line hidden
-#nullable restore
-#line (8, 12) - (8, 65) "C:\Users\Mar\Desktop\Alquileres_Express\Alquileres_Express.UI\Components\Pages\HerramientasEmpleados.razor"
+            // Efecto de entrada para los botones
+            document.addEventListener('DOMContentLoaded', function () {
+                const buttons = document.querySelectorAll('.operation-btn');
+                buttons.forEach((button, index) => {
+                    using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
+                    #line default
+                    #line hidden
+                    #nullable restore
+                    #line(8, 12) - (8, 65) "C:\Users\Mar\Desktop\Alquileres_Express\Alquileres_Express.UI\Components\Pages\HerramientasEmpleados.razor"
         </script>
-</div>
-    @code {
-        
-    private bool mostrarTarjeta { get; set; } = false;   // Cambiá esto a false para ocultarla
+
+@code {
+
+    private bool mostrarTarjeta { get; set; } = false; // Cambiá esto a false para ocultarla
     private bool esParaInmuebles { get; set; } = false;
     private bool esParaClientes { get; set; } = false;
 
 
-       void MostrarIngresos() {
-            if(!esParaInmuebles){
-                esParaClientes = false;
-                esParaInmuebles = true;
-                mostrarTarjeta = true;
-                StateHasChanged();
-            }
-            else{
-                esParaInmuebles = false;
-                mostrarTarjeta = false;
-                StateHasChanged();
-            }
+    void MostrarIngresos()
+    {
+        if (!esParaInmuebles)
+        {
+            esParaClientes = false;
+            esParaInmuebles = true;
+            mostrarTarjeta = true;
+            StateHasChanged();
         }
-
-        void MostrarClientes(){
-            if(!esParaClientes ){
-                esParaInmuebles = false;
-                esParaClientes = true;
-                mostrarTarjeta = true;
-                StateHasChanged();
-            }
-            else{
-                esParaInmuebles = false;
-                mostrarTarjeta = false;
-                StateHasChanged();
-            }
+        else
+        {
+            esParaInmuebles = false;
+            mostrarTarjeta = false;
+            StateHasChanged();
         }
+    }
 
-   
+    void MostrarClientes()
+    {
+        if (!esParaClientes)
+        {
+            esParaInmuebles = false;
+            esParaClientes = true;
+            mostrarTarjeta = true;
+            StateHasChanged();
+        }
+        else
+        {
+            esParaInmuebles = false;
+            mostrarTarjeta = false;
+            StateHasChanged();
+        }
+    }
 
     private string mensajeError = string.Empty;
 
-    DateTimeOffset? StartDate { get; set; } 
-    DateTimeOffset? EndDate { get; set; } 
+    DateTimeOffset? StartDate { get; set; }
+    DateTimeOffset? EndDate { get; set; }
 
-     private decimal totalAlquileres(){
+    private decimal totalAlquileres()
+    {
         decimal total = 0;
         DateTime fecha1 = StartDate?.UtcDateTime ?? DateTime.MinValue;
         DateTime fecha2 = EndDate?.UtcDateTime ?? DateTime.MinValue;
@@ -215,15 +164,16 @@
         return total;
     }
 
-     private int cantidadClientes(){
+    private int cantidadClientes()
+    {
         int num = 0;
         DateTime fecha1 = StartDate?.UtcDateTime ?? DateTime.MinValue;
         DateTime fecha2 = EndDate?.UtcDateTime ?? DateTime.MinValue;
         num = CasoDeUsoObtenerCantidadDeClientesEntreFechas.Ejecutar(fecha1, fecha2);
         return num;
-     }
+    }
 
-      private void VerificarFechas()
+    private void VerificarFechas()
     {
         if (StartDate == null || EndDate == null)
         {
@@ -237,7 +187,7 @@
         }
         mensajeError = string.Empty;
     }
-}
+
 }
 
 <style>

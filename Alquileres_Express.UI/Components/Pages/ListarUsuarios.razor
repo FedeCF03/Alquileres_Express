@@ -1,16 +1,23 @@
 @page "/listadoUsuario"
-@rendermode InteractiveServer
 @inject CasoDeUsoListarUsuarios casoDeUsoListarUsuarios
 @inject CasoDeUsoListarRestringido casoDeUsoListarRestringido
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@attribute [Authorize(Roles = "Administrador,Gerente,Empleado")]
-@page "/search"
+@attribute [Authorize(Roles = "Gerente,Empleado")]
+@using Microsoft.AspNetCore.WebUtilities
+
 @inject CasoDeUsoPersonalDescenderGerente casoDeUsoBuscarPersonalDescenderGerente
 
 @inject CasoDeUsoAscenderAGerente casoDeUsoBuscarPersonalAscenderAGerente
 @inject CasoDeUsoEliminarPersonal casoDeUsoEliminarPersonal
+@rendermode InteractiveServer
 
+@if (!String.IsNullOrEmpty(Mensaje))
+{
+        <div class="toast-message">
+            @Mensaje
+        </div>   
+}
 <div class="search-container">
     <input type="text" @bind="searchTerm" @onkeypress="OnKeyPress" placeholder="Buscar..." class="search-input" />
     <button @onclick="PerformSearch" class="search-button">Buscar</button>
@@ -46,6 +53,10 @@
                 <tbody>
                     @foreach (var usuario in _listaBusqueda)
                     {
+                        if (usuario.Borrado)
+                        {
+                            continue;
+                        }
                         <tr>
                             <td>@usuario.Nombre</td>
                             <td>@usuario.Apellido</td>
@@ -55,8 +66,7 @@
                                 <span class="badge @(GetBadgeClass(usuario.Rol))">@usuario.Rol</span>
                             </td>
                             <td>
-                                @if (usuario.Rol == RolUsuario.Empleado || usuario.Rol == RolUsuario.Gerente || usuario.Rol ==
-                                                        RolUsuario.Administrador)
+                                @if (usuario.Rol == RolUsuario.Empleado || usuario.Rol == RolUsuario.Gerente)
                                 {
                                     <span class="fw-bold text-success">@usuario.Id</span>
                                 }
@@ -83,7 +93,7 @@
                                                 <i class="fas fa-eye"></i> Descender a Empleado
                                             </button>
                                         }
-                                        @if (usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado)
+                                        @if ((usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado))
                                         {
                                             <button class="btn btn-sm btn-outline-primary" @onclick="() => DarDeBaja(usuario.Id)">
                                                 <i class="fas fa-eye"></i> Dar de baja
@@ -99,7 +109,6 @@
                                     </Authorized>
                                 </AuthorizeView>
                             </td>
-
                         </tr>
                     }
                 </tbody>
@@ -108,7 +117,56 @@
     </div>
 </div>
 
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <h2 class="text-center text-primary">📋 Listado de Usuarios eliminados</h2>
+        <table class="table table-striped table-hover text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>NOMBRE</th>
+                        <th>APELLIDO</th>
+                        <th>CORREO</th>
+                        <th>FECHA DE NACIMIENTO</th>
+                        <th>ROL</th>
+                        <th>NÚMERO DE PERSONAL</th>
+                        <th>ACCIÓN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var usuario in _listaBusqueda)
+                {
+                    if (usuario.Borrado)
+                    {
+                        <tr>
+                            <td>@usuario.Nombre</td>
+                            <td>@usuario.Apellido</td>
+                            <td>@usuario.Correo</td>
+                            <td>@usuario.FechaNacimiento.ToShortDateString()</td>
+                            <td>
+                                <span class="badge @(GetBadgeClass(usuario.Rol))">@usuario.Rol</span>
+                            </td>
+                            <td>
+                                 <span class="fw-bold text-success">@usuario.Id</span>
+                            </td>
+                            <td>
+                                <NavLink class="nav-link"
+                                    href="@($"/verUsuario/?{(usuario.Rol == RolUsuario.Cliente ? "clienteid" : "personalid")}={usuario.Id}")">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> Ver usuario
+                                    </button>
+                                </NavLink>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+          </table>
+    </div>
+</div>
+
 @code {
+    [SupplyParameterFromQuery]
+    private string? Mensaje { get; set; } 
     List<Usuario> _lista = new List<Usuario>();
     List<Usuario> _listaBusqueda = new List<Usuario>();
 
@@ -121,7 +179,8 @@
         {
             _listaBusqueda = _lista
             .Where(item => item.Nombre.Contains(searchTerm,
-            StringComparison.OrdinalIgnoreCase)).ToList();
+            StringComparison.OrdinalIgnoreCase) || item.Apellido.Contains(searchTerm,
+            StringComparison.OrdinalIgnoreCase) || searchTerm.All(c => item.Nombre.Contains(c, StringComparison.OrdinalIgnoreCase))).ToList();
         }
         else
         {
@@ -145,7 +204,7 @@
 
         if (user.Identity is not null && user.Identity.IsAuthenticated)
         {
-            if (user.IsInRole("Administrador") || user.IsInRole("Gerente"))
+            if (user.IsInRole("Gerente"))
             {
                 _lista = casoDeUsoListarUsuarios.Ejecutar();
             }
@@ -171,7 +230,6 @@
     {
         return rol switch
         {
-            RolUsuario.Administrador => "bg-danger",
             RolUsuario.Gerente => "bg-warning text-dark",
             RolUsuario.Empleado => "bg-info text-dark",
             _ => "bg-secondary"
@@ -181,17 +239,17 @@
     void DescenderGerente(int id)
     {
         casoDeUsoBuscarPersonalDescenderGerente.Ejecutar(id);
-        NavigationManager.NavigateTo("/listadoUsuario", true);
+        NavigationManager.NavigateTo("/listadoUsuario?mensaje=Operacion exitosa", true);
     }
     void DarDeBaja(int id)
     {
         casoDeUsoEliminarPersonal.Ejecutar(id);
-        NavigationManager.NavigateTo("/listadoUsuario", true);
+        NavigationManager.NavigateTo("/listadoUsuario?mensaje=Baja exitosa", true);
     }
     void AscenderAGerente(int id)
     {
         casoDeUsoBuscarPersonalAscenderAGerente.Ejecutar(id);
-        NavigationManager.NavigateTo("/listadoUsuario", true);
+        NavigationManager.NavigateTo("/listadoUsuario?mensaje=Ascenso exitoso", true);
     }
 
 }

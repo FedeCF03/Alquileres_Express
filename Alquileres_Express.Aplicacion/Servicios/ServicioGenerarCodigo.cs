@@ -1,6 +1,6 @@
 namespace Alquileres_Express.Aplicacion.Servicios;
 
-public  class ServicioGenerarCodigo
+public class ServicioGenerarCodigo
 {
     public string GenerarCodigoAleatorio()
     {

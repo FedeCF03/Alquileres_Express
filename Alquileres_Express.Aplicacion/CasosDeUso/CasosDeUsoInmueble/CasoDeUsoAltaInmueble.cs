@@ -14,7 +14,7 @@ public class CasoDeUsoAltaInmueble(ValidadorInmueble validador, IRepositorioInmu
         if (rolUsuario != RolUsuario.Gerente)
         {
             errores = [];
-            errores.Add("Solo los administradores o gerentes pueden agregar inmuebles.");
+            errores.Add("Solo los gerentes pueden agregar inmuebles.");
             return -1;
         }
         errores = Validador.Ejecutar(inmueble);

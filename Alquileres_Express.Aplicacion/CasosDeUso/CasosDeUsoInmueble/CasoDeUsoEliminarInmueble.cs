@@ -12,7 +12,13 @@ public class CasoDeUsoEliminarInmueble(IRepositorioInmueble repositorio, Servici
         mensajeErrror = string.Empty;
         try
         {
-            servicioFotos.EliminarFotosDelDirectorio(repositorio.ObtenerInmueblePorId(inmuebleId).Fotos);
+            Inmueble inmueble = repositorio.ObtenerInmueblePorId(inmuebleId);
+            if (repositorio.TieneAlquileresVigentesOPendientes(inmuebleId))
+            {
+                mensajeErrror = "No se puede eliminar el inmueble porque tiene alquileres asociados.";
+                return false;
+            }
+            servicioFotos.EliminarFotosDelDirectorio(inmueble.Fotos);
             repositorio.EliminarInmueble(inmuebleId);
             return true;
 

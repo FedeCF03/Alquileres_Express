@@ -1,6 +1,8 @@
-@page "/ListarLlaves/{idAlquiler:int}"
+@page "/ListarLlaves/{idAlquiler:int}/{idCliente:int}"
 @inject CasoDeUsoListarLlaves CasoDeUsoListarLlaves
 @inject CasoDeUsoBuscarClientePorId CasoDeUsoBuscarClientePorId
+
+@attribute [Authorize(Roles = "Gerente,Empleado")]
 
 <div class="container mt-4">
     <div class="card shadow p-4">
@@ -76,6 +78,8 @@
 @code {
     [Parameter]
     public int idAlquiler { get; set; }
+    [Parameter]
+    public int idCliente { get; set; }
 
     private List<RegistroDeLlave>? listaEntrega;
     private List<RegistroDeLlave>? listaDevolucion;
@@ -85,6 +89,6 @@
     {
         listaEntrega = CasoDeUsoListarLlaves.Ejecutar(idAlquiler, true);
         listaDevolucion = CasoDeUsoListarLlaves.Ejecutar(idAlquiler, false);
-        cliente = CasoDeUsoBuscarClientePorId.Ejecutar(idAlquiler);
+        cliente = CasoDeUsoBuscarClientePorId.Ejecutar(idCliente);
     }
 }

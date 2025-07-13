@@ -36,7 +36,7 @@ public class Crear
                 ,
             });
 
-            Inmueble inmueble = new Inmueble
+            Inmueble inmueble = new()
             {
                 Nombre = "Casa en la playa",
                 Direccion = "Avenida del Mar 123",
@@ -47,9 +47,10 @@ public class Crear
                 Ciudad = "Mar del Plata",
                 Precio = 800,
                 CantidadDeCamas = 2,
-                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda
+                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda,
+                PromedioCalificacion = 3.5,
             };
-            Inmueble inmueble2 = new Inmueble
+            Inmueble inmueble2 = new ()
             {
                 Nombre = "Casa en la ciudad",
                 Direccion = "Avenida 9 de Julio",
@@ -60,7 +61,8 @@ public class Crear
                 Ciudad = "Buenos Aires",
                 Precio = 1200,
                 CantidadDeCamas = 2,
-                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda
+                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda,
+                PromedioCalificacion = 4.0,
             };
             context.Add(inmueble);
             context.SaveChanges();
@@ -94,6 +96,7 @@ public class Crear
                 Dni = "22222222",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Real 456",
+                FechaCreacionCuenta = new DateTime(2014,3,19),
                 FechaNacimiento = new DateTime(1995, 5, 15),
                 Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
             };
@@ -106,6 +109,7 @@ public class Crear
                 Dni = "22222211",
                 Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
                 Direccion = "Calle Real 456",
+                FechaCreacionCuenta = new DateTime(2023,6,16),
                 FechaNacimiento = new DateTime(1995, 5, 15),
                 Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
             };
@@ -116,6 +120,7 @@ public class Crear
             {
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
+                FechaDeCreacion = new DateTime(2014,9,12),
                 FechaDeInicio = DateTime.Today.AddDays(-10),
                 FechaDeFin = DateTime.Today.AddDays(-5),
                 Precio = 5000,
@@ -127,6 +132,7 @@ public class Crear
             {
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
+                FechaDeCreacion = new DateTime(2015,1,1),
                 FechaDeInicio = DateTime.Today.AddDays(-20),
                 FechaDeFin = DateTime.Today.AddDays(-15),
                 Precio = 6500,
@@ -138,6 +144,7 @@ public class Crear
             {
                 ClienteId = cliente2.Id,
                 CorreoCliente = cliente2.Correo,
+                FechaDeCreacion = new DateTime(2013,8,1),
                 FechaDeInicio = DateTime.Today.AddDays(-30),
                 FechaDeFin = DateTime.Today.AddDays(-25),
                 Precio = 6500,
@@ -148,6 +155,7 @@ public class Crear
             {
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
+                FechaDeCreacion = new DateTime(2010,3,3),
                 FechaDeInicio = DateTime.Today.AddDays(-10),
                 FechaDeFin = DateTime.Today.AddDays(-5),
                 Precio = 5000,
