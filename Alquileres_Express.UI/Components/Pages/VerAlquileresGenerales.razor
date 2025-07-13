@@ -16,6 +16,8 @@
 @inject CasoDeUsoCalificarInmueble casoDeUsoCalificarInmueble
 @inject CasoDeUsoObtenerTodosLosAlquileres casoDeUsoObtenerTodosLosAlquileres
 
+
+
 @rendermode InteractiveServer
 
 @if (!string.IsNullOrEmpty(mensajeLlave))
@@ -24,23 +26,85 @@
         @mensajeLlave
     </div>
 }
-
-<div class="page-header">
-    <h1><i class="fas fa-home"></i> Mis Alquileres</h1>
-    <p>Gestiona tus reservas de manera fácil y rápida</p>
-</div>
-
     
 <div class="page-header">
     <h1><i class="fas fa-home"></i> Alquileres</h1>
     <p>Gestiona los alquileres de todos los clientes</p> 
 </div>
 
+<!-- Barra de búsqueda y filtros -->
+<div class="search-container">
+    <div class="search-header">
+        <h2><i class="fas fa-search"></i> Buscar y Filtrar Alquileres</h2>
+        <p>Encuentra los alquileres que necesitas con nuestros filtros avanzados</p>
+    </div>
+    
+    <div class="search-content">
+        <!-- Barra de búsqueda principal -->
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" class="search-input" placeholder="Buscar por nombre de inmueble o cliente..." 
+                @bind="filtroTexto" @oninput="AplicarFiltrosBusqueda" />
+        </div>
+
+        <!-- Filtros rápidos -->
+      <div class="quick-filters"></div>
+        <button class="quick-filter @(filtroRapido == "todos" ? "active" : "")"
+            @onclick="@(() => AplicarFiltroRapido("todos"))">Todos</button>
+        <button class="quick-filter @(filtroRapido == "hoy" ? "active" : "")"
+            @onclick="@(() => AplicarFiltroRapido("hoy"))">Hoy</button>
+        <button class="quick-filter @(filtroRapido == "semana" ? "active" : "")"
+            @onclick="@(() => AplicarFiltroRapido("semana"))">Esta Semana</button>
+        </div>
+
+        <!-- Filtros avanzados -->
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label class="filter-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    Rango de Fechas
+                </label>
+                <div class="date-range">
+                    <input type="date" @bind="FechaInicio" class="filter-input" />
+                    <input type="date" @bind="FechaFin" class="filter-input"  />
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">
+                    <i class="fas fa-sort-amount-down"></i>
+                    Ordenar por
+                </label>
+            <select class="filter-select" @bind="ordenSeleccionado">
+                    <option value="fecha-desc">Fecha más reciente</option>
+                    <option value="fecha-asc">Fecha más antigua</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Barra de acciones -->
+        <div class="actions-bar">
+            <div class="results-info">
+                <i class="fas fa-info-circle"></i>
+                <span>Mostrando @alquileresAux.Count de @alquileres.Count alquileres</span>
+            </div>
+            
+            <div class="filter-actions">
+                <button class="btn btn-secondary" @onclick="LimpiarFiltros">
+                    <i class="fas fa-eraser"></i> "Limpiar Filtros" 
+                </button>
+            <button class="btn btn-primary" @onclick="AplicarFiltros">
+                    <i class="fas fa-filter"></i> "Aplicar Filtros"
+                </button>
+            </div>
+        </div>
+    </div>
+
 
 <div class="rental-grid">
-    @if (alquileres != null && alquileres.Count > 0)
+@if (alquileresAux != null && alquileresAux.Count > 0)
     {
-        @foreach (var alquiler in alquileres)
+    @foreach (var alquiler in alquileresAux)
         {
             var inmueble = GetInmuebleById(alquiler.InmuebleId);
             @if (inmueble != null)
@@ -189,10 +253,17 @@
     private string correo = "";
     private string rol = "";
     private List<Alquiler>? alquileres = new ();
+    private List<Alquiler>? alquileresAux = new();
+    private string filtroRapido = "hoy";
     private List<Inmueble> inmuebles = new();
     private string mensajeLlave = string.Empty;
+    private string filtroTexto = string.Empty;
+    private string ordenSeleccionado = "fecha-desc";
     private int alquilerSeleccionadoId = 0; 
-    
+
+    DateTime FechaInicio { get; set; } 
+    DateTime FechaFin { get; set; } 
+
     [Parameter]
     public int id { get; set; } = 0;
     Personal? personal;
@@ -226,6 +297,8 @@
                 getInmuebles();
             }
         }
+        alquileresAux.AddRange(alquileres);
+        filtrarEntreFechas(DateTime.Now, DateTime.Now);
         Console.WriteLine("");
     }
     private void getInmuebles()
@@ -250,6 +323,64 @@
     {
         return inmuebles!.FirstOrDefault(i => i.Id == inmuebleId)!;
     }
+
+      private void LimpiarFiltros()
+    {
+        alquileresAux.Clear();
+        foreach (var alquiler in alquileres)
+        {
+           alquileresAux.Add(alquiler);
+        }
+        StateHasChanged();
+    }
+
+    private void AplicarFiltros()
+    {   
+        
+    }
+
+
+    private void AplicarFiltroRapido(string filtro)
+    {
+        switch (filtro)
+        {
+            case "todos":
+                alquileresAux.Clear();
+                alquileresAux.AddRange(alquileres);
+                break;
+            case "hoy":
+                alquileresAux.Clear();
+                foreach
+                filtrarEntreFechas(DateTime.Now, DateTime.Now);
+                break;
+            case "semana":
+                int diferencia = (7 + (DateTime.Now.DayOfWeek - DayOfWeek.Monday)) % 7;
+                var fechaInicioSemana = DateTime.Now.AddDays(-diferencia).Date;
+                var fechaFinSemana = fechaInicioSemana.AddDays(6);
+                filtrarEntreFechas(fechaInicioSemana, fechaFinSemana);
+                break;
+            default:
+                alquileresAux.Clear();
+                alquileresAux.AddRange(alquileres);
+                break;
+        }        
+        StateHasChanged();
+    }
+
+    private void AplicarFiltrosBusqueda(){
+
+        if (string.IsNullOrEmpty(filtroTexto))
+        {
+            alquileresAux.Clear();
+            alquileresAux.AddRange(alquileres);
+        }
+        else
+        {
+            alquileresAux.Clear();
+
+        }
+        StateHasChanged();
+    }
     private void CancelarReserva(int Alquilerid)
     {
         casoDeUsoAlquilerCancelarAlquiler.Ejecutar(Alquilerid);
@@ -268,4 +399,11 @@
 
         NavigationManager.NavigateTo($"/alquileres-totales", true);
     }
+    private void filtrarEntreFechas( DateTime fechaInicio, DateTime fechaFin){
+       alquileresAux.Clear();
+       alquileresAux = alquileresAux.Where(f => f.FechaDeInicio.Date == fechaInicio.Date || f.FechaDeFin.Date == fechaInicio.Date)
+            .ToList();
+
+    }
+
 }
