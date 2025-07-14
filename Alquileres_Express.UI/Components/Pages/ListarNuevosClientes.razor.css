@@ -480,4 +480,27 @@
                 padding: 0.5rem;
                 font-size: 0.8rem;
             }
+
+            .mensajeA {
+                text-align: center;
+                padding: 40px 20px;
+                background-color: #f8f9fa;
+                border: 1px dashed #ced4da;
+                border-radius: 12px;
+                margin-top: 30px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
+
+            .mensajeA i {
+                font-size: 2.5rem;
+                color: #6c757d;
+                margin-bottom: 10px;
+                display: block;
+            }
+
+            .mensajeA h3 {
+                font-size: 1.25rem;
+                color: #495057;
+                margin-top: 10px;
         }
+    }
