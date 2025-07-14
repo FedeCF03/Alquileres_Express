@@ -152,7 +152,7 @@
         alquileres.Where(a => !a.Cancelado &&
         !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado) && a.Pagado).ToList().ForEach(alquiler =>
         {
-            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin.AddDays(-1)));
+            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio.AddDays(+1), alquiler.FechaDeFin.AddDays(-1)));
         });
     }
     private bool NoEsHabil(DateTimeOffset date)

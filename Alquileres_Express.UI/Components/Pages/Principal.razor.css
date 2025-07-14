@@ -84,7 +84,7 @@
     font-weight: 600;
     z-index: 1;
     opacity: 0;
-    animation: fadeInOut 4s forwards;
+    animation: fadeInOut 10s forwards;
 }
 .red{
     background-color: #dc3545; /* Rojo de error */

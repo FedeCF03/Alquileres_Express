@@ -1,4 +1,4 @@
- @page "/cambiar-contrasena"
+@page "/cambiar-contrasena"
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Components.Authorization
@@ -65,8 +65,7 @@
             Console.WriteLine($"Codigo de verificacion: {user.Codigo}");
             errores.Add(servicioCambiarContrasena.Añadir(user));
             // Enviar el código de verificación al correo electrónico del usuario
-            //servicioEnviarEmail.EnviarEmail("fedecalta03@gmail.com", "Cambio de contraseña", "Codigo de verificacion : ",
-            // user.CodigoVerificacion.ToString());
+            servicioEnviarEmail.EnviarEmail("fedecalta03@gmail.com", "Cambio de contraseña", "Codigo de verificacion : ",user.Codigo.ToString());
             NavigationManager.NavigateTo("/verificar-codigo-cambio-contrasena",
             true);
         }
@@ -82,16 +81,6 @@
         }
     }
 
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        if (user.Identity!.IsAuthenticated)
-        {
-            NavigationManager.NavigateTo("/");
-        }
-    }
 
 
 }
