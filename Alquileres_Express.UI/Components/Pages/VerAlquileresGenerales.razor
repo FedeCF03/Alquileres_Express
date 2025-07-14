@@ -65,8 +65,8 @@
                     Rango de Fechas
                 </label>
                 <div class="date-range">
-                    <input type="date" @bind="FechaInicio" class="filter-input" />
-                    <input type="date" @bind="FechaFin" class="filter-input"  />
+                <input type="date" @bind="FechaInicio" @oninput="AplicarFiltros" class="filter-input" />
+                    <input type="date" @bind="FechaFin" @oninput="AplicarFiltros" class="filter-input"  />
                 </div>
             </div>
 
@@ -75,7 +75,7 @@
                     <i class="fas fa-sort-amount-down"></i>
                     Ordenar por
                 </label>
-            <select class="filter-select" @bind="ordenSeleccionado">
+            <select class="filter-select" @bind="ordenSeleccionado" @oninput="AplicarFiltros">
                     <option value="fecha-desc">Fecha más reciente</option>
                     <option value="fecha-asc">Fecha más antigua</option>
                 </select>
@@ -93,10 +93,7 @@
                 <button class="btn btn-secondary" @onclick="LimpiarFiltros">
                     <i class="fas fa-eraser"></i> "Limpiar Filtros" 
                 </button>
-            <button class="btn btn-primary" @onclick="AplicarFiltros">
-                    <i class="fas fa-filter"></i> "Aplicar Filtros"
-                </button>
-            </div>
+            </div>      
         </div>
     </div>
 
@@ -203,8 +200,7 @@
                 {
                     <AuthorizeView Roles="Cliente">
                         <Authorized>
-          </Authorized>
-
+                            </Authorized>
                                 </AuthorizeView>
                                 <span class="status-label terminado">
                                         <i class="fas fa-check"></i> Terminado
@@ -261,8 +257,8 @@
     private string ordenSeleccionado = "fecha-desc";
     private int alquilerSeleccionadoId = 0; 
 
-    DateTime FechaInicio { get; set; } 
-    DateTime FechaFin { get; set; } 
+    DateTime FechaInicio { get; set; } = DateTime.Now;
+    DateTime FechaFin { get; set; } = DateTime.Now;
 
     [Parameter]
     public int id { get; set; } = 0;
@@ -324,19 +320,40 @@
         return inmuebles!.FirstOrDefault(i => i.Id == inmuebleId)!;
     }
 
-      private void LimpiarFiltros()
+    private void LimpiarFiltros()
     {
         alquileresAux.Clear();
         foreach (var alquiler in alquileres)
         {
-           alquileresAux.Add(alquiler);
+            alquileresAux.Add(alquiler);
         }
         StateHasChanged();
     }
 
-    private void AplicarFiltros()
+    private void AplicarFiltros(ChangeEventArgs e)
     {   
-        
+        if (FechaInicio > FechaFin)
+        {
+            // Mostrar mensaje de error o manejar el caso según sea necesario
+            Console.WriteLine("La fecha de inicio no puede ser mayor que la fecha de fin.");
+            return;
+        }else
+        {
+            alquileresAux.Clear();
+            alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date >= FechaInicio.Date &&
+            f.FechaDeInicio.Date <= FechaFin.Date || f.FechaDeFin.Date >= FechaInicio.Date &&
+            f.FechaDeFin.Date <= FechaFin.Date).ToList();
+            filtroRapido = "";
+        }
+
+        if(ordenSeleccionado =="fecha-desc")
+        {
+            alquileresAux.Sort((a, b) => a.FechaDeInicio.CompareTo(b.FechaDeInicio));
+        }
+        else
+        {
+            alquileresAux.Sort((a, b) => b.FechaDeInicio.CompareTo(a.FechaDeInicio)); 
+        }
     }
 
 
@@ -347,17 +364,25 @@
             case "todos":
                 alquileresAux.Clear();
                 alquileresAux.AddRange(alquileres);
+                filtroRapido = "todos";
                 break;
             case "hoy":
-                alquileresAux.Clear();
-                foreach
                 filtrarEntreFechas(DateTime.Now, DateTime.Now);
+                filtroRapido = "hoy";
+                FechaInicio = DateTime.Now;
+                FechaFin = DateTime.Now;
                 break;
             case "semana":
                 int diferencia = (7 + (DateTime.Now.DayOfWeek - DayOfWeek.Monday)) % 7;
-                var fechaInicioSemana = DateTime.Now.AddDays(-diferencia).Date;
+                var fechaInicioSemana = DateTime.Now.Date.AddDays(-diferencia);
                 var fechaFinSemana = fechaInicioSemana.AddDays(6);
-                filtrarEntreFechas(fechaInicioSemana, fechaFinSemana);
+                alquileresAux.Clear();
+                FechaInicio = fechaInicioSemana;
+                FechaFin = fechaFinSemana;
+                alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date >= fechaInicioSemana.Date && 
+                f.FechaDeInicio.Date <= fechaFinSemana.Date ||  f.FechaDeFin.Date >= fechaInicioSemana.Date &&
+                f.FechaDeFin.Date <= fechaFinSemana.Date).ToList();
+                filtroRapido = "semana";
                 break;
             default:
                 alquileresAux.Clear();
@@ -367,8 +392,8 @@
         StateHasChanged();
     }
 
-    private void AplicarFiltrosBusqueda(){
-
+    private void AplicarFiltrosBusqueda(ChangeEventArgs e){     // fede crack
+        filtroTexto = e.Value?.ToString() ?? string.Empty;
         if (string.IsNullOrEmpty(filtroTexto))
         {
             alquileresAux.Clear();
@@ -377,7 +402,9 @@
         else
         {
             alquileresAux.Clear();
-
+            alquileresAux = alquileres.Where(a => a.CorreoCliente.Contains(filtroTexto, StringComparison.OrdinalIgnoreCase) ||
+              inmuebles.Any(i => i.Id == a.InmuebleId && i.Nombre.Contains(filtroTexto, StringComparison.OrdinalIgnoreCase))    
+            ).ToList();
         }
         StateHasChanged();
     }
@@ -401,7 +428,7 @@
     }
     private void filtrarEntreFechas( DateTime fechaInicio, DateTime fechaFin){
        alquileresAux.Clear();
-       alquileresAux = alquileresAux.Where(f => f.FechaDeInicio.Date == fechaInicio.Date || f.FechaDeFin.Date == fechaInicio.Date)
+       alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date == fechaInicio.Date || f.FechaDeFin.Date == fechaInicio.Date)
             .ToList();
 
     }
