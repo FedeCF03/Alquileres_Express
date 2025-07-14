@@ -159,13 +159,8 @@
                                             ClienteId="@cliente!.Id"
                                             OnClose="CerrarFormulario" />
                                         }
-                                        <span class="status-label terminado">
-                                            <i class="fas fa-check"></i> Terminado
-                                        </span>
                                     </Authorized>
                                 </AuthorizeView>
-                                <AuthorizeView Roles="Empleado, Gerente">
-                                    <Authorized>
                                         @if(alquiler.TieneDevolucion()){
                                             <span class="status-label terminado">
                                                 <i class="fas fa-check"></i> Terminado
@@ -177,8 +172,6 @@
                                                 <i class="fas fa-clock"></i> Devolución pendiente
                                             </span>
                                         }
-                                    </Authorized>
-                                </AuthorizeView>
                             }
                             else if (estado == EstadoDeAlquiler.EnProceso)
                                 {
