@@ -199,7 +199,7 @@
                     
                     @if (estado == EstadoDeAlquiler.Terminado)
                     {
-                        @if(alquiler.TieneDevolucion()){
+                        @if(alquiler.TieneDevolucion() || alquiler.TerminoSinEntregaDeLlave()){
                             <span class="status-label terminado">
                                 <i class="fas fa-check"></i> Terminado
                             </span>
@@ -401,7 +401,7 @@
         {
             alquileresAux.Clear();
             alquileresAux = alquileres.Where(a => a.CorreoCliente.Contains(filtroTexto, StringComparison.OrdinalIgnoreCase) ||
-              inmuebles.Any(i => i.Id == a.InmuebleId && i.Nombre.Contains(filtroTexto, StringComparison.OrdinalIgnoreCase))    
+              inmuebles.Any(i => i.Id == a.InmuebleId && i.Nombre!.Contains(filtroTexto, StringComparison.OrdinalIgnoreCase))    
             ).ToList();
         }
         StateHasChanged();

@@ -94,7 +94,7 @@
         try
         {
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
-            CrearRangosDeFechaReservados(inmueble.Alquileres);
+            CrearRangosDeFechaReservados(inmueble!.Alquileres!);
 
 
         }
@@ -159,12 +159,17 @@
     {
         return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date < DateTime.Today;
     }
-
     private void VerificarFechas()
     {
         if (StartDate == null || EndDate == null)
         {
             mensajeError = "Debe seleccionar un rango de fechas.";
+            podesPagar = false;
+            return;
+        }
+        if (StartDate.Value.Date == EndDate.Value.Date)
+        {
+            mensajeError = "Debe elegir por lo menos una noche.";
             podesPagar = false;
             return;
         }

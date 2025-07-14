@@ -131,7 +131,7 @@
                 
                 @if (estado == EstadoDeAlquiler.Terminado)
                 {
-                    @if(alquiler.TieneDevolucion()){
+                    @if(alquiler.TieneDevolucion() || alquiler.TerminoSinEntregaDeLlave()){
                         <span class="status-label terminado">
                             <i class="fas fa-check"></i> Terminado
                         </span>

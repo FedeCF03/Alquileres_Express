@@ -401,7 +401,12 @@
         {
             mensajeError = "Debe elegir por lo menos una noche.";
             podesPagar = false;
+            return;if (StartDate.Value.Date == EndDate.Value.Date)
+        {
+            mensajeError = "Debe elegir por lo menos una noche.";
+            podesPagar = false;
             return;
+        }
         }
         for (DateTime date = StartDate.Value.Date; date <= EndDate.Value.Date; date = date.AddDays(1))
         {

@@ -2,6 +2,7 @@
 @attribute [Authorize]
 
 @using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler
+@using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject CasoDeUsoObtenerAlquileresPorCorreo casoDeUsoObtenerAlquileresPorCorreo
@@ -164,7 +165,7 @@
                                         }
                                     </Authorized>
                                 </AuthorizeView>
-                                @if(alquiler.TieneDevolucion()){
+                                @if(alquiler.TieneDevolucion() || alquiler.TerminoSinEntregaDeLlave()){
                                     <span class="status-label terminado">
                                         <i class="fas fa-check"></i> Terminado
                                     </span>

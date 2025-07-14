@@ -7,8 +7,8 @@ public class Alquiler
 {
     public int Id { get; set; }
     public string CorreoCliente { get; set; } //Cambiar por id
-    public int ClienteId { get; set; } 
-    public DateTime FechaDeCreacion { get; set; } 
+    public int ClienteId { get; set; }
+    public DateTime FechaDeCreacion { get; set; }
     public DateTime FechaDeInicio { get; set; }
     public DateTime FechaDeFin { get; set; }
     public decimal Precio { get; set; }
@@ -51,7 +51,7 @@ public class Alquiler
         if (TieneDevolucion())
             return EstadoDeAlquiler.Terminado;
         if (Cancelado)
-                return EstadoDeAlquiler.Cancelado;
+            return EstadoDeAlquiler.Cancelado;
         DateTime horaLimite = FechaDeInicio.AddHours(14);
         if (horaLimite < DateTime.Now && FechaDeFin.AddHours(10) > DateTime.Today) //se puede cancelar el mismo día antes de las 3?
             return EstadoDeAlquiler.EnProceso;
@@ -67,5 +67,9 @@ public class Alquiler
         return RegistrosDeLlave?.Count == 2;
     }
     public bool PuedeEntregarLlave() => GetEstadoDeAlquiler() == EstadoDeAlquiler.EnProceso || DateTime.Today.AddDays(1) == FechaDeInicio;
-    
+
+    public bool TerminoSinEntregaDeLlave()
+    {
+        return (GetEstadoDeAlquiler() == EstadoDeAlquiler.Terminado) && ((RegistrosDeLlave?.Count == null) || (RegistrosDeLlave?.Count == 0));
+    }
 }
