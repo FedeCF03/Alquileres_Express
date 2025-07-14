@@ -163,6 +163,24 @@
             box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4);
         }
 
+        .operation-btn.cantidad {
+            background: linear-gradient(135deg, #61f65c, #3aed3a);
+            box-shadow: 0 8px 20px rgba(92, 246, 118, 0.3);
+        }
+
+        .operation-btn.cantidad:hover {
+            box-shadow: 0 12px 30px rgba(92, 246, 118, 0.4);
+        }
+
+        .operation-btn.ALQUILERES {
+            background: linear-gradient(135deg, #f7d82c, #f0dc29);
+            box-shadow: 0 8px 20px rgba(218, 172, 22, 0.3);
+        }
+
+        .operation-btn.ALQUILERES:hover {
+            box-shadow: 0 12px 30px rgba(218, 172, 22, 0.4);
+        }
+
 
         .operation-btn.listar {
             background: linear-gradient(135deg, #ef4444, #dc2626);
