@@ -36,22 +36,37 @@
 
     <!-- Botones -->
     <div class="d-flex gap-2">
-      @* <button class="btn btn-review" @onclick="() => EnviarCalificacion()">
-        <i class="fas fa-star"></i> Guardar
-      </button> *@
       <button class="btn btn-success"
-                    @onclick="() => EnviarCalificacion()">
-                <i class="fas fa-save"></i> Guardar
-            </button>
-      <button class="btn btn-outline-secondary" @onclick="Cerrar">
+        @onclick="EnviarCalificacion"
+        disabled="@estaEnviando">
+        <i class="fas fa-save"></i> Guardar
+      </button>
+
+      <button class="btn btn-outline-secondary"
+        @onclick="Cerrar"
+        disabled="@estaEnviando">
         Cancelar
       </button>
+
     </div>
 
     @if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert @(esError ? "alert-danger" : "alert-success") mt-3">
+        @mensaje
+    </div>
+
+    @* @if (!esError)
     {
-      <div class="alert alert-success mt-3">@mensaje</div>
-    }
+      <div class="d-flex justify-content-start mt-3">
+        <button class="btn btn-success shadow-sm px-4 py-2 rounded-3"
+          @onclick="Finalizar">
+          <i class="fas fa-check-circle me-2"></i> Finalizar
+        </button>
+      </div>
+    } *@
+}
+
   </div>
 }
 
@@ -66,6 +81,8 @@
   string comentario = "";
   string mensaje = "";
   bool esError = false;
+  bool estaEnviando = false;
+
   void SeleccionarCalificacion(int v)
     {
         calificacionSeleccionada = v;
@@ -76,12 +93,12 @@
     async Task EnviarCalificacion()
     {
       if (calificacionSeleccionada < 1)
-    {
+      {
         mensaje   = "Por favor selecciona una calificación.";
         esError   = true;
         return;
-    }
-
+      }
+      estaEnviando = true;  
       Cliente? cliente = casoDeUsoBuscarClientePorId.Ejecutar(ClienteId);
       
       var modelo = new Valoracion
@@ -97,13 +114,12 @@
     
 
     bool ok = casoCalificar.Ejecutar(InmuebleId, ClienteId, modelo);
-
     if (ok)
     {
         mensaje = "¡Gracias! Tu reseña fue guardada.";
         esError = false;
-        await Task.Delay(3000);
-        await Cerrar();
+        await Task.Delay(5000); // ← tiempo de visualización
+        mostrar = false;
         navegationManager.NavigateTo($"/alquileres/{ClienteId}", true);
         await OnClose.InvokeAsync(null);
     }
@@ -111,8 +127,14 @@
     {
         mensaje = "Error: no se pudo guardar la calificación.";
         esError = true;
+        estaEnviando = false;  // ← reactiva botones
     }
 
+  }
+  async Task Finalizar()
+  {
+    await Cerrar();
+    navegationManager.NavigateTo($"/alquileres/{ClienteId}", true);
   }
 
     async Task Cerrar()
@@ -121,3 +143,14 @@
     await OnClose.InvokeAsync(null);
 }
 }
+<style>
+  .btn-success {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.btn-success:hover {
+  background-color: #157347;
+  border-color: #146c43;
+}
+</style>
