@@ -2,18 +2,20 @@
 @attribute [Authorize]
 
 @using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler
+@using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject CasoDeUsoObtenerAlquileresPorCorreo casoDeUsoObtenerAlquileresPorCorreo
 @inject CasoDeUsoObtenerTodosLosAlquileres casoDeUsoObtenerTodosLosAlquileres
 @inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
 @inject CasoDeUsoAlquilerCancelarAlquiler casoDeUsoAlquilerCancelarAlquiler
-@inject CasoDeUsoAlquilerGetEstadoDeAlquiler casoDeUsoAlquilerGetEstadoDeAlquiler
 @inject CasoDeUsoObtenerAlquilerPorId casoDeUsoObtenerAlquilerPorId
 @inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
 @inject CasoDeUsoAñadirLlave casoDeUsoAlquilerAñadirLlave
 @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
 @inject CasoDeUsoCalificarInmueble casoDeUsoCalificarInmueble
+@inject ServicioEnviarEmail servicioEnviarEmail
+@inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
 
 @rendermode InteractiveServer
 
@@ -129,10 +131,10 @@
                             </AuthorizeView>
                             @if (!alquiler.Cancelado)
                             {
-                                EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
+                                var estado = alquiler.GetEstadoDeAlquiler();  
                                 
                             @if (estado == EstadoDeAlquiler.Vigente )
-                            {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
+                            {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler)" >
                                     <i class="fas fa-times"></i> Cancelar
                                 </button>
                             }
@@ -164,7 +166,7 @@
                                         }
                                     </Authorized>
                                 </AuthorizeView>
-                                @if(alquiler.TieneDevolucion()){
+                                @if(alquiler.TieneDevolucion() || alquiler.TerminoSinEntregaDeLlave()){
                                     <span class="status-label terminado">
                                         <i class="fas fa-check"></i> Terminado
                                     </span>
@@ -295,9 +297,12 @@
         return inmuebles!.FirstOrDefault(i => i.Id == inmuebleId)!;
     }
 
-    private void CancelarReserva(int Alquilerid)
+    private void CancelarReserva(Alquiler alquiler)
     {
-        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(Alquilerid);
+        Cliente clienteDeAlquiler = casoDeUsoBuscarClientePorId.Ejecutar(alquiler.ClienteId)!;
+        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(alquiler.Id);
+        Inmueble? inmueble = casoDeUsoObtenerInmueble.Ejecutar(alquiler.InmuebleId);
+        servicioEnviarEmail.EnviarEmail(clienteDeAlquiler!.Correo, "Alquiler cancelado", "La política de cancelación del inmueble es: ", inmueble.DevolverPoliticaDeCancelacion() + ". Por favor, comuníquese con algún empleado en el caso de que se devuelva dinero.");
         NavigationManager.NavigateTo($"/alquileres/{id}", true);    
 
     }

@@ -8,14 +8,13 @@
 @inject CasoDeUsoObtenerTodosLosAlquileres casoDeUsoObtenerTodosLosAlquileres
 @inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
 @inject CasoDeUsoAlquilerCancelarAlquiler casoDeUsoAlquilerCancelarAlquiler
-@inject CasoDeUsoAlquilerGetEstadoDeAlquiler casoDeUsoAlquilerGetEstadoDeAlquiler
-@inject CasoDeUsoObtenerAlquilerPorId casoDeUsoObtenerAlquilerPorId
-@inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
+
 @inject CasoDeUsoAñadirLlave casoDeUsoAlquilerAñadirLlave
 @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
-@inject CasoDeUsoCalificarInmueble casoDeUsoCalificarInmueble
 @inject CasoDeUsoObtenerTodosLosAlquileres casoDeUsoObtenerTodosLosAlquileres
-
+@inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
+@inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
+@inject ServicioEnviarEmail servicioEnviarEmail
 
 
 @rendermode InteractiveServer
@@ -187,11 +186,10 @@
                         
                 }
                 @if (!alquiler.Cancelado)
-                {
-                    EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
-                    
+                {             
+                    var estado = alquiler.GetEstadoDeAlquiler();       
                     @if (estado == EstadoDeAlquiler.Vigente)
-                    {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
+                    {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler)" >
                             <i class="fas fa-times"></i> 
                             Cancelar
                         </button>
@@ -199,7 +197,7 @@
                     
                     @if (estado == EstadoDeAlquiler.Terminado)
                     {
-                        @if(alquiler.TieneDevolucion()){
+                        @if(alquiler.TieneDevolucion() || alquiler.TerminoSinEntregaDeLlave()){
                             <span class="status-label terminado">
                                 <i class="fas fa-check"></i> Terminado
                             </span>
@@ -364,7 +362,7 @@
                 alquileresAux.AddRange(alquileres);
                 filtroRapido = "todos";
                 break;
-                case "hoy":
+            case "hoy":
                 filtrarEntreFechas(DateTime.Today, DateTime.Today);
                 filtroRapido = "hoy";
                 FechaInicio = DateTime.Today;
@@ -401,15 +399,18 @@
         {
             alquileresAux.Clear();
             alquileresAux = alquileres.Where(a => a.CorreoCliente.Contains(filtroTexto, StringComparison.OrdinalIgnoreCase) ||
-              inmuebles.Any(i => i.Id == a.InmuebleId && i.Nombre.Contains(filtroTexto, StringComparison.OrdinalIgnoreCase))    
+              inmuebles.Any(i => i.Id == a.InmuebleId && i.Nombre!.Contains(filtroTexto, StringComparison.OrdinalIgnoreCase))    
             ).ToList();
         }
         StateHasChanged();
     }
-    private void CancelarReserva(int Alquilerid)
+    private void CancelarReserva(Alquiler alquiler)
     {
-        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(Alquilerid);
-        NavigationManager.NavigateTo($"/alquileres-totales", true);    
+        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(alquiler.Id);
+        Inmueble? inmueble = casoDeUsoObtenerInmueble.Ejecutar(alquiler.InmuebleId);
+        Cliente? cliente = casoDeUsoBuscarClientePorId.Ejecutar(alquiler.ClienteId);
+        servicioEnviarEmail.EnviarEmail(cliente!.Correo, "Alquiler cancelado", "La política de cancelación del inmueble es: ", inmueble.DevolverPoliticaDeCancelacion() + ". Por favor, comuníquese con algún empleado en el caso de que se devuelva dinero.");
+        NavigationManager.NavigateTo($"/alquileres-de-inmueble/{id}", true); 
 
     }
     public async Task AñadirLlave(int alquilerId,  int clienteId, bool esEntrega )

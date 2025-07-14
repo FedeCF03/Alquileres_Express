@@ -168,7 +168,7 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        var correo = authState.User.Identity.Name;
+        var correo = authState!.User.Identity!.Name;
 
         if (user.Identity is not null && user.Identity.IsAuthenticated)
         {

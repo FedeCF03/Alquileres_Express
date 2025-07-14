@@ -52,7 +52,7 @@ public class RepositorioAlquiler : IRepositorioAlquiler
     public bool EstaDisponible(int inmuebleId, DateTime fechaInicio, DateTime fechaFin)
     {
         using Alquileres_ExpressContext _context = new();
-        var alquileresDelInmueble = _context.Alquileres
+        var alquileresDelInmueble = _context.Alquileres.Include(a => a.RegistrosDeLlave)
             .Where(a => a.InmuebleId == inmuebleId)
             .ToList();
 
@@ -113,24 +113,6 @@ public class RepositorioAlquiler : IRepositorioAlquiler
     {
         using Alquileres_ExpressContext _context = new();
         return [.. _context.Alquileres.Include(a => a.RegistrosDeLlave).ToList()];
-    }
-
-    public EstadoDeAlquiler GetEstadoDeAlquiler(int idAlquiler)
-    {
-        using Alquileres_ExpressContext _context = new();
-        Alquiler? alquiler = _context.Alquileres.FirstOrDefault(a => a.Id == idAlquiler);
-
-        if (alquiler.FechaDeFin < DateTime.Now)
-        {
-            return EstadoDeAlquiler.Terminado;
-        }
-        else if (alquiler.FechaDeInicio > DateTime.Now)
-        {
-            return EstadoDeAlquiler.Vigente;
-
-        }
-
-        return EstadoDeAlquiler.EnProceso;
     }
 
     public void cancelarAlquiler(int idAlquiler)

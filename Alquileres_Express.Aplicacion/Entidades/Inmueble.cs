@@ -46,6 +46,15 @@ namespace Alquileres_Express.Aplicacion.Entidades;
         {
         }
 
-
+        public String DevolverPoliticaDeCancelacion()
+        {
+            return PoliticaDeCancelacion switch
+            {
+                PoliticaDeCancelacion.SinCosto => "Sin costo",
+                PoliticaDeCancelacion.NoReembolsable => "No reembolsable",
+                PoliticaDeCancelacion.VeintePorcientoDeReembolso => "20% de reembolso",
+                _ => "Desconocida"
+            };
+        }
     
     }
