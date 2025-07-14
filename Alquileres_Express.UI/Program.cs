@@ -62,7 +62,6 @@ builder.Services
     .AddTransient<CasoDeUsoRegistrarCliente>()
     .AddTransient<CasoDeUsoObtenerTodosLosAlquileres>()
     .AddTransient<CasoDeUsoObtenerAlquileresPorCorreo>()
-    .AddTransient<CasoDeUsoAlquilerGetEstadoDeAlquiler>()
     .AddTransient<CasoDeUsoBuscarPersonalPorId>()
     .AddTransient<CasoDeUsoAñadirLlave>()
 

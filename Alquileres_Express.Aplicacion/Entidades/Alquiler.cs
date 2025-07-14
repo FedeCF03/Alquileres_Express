@@ -53,7 +53,7 @@ public class Alquiler
         if (Cancelado)
             return EstadoDeAlquiler.Cancelado;
         DateTime horaLimite = FechaDeInicio.AddHours(14);
-        if (horaLimite < DateTime.Now && FechaDeFin.AddHours(10) > DateTime.Today) //se puede cancelar el mismo día antes de las 3?
+        if (horaLimite < DateTime.Now && FechaDeFin.AddHours(10) > DateTime.Now) //se puede cancelar el mismo día antes de las 3?
             return EstadoDeAlquiler.EnProceso;
 
         if (horaLimite > DateTime.Now)

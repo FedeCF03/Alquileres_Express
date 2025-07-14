@@ -19,6 +19,7 @@
 @inject CasoDeUsoListarValoraciones casoDeUsoListarValoraciones
 @inject CasoDeUsoPromedioValoracion casoDeUsoPromedioValoracion
 @inject CasoDeUsoEliminarInmueble CasoDeUsoEliminarInmueble
+@inject CasoDeUsoListarLlaves casoDeUsoListarLlaves
 
 
 <div class="property-page">
@@ -346,10 +347,28 @@
         try
         {
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
-            CrearRangosDeFechaReservados(inmueble.Alquileres!);
+            CrearRangosDeFechaReservados(inmueble!.Alquileres!.GroupJoin(casoDeUsoListarLlaves.Ejecutar(), 
+                    alquiler => alquiler.Id, 
+                    llave => llave.AlquilerId, 
+                    (alquiler, llavesCollection) => new Alquiler 
+                    {
+                        Id = alquiler.Id,
+                        InmuebleId = alquiler.InmuebleId,
+                        ClienteId = alquiler.ClienteId,
+                        NombreDePersonal = alquiler.NombreDePersonal,
+                        ApellidoDePersonal = alquiler.ApellidoDePersonal,
+                        CorreoCliente = alquiler.CorreoCliente,
+                        FechaDeCreacion = alquiler.FechaDeCreacion,
+                        FechaDeInicio = alquiler.FechaDeInicio,
+                        FechaDeFin = alquiler.FechaDeFin,
+                        Precio = alquiler.Precio,
+                        Cancelado = alquiler.Cancelado,
+                        Pagado = alquiler.Pagado,
+                        RegistrosDeLlave = llavesCollection.ToList()
+                    }).ToList());
             imagenes = inmueble.Fotos != null ? inmueble.Fotos.Select(f => f.Url).ToArray() : new string[0];
         }
-        catch (Exception)
+        catch
         {
             NavigationManager.NavigateTo("/");
         }
@@ -380,13 +399,13 @@
         alquileres.Where(a => !a.Cancelado &&
         !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado)).ToList().ForEach(alquiler =>
         {
-            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin.AddDays(-1)));
+            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio.AddDays(1), alquiler.FechaDeFin.AddDays(-1)));
         });
     }
 
     private bool NoEsHabil(DateTimeOffset date)
     {
-        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date < DateTime.Today;
+        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date.AddHours(14) < DateTime.Now;
     }
 
     private void VerificarFechas()

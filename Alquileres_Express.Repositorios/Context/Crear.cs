@@ -121,53 +121,57 @@ public class Crear
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
                 FechaDeCreacion = new DateTime(2014,9,12),
-                FechaDeInicio = DateTime.Today.AddDays(-10),
-                FechaDeFin = DateTime.Today.AddDays(-5),
+                FechaDeInicio = DateTime.Today.AddDays(1),
+                FechaDeFin = DateTime.Today.AddDays(6),
                 Precio = 5000,
                 InmuebleId = 1,
                 Pagado = true
             };
 
-            var alquiler2 = new Alquiler
-            {
-                ClienteId = cliente.Id,
-                CorreoCliente = cliente.Correo,
-                FechaDeCreacion = new DateTime(2015,1,1),
-                FechaDeInicio = DateTime.Today.AddDays(-20),
-                FechaDeFin = DateTime.Today.AddDays(-15),
-                Precio = 6500,
-                InmuebleId = 1,
-                Pagado = true
-            };
+            // var alquiler2 = new Alquiler
+            // {
+            //     ClienteId = cliente.Id,
+            //     CorreoCliente = cliente.Correo,
+            //     FechaDeCreacion = new DateTime(2015,1,1),
+            //     FechaDeInicio = DateTime.Today.AddDays(-20),
+            //     FechaDeFin = DateTime.Today.AddDays(-15),
+            //     Precio = 6500,
+            //     InmuebleId = 1,
+            //     Pagado = true
+            // };
 
-            var alquiler3 = new Alquiler
-            {
-                ClienteId = cliente2.Id,
-                CorreoCliente = cliente2.Correo,
-                FechaDeCreacion = new DateTime(2013,8,1),
-                FechaDeInicio = DateTime.Today.AddDays(-30),
-                FechaDeFin = DateTime.Today.AddDays(-25),
-                Precio = 6500,
-                InmuebleId = 1,
-                Pagado = true
-            };
-            var alquiler4 = new Alquiler
-            {
-                ClienteId = cliente.Id,
-                CorreoCliente = cliente.Correo,
-                FechaDeCreacion = new DateTime(2010,3,3),
-                FechaDeInicio = DateTime.Today.AddDays(-10),
-                FechaDeFin = DateTime.Today.AddDays(-5),
-                Precio = 5000,
-                InmuebleId = 1,
-                Pagado = true
-            };
+            // var alquiler3 = new Alquiler
+            // {
+            //     ClienteId = cliente2.Id,
+            //     CorreoCliente = cliente2.Correo,
+            //     FechaDeCreacion = new DateTime(2013,8,1),
+            //     FechaDeInicio = DateTime.Today.AddDays(-30),
+            //     FechaDeFin = DateTime.Today.AddDays(-25),
+            //     Precio = 6500,
+            //     InmuebleId = 1,
+            //     Pagado = true
+            // };
+            // var alquiler4 = new Alquiler
+            // {
+            //     ClienteId = cliente.Id,
+            //     CorreoCliente = cliente.Correo,
+            //     FechaDeCreacion = new DateTime(2010,3,3),
+            //     FechaDeInicio = DateTime.Today.AddDays(-10),
+            //     FechaDeFin = DateTime.Today.AddDays(-5),
+            //     Precio = 5000,
+            //     InmuebleId = 1,
+            //     Pagado = true
+            // };
 
-            context.Alquileres.AddRange(alquiler1, alquiler2, alquiler3, alquiler4);
+            
+            
+            context.Alquileres.AddRange(alquiler1);
+            context.SaveChanges();
+            var registro1 = new RegistroDeLlave(alquiler1.Id, 1,1, true);
+            var registro2 = new RegistroDeLlave(alquiler1.Id, 1,1, false);
+            context.AddRange(registro1, registro2);
             inmueble!.Alquileres!.Add(alquiler1);
-            inmueble.Alquileres.Add(alquiler2);
-            inmueble.Alquileres.Add(alquiler3);
-            inmueble2.Alquileres!.Add(alquiler4);
+
             
 
             context.SaveChanges();

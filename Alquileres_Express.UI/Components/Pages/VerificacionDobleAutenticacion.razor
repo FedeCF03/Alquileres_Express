@@ -12,7 +12,6 @@
 
 <EditForm Model="@modelo" OnValidSubmit="ProcesarVerificacion" FormName="CodigoVerificacion">
     <DataAnnotationsValidator />
-
     <div class="mb-3">
         <label>Email:</label>
         <InputText @bind-Value="modelo.Correo" class="form-control" />
@@ -92,7 +91,7 @@ new Claim(ClaimTypes.Role, rol.ToString())
 };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
-        await HttpContext.SignInAsync(principal);
+        await HttpContext!.SignInAsync(principal);
         NavigationManager.NavigateTo($"/?mensaje=¡Hola {nombre} Bienvenido/a.");
     }
 }

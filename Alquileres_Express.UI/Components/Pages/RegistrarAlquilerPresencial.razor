@@ -13,6 +13,7 @@
 @inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
 @inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
 @inject CasoDeUsoPagarEfectivo casoDeUsoPagarEfectivo
+@inject CasoDeUsoListarLlaves casoDeUsoListarLlaves
 @attribute [Authorize(Roles = "Gerente,Empleado")]
 
 
@@ -58,8 +59,8 @@
             }
             else
             {
-                <div class="text-success fs-5 fw-bold">💲 Precio total: $@calcularPrecio(StartDate.Value.DateTime,
-                                    EndDate.Value.DateTime, inmueble.Precio).ToString("F2")</div>
+                <div class="text-success fs-5 fw-bold">💲 Precio total: $@calcularPrecio(StartDate!.Value.DateTime,
+                                    EndDate!.Value.DateTime, inmueble!.Precio).ToString("F2")</div>
             <button class="btn btn-success btn-lg mt-3" @onclick="RegistrarPagoEfectivo">✅ Registrar alquiler</button>
                         }
         </div>
@@ -94,8 +95,26 @@
         try
         {
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
-            CrearRangosDeFechaReservados(inmueble!.Alquileres!);
-
+            CrearRangosDeFechaReservados(inmueble!.Alquileres!.GroupJoin(casoDeUsoListarLlaves.Ejecutar(), 
+                    alquiler => alquiler.Id, 
+                    llave => llave.AlquilerId, 
+                    (alquiler, llavesCollection) => new Alquiler 
+                    {
+                        Id = alquiler.Id,
+                        InmuebleId = alquiler.InmuebleId,
+                        ClienteId = alquiler.ClienteId,
+                        NombreDePersonal = alquiler.NombreDePersonal,
+                        ApellidoDePersonal = alquiler.ApellidoDePersonal,
+                        CorreoCliente = alquiler.CorreoCliente,
+                        FechaDeCreacion = alquiler.FechaDeCreacion,
+                        FechaDeInicio = alquiler.FechaDeInicio,
+                        FechaDeFin = alquiler.FechaDeFin,
+                        Precio = alquiler.Precio,
+                        Cancelado = alquiler.Cancelado,
+                        Pagado = alquiler.Pagado,
+                        RegistrosDeLlave = llavesCollection.ToList()
+                    }).ToList());
+            Console.WriteLine();
 
         }
         catch (Exception)
@@ -152,12 +171,13 @@
         alquileres.Where(a => !a.Cancelado &&
         !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado) && a.Pagado).ToList().ForEach(alquiler =>
         {
-            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio, alquiler.FechaDeFin.AddDays(-1)));
+            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio.AddDays(1), alquiler.FechaDeFin.AddDays(-1)));
         });
+        Console.WriteLine($"Fechas reservadas: {FechasReservadas.Count}");
     }
     private bool NoEsHabil(DateTimeOffset date)
     {
-        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date < DateTime.Today;
+        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date.AddHours(14) < DateTime.Now;
     }
     private void VerificarFechas()
     {

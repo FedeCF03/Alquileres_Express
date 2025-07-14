@@ -7,7 +7,6 @@
 @inject CasoDeUsoObtenerTodosLosAlquileres casoDeUsoObtenerTodosLosAlquileres
 @inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
 @inject CasoDeUsoAlquilerCancelarAlquiler casoDeUsoAlquilerCancelarAlquiler
-@inject CasoDeUsoAlquilerGetEstadoDeAlquiler casoDeUsoAlquilerGetEstadoDeAlquiler
 @inject CasoDeUsoObtenerAlquilerPorId casoDeUsoObtenerAlquilerPorId
 @inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
 @inject CasoDeUsoAñadirLlave casoDeUsoAlquilerAñadirLlave
@@ -15,7 +14,7 @@
 @inject CasoDeUsoCalificarInmueble casoDeUsoCalificarInmueble
 @inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
 @inject CasoDeUsoListarLlaves casoDeUsoListarLlaves
-
+@inject ServicioEnviarEmail servicioEnviarEmail
 @rendermode InteractiveServer
 
 @if (!string.IsNullOrEmpty(mensajeLlave))
@@ -121,10 +120,10 @@
                 </AuthorizeView>
                 @if (!alquiler.Cancelado)
                 {
-                    EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
+                    var estado = alquiler.GetEstadoDeAlquiler();  
                     
                 @if (estado == EstadoDeAlquiler.Vigente)
-                {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
+                {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler)" >
                         <i class="fas fa-times"></i> Cancelar
                     </button>
                 }
@@ -157,9 +156,6 @@
                     <span class="status-label" style="background: #e74c3c; color: white;">
                         <i class="fas fa-ban"></i> Cancelado
                     </span>
-                        @* <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
-                            <i class="fas fa-star"> Dejar Reseña</i>
-                        </button>  *@
                 }
             </div>
         </div>
@@ -213,9 +209,12 @@
             Nav.NavigateTo("/login");
         }
     }
-    private void CancelarReserva(int Alquilerid)
+    private void CancelarReserva(Alquiler alquiler)
     {
-        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(Alquilerid);
+        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(alquiler.Id);
+        Inmueble? inmueble = casoDeUsoObtenerInmueble.Ejecutar(alquiler.InmuebleId);
+        Cliente? cliente = casoDeUsoBuscarClientePorId.Ejecutar(alquiler.ClienteId);
+        servicioEnviarEmail.EnviarEmail(cliente!.Correo, "Alquiler cancelado", "La política de cancelación del inmueble es: ", inmueble.DevolverPoliticaDeCancelacion() + ". Por favor, comuníquese con algún empleado en el caso de que se devuelva dinero.");
         Nav.NavigateTo($"/alquileres-de-inmueble/{id}", true);    
 
     }
@@ -224,7 +223,7 @@
             try
             {
                 inmueble = casoDeUsoObtenerInmueble.Ejecutar(id);
-                alquileres = inmueble.Alquileres?.GroupJoin(casoDeUsoListarLlaves.Ejecutar(), 
+                alquileres = inmueble!.Alquileres!.GroupJoin(casoDeUsoListarLlaves.Ejecutar(), 
                     alquiler => alquiler.Id, 
                     llave => llave.AlquilerId, 
                     (alquiler, llavesCollection) => new Alquiler 
@@ -232,10 +231,15 @@
                         Id = alquiler.Id,
                         InmuebleId = alquiler.InmuebleId,
                         ClienteId = alquiler.ClienteId,
+                        NombreDePersonal = alquiler.NombreDePersonal,
+                        ApellidoDePersonal = alquiler.ApellidoDePersonal,
+                        CorreoCliente = alquiler.CorreoCliente,
+                        FechaDeCreacion = alquiler.FechaDeCreacion,
                         FechaDeInicio = alquiler.FechaDeInicio,
                         FechaDeFin = alquiler.FechaDeFin,
                         Precio = alquiler.Precio,
                         Cancelado = alquiler.Cancelado,
+                        Pagado = alquiler.Pagado,
                         RegistrosDeLlave = llavesCollection.ToList()
                     }).ToList();
             }
