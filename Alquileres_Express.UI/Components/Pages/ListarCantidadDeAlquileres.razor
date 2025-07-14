@@ -28,7 +28,16 @@
                                 <DateRangePicker StartDatePlaceholder="Comienzo" EndDatePlaceholder="Fin"
                                 @bind-StartDate="StartDate" @bind-EndDate="EndDate"
                                 class="hidden-picker"
-                                placeholder="Select dates..." OnRangeSelect="Filtrar" OnCancel="Cancelar"/>
+                                placeholder="Select dates..." OnRangeSelect="Filtrar" OnCancel="Cancelar">
+                                <ButtonsTemplate>
+                                        <button class="btn-primary" @onclick="@context.ClickCancel" type="button">
+                                            Cancelar
+                                        </button>
+                                        <button class="btn-primary" @onclick="@context.ClickApply"
+                                        type="button">Aplicar
+                                        </button>
+                                    </ButtonsTemplate>
+                                </DateRangePicker>
                             </div>   
                         </div>
                     </div>

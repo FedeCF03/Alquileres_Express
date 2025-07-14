@@ -93,10 +93,12 @@
                 <AuthorizeView Roles=" Gerente, Empleado">
                 @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
                 {
-                    <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
-                        <i class= "fas fa-times" > </i> Registrar entrega 
-                    </button>
-                    
+                    if (alquiler.PuedeEntregarLlave())
+                    {
+                        <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
+                            <i class= "fas fa-times" > </i> Registrar entrega 
+                        </button>
+                    }
                 } 
                 else 
                 {
@@ -129,9 +131,17 @@
                 
                 @if (estado == EstadoDeAlquiler.Terminado)
                 {
-                    <span class="status-label terminado">
+                    @if(alquiler.TieneDevolucion()){
+                        <span class="status-label terminado">
                             <i class="fas fa-check"></i> Terminado
-                    </span>
+                        </span>
+                    }
+                    else 
+                    {
+                        <span class="status-label pendiente">
+                            <i class="fas fa-clock"></i> Devolución pendiente
+                        </span>
+                    }
                 }
                 else 
                 if (estado == EstadoDeAlquiler.EnProceso)
@@ -243,7 +253,7 @@
         mensajeLlave = esEntrega
         ? "✔️ Entrega registrada correctamente."
         : "🔄 Devolución registrada correctamente.";
-        await Task.Delay(1500);
+        await Task.Delay(5000);
 
         Nav.NavigateTo($"/alquileres-de-inmueble/{id}", true);
     }

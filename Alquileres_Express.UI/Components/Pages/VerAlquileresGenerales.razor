@@ -159,13 +159,14 @@
                 </NavLink>
             </div> 
             <div class="rental-actions">
-                <AuthorizeView Roles="Gerente, Empleado">
                 @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
                 {
-                    <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
-                        <i class= "fas fa-times" > </i> Registrar entrega 
-                    </button>
-                    
+                    if (alquiler.PuedeEntregarLlave())
+                    {
+                        <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
+                            <i class= "fas fa-times" > </i> Registrar entrega 
+                        </button>
+                    } 
                 } 
                 else 
                 {
@@ -185,49 +186,49 @@
                     }
                         
                 }
-                </AuthorizeView>
                 @if (!alquiler.Cancelado)
                 {
                     EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
                     
-                @if (estado == EstadoDeAlquiler.Vigente)
-                {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
-                        <i class="fas fa-times"></i> Cancelar
-                    </button>
+                    @if (estado == EstadoDeAlquiler.Vigente)
+                    {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
+                            <i class="fas fa-times"></i> 
+                            Cancelar
+                        </button>
+                    }
+                    
+                    @if (estado == EstadoDeAlquiler.Terminado)
+                    {
+                        @if(alquiler.TieneDevolucion()){
+                            <span class="status-label terminado">
+                                <i class="fas fa-check"></i> Terminado
+                            </span>
+                        }
+                        else 
+                        {
+                            <span class="status-label pendiente">
+                                <i class="fas fa-clock"></i> Devolución pendiente
+                            </span>
+                        }
+                    }
+                    else if (estado == EstadoDeAlquiler.EnProceso)
+                        {
+                            <span class="status-label en-proceso">
+                                <i class="fas fa-spinner"></i> En Proceso
+                            </span>
+                        }
                 }
-                
-                @if (estado == EstadoDeAlquiler.Terminado)
+                else
                 {
-                    <AuthorizeView Roles="Cliente">
-                        <Authorized>
-                            </Authorized>
-                                </AuthorizeView>
-                                <span class="status-label terminado">
-                                        <i class="fas fa-check"></i> Terminado
-                                </span>
-                            }
-                            else if (estado == EstadoDeAlquiler.EnProceso)
-                                {
-                                    <span class="status-label en-proceso">
-                                        <i class="fas fa-spinner"></i> En Proceso
-                                    </span>
-                                }
-                            
-                            }
-                            else
-                            {
-                                <span class="status-label" style="background: #e74c3c; color: white;">
-                                    <i class="fas fa-ban"></i> Cancelado
-                                </span>
-                                    @* <button class="btn btn-review" @onclick="() => DejarResena(alquiler.InmuebleId)">
-                                        <i class="fas fa-star"> Dejar Reseña</i>
-                                    </button>  *@
-                            }
+                    <span class="status-label" style="background: #e74c3c; color: white;">
+                        <i class="fas fa-ban"></i> Cancelado
+                    </span>
+                }
                         </div>
                     </div>
                 </div>
+                }
             }
-        }
     }
     else
     {
@@ -240,7 +241,6 @@
         </div>
     }
 </div> 
-
         <div class="alert alert-success mt-3 text-center" role="alert"
             style="display: @(string.IsNullOrEmpty(mensajeLlave) ? "none" : "block")">
             @mensajeLlave
@@ -248,14 +248,13 @@
 @code {
     private string correo = "";
     private string rol = "";
-    private List<Alquiler>? alquileres = new ();
-    private List<Alquiler>? alquileresAux = new();
+    private List<Alquiler> alquileres = new ();
+    private List<Alquiler> alquileresAux = new();
     private string filtroRapido = "hoy";
     private List<Inmueble> inmuebles = new();
     private string mensajeLlave = string.Empty;
     private string filtroTexto = string.Empty;
     private string ordenSeleccionado = "fecha-desc";
-    private int alquilerSeleccionadoId = 0; 
 
     DateTime FechaInicio { get; set; } = DateTime.Now;
     DateTime FechaFin { get; set; } = DateTime.Now;
@@ -293,8 +292,7 @@
                 getInmuebles();
             }
         }
-        alquileresAux.AddRange(alquileres);
-        filtrarEntreFechas(DateTime.Now, DateTime.Now);
+        filtrarEntreFechas(DateTime.Today, DateTime.Today);
         Console.WriteLine("");
     }
     private void getInmuebles()
@@ -367,10 +365,10 @@
                 filtroRapido = "todos";
                 break;
             case "hoy":
-                filtrarEntreFechas(DateTime.Now, DateTime.Now);
+                filtrarEntreFechas(DateTime.Today, DateTime.Today);
                 filtroRapido = "hoy";
-                FechaInicio = DateTime.Now;
-                FechaFin = DateTime.Now;
+                FechaInicio = DateTime.Today;
+                FechaFin = DateTime.Today;
                 break;
             case "semana":
                 int diferencia = (7 + (DateTime.Now.DayOfWeek - DayOfWeek.Monday)) % 7;
@@ -422,15 +420,13 @@
         mensajeLlave = esEntrega
         ? "✔️ Entrega registrada correctamente."
         : "🔄 Devolución registrada correctamente.";
-        await Task.Delay(1500);
+        await Task.Delay(5000);
 
         NavigationManager.NavigateTo($"/alquileres-totales", true);
     }
     private void filtrarEntreFechas( DateTime fechaInicio, DateTime fechaFin){
        alquileresAux.Clear();
-       alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date == fechaInicio.Date || f.FechaDeFin.Date == fechaInicio.Date)
+       alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date >= fechaInicio && f.FechaDeFin.Date <= fechaFin.Date)
             .ToList();
-
     }
-
 }
