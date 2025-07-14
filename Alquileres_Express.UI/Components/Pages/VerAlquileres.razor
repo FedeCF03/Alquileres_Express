@@ -100,9 +100,12 @@
                          <AuthorizeView Roles="Gerente, Empleado">
                             @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
                             {
-                                <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
-                                    <i class= "fas fa-times" > </i> Registrar entrega 
-                                </button>
+                                if (alquiler.PuedeEntregarLlave())
+                                {
+                                    <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
+                                        <i class= "fas fa-times" > </i> Registrar entrega 
+                                    </button>
+                                }
                                 
                             } 
                             else 
@@ -128,7 +131,7 @@
                             {
                                 EstadoDeAlquiler estado = casoDeUsoAlquilerGetEstadoDeAlquiler.Ejecutar(alquiler.Id);
                                 
-                            @if (estado == EstadoDeAlquiler.Vigente)
+                            @if (estado == EstadoDeAlquiler.Vigente )
                             {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler.Id)" >
                                     <i class="fas fa-times"></i> Cancelar
                                 </button>
@@ -161,17 +164,17 @@
                                         }
                                     </Authorized>
                                 </AuthorizeView>
-                                        @if(alquiler.TieneDevolucion()){
-                                            <span class="status-label terminado">
-                                                <i class="fas fa-check"></i> Terminado
-                                            </span>
-                                        }
-                                        else 
-                                        {
-                                            <span class="status-label pendiente">
-                                                <i class="fas fa-clock"></i> Devolución pendiente
-                                            </span>
-                                        }
+                                @if(alquiler.TieneDevolucion()){
+                                    <span class="status-label terminado">
+                                        <i class="fas fa-check"></i> Terminado
+                                    </span>
+                                }
+                                else 
+                                {
+                                    <span class="status-label pendiente">
+                                        <i class="fas fa-clock"></i> Devolución pendiente
+                                    </span>
+                                }
                             }
                             else if (estado == EstadoDeAlquiler.EnProceso)
                                 {

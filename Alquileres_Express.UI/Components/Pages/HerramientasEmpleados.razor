@@ -17,7 +17,7 @@
 <div class="container">
     <h1 class="title">Operaciones Disponibles</h1>
     <div class="buttons-grid">
-        <a class="operation-btn cliente" href="/registrar-cliente-presencial">
+        <a class="operation-btn empleado" href="/registrar-cliente-presencial">
             <span class="btn-icon">👷‍♂️</span>
             Agregar cliente
         </a>
@@ -29,23 +29,23 @@
                     Agregar empleado
                 </a>
 
-                <a class="operation-btn historial" href="/cargar-inmueble">
+                <a class="operation-btn ALQUILERES" href="/cargar-inmueble">
                     <span class="btn-icon">📋</span>
                     Cargar inmueble
                 </a>
 
-                <a class="operation-btn listar" href = "/cantidadDeAlquileres">
-                  <span class="btn-icon">👥</span>
+                <a class="operation-btn listar" href="/cantidadDeAlquileres">
+                    <span class="btn-icon">👥</span>
                     Cantidad de alquileres
                 </a>
 
-                <a class="operation-btn listar" href = "/listadoClientesNuevos">
-                  <span class="btn-icon">👥</span>
+                <a class="operation-btn listar" href="/listadoClientesNuevos">
+                    <span class="btn-icon">👥</span>
                     Nuevos clientes
                 </a>
-                </Authorized>  
-            </AuthorizeView>
-<!-- 
+            </Authorized>
+        </AuthorizeView>
+        <!-- 
             <button class="operation-btn historial" onclick="verHistorial()">
                 <span class="btn-icon">📋</span>
                 Ver Historial de Llaves
@@ -54,60 +54,66 @@
             
                                                                                 -->
         <!--                 LOS METODOS COMENTADOS SON PARA LA 2DA EMT O NO LOS TENEMOS IMPLEMENTADOS TODAVIA       -->
-        <a class="operation-btn listar" href="/listadoUsuario">
+        <a class="operation-btn empleado" href="/listadoUsuario">
             <span class="btn-icon">👥</span>
             Listar usuarios
         </a>
 
-        <a class="operation-btn historial" href="/InmueblesNoDisponibles">
+        <a class="operation-btn ALQUILERES" href="/InmueblesNoDisponibles">
             <span class="btn-icon">🔑</span>
             Inmuebles no disponibles
         </a>
+
+        <a class="operation-btn ALQUILERES" href="/alquileres-totales">
+            <span class="btn-icon">🏠</span>
+            Menu general de alquileres
+        </a>
+
     </div>
 </div>
 
-    <script>
-        // Funciones para cada operación
-        function registrarEntrega() {
-            // Lógica para registrar entrega de llaves
-            alert('Función: Registrar Entrega de Llaves');
-            console.log('Ejecutando: Registrar Entrega de Llaves');
-        }
+<script>
+    // Funciones para cada operación
+    function registrarEntrega() {
+        // Lógica para registrar entrega de llaves
+        alert('Función: Registrar Entrega de Llaves');
+        console.log('Ejecutando: Registrar Entrega de Llaves');
+    }
 
-            function registrarDevolucion() {
-                // Lógica para registrar devolución de llaves
-                alert('Función: Registrar Devolución de Llaves');
-                console.log('Ejecutando: Registrar Devolución de Llaves');
-            }
+    function registrarDevolucion() {
+        // Lógica para registrar devolución de llaves
+        alert('Función: Registrar Devolución de Llaves');
+        console.log('Ejecutando: Registrar Devolución de Llaves');
+    }
 
-            function registrarEmpleado() {
-                // Lógica para registrar empleado
-                alert('Función: Registrar Empleado');
-                console.log('Ejecutando: Registrar Empleado');
-            }
+    function registrarEmpleado() {
+        // Lógica para registrar empleado
+        alert('Función: Registrar Empleado');
+        console.log('Ejecutando: Registrar Empleado');
+    }
 
-            function verHistorial() {
-                // Lógica para ver historial de llaves
-                alert('Función: Ver Historial de Llaves');
-                console.log('Ejecutando: Ver Historial de Llaves');
-            }
+    function verHistorial() {
+        // Lógica para ver historial de llaves
+        alert('Función: Ver Historial de Llaves');
+        console.log('Ejecutando: Ver Historial de Llaves');
+    }
 
-            function listarUsuarios() {
-                // Lógica para listar usuarios
-                alert('Función: Listar Usuarios');
-                console.log('Ejecutando: Listar Usuarios');
-            }
+    function listarUsuarios() {
+        // Lógica para listar usuarios
+        alert('Función: Listar Usuarios');
+        console.log('Ejecutando: Listar Usuarios');
+    }
 
-            // Efecto de entrada para los botones
-            document.addEventListener('DOMContentLoaded', function () {
-                const buttons = document.querySelectorAll('.operation-btn');
-                buttons.forEach((button, index) => {
-                    using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
-                    #line default
-                    #line hidden
-                    #nullable restore
-                    #line(8, 12) - (8, 65) "C:\Users\Mar\Desktop\Alquileres_Express\Alquileres_Express.UI\Components\Pages\HerramientasEmpleados.razor"
-        </script>
+    // Efecto de entrada para los botones
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('.operation-btn');
+        buttons.forEach((button, index) => {
+            using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
+            #line default
+            #line hidden
+            #nullable restore
+            #line(8, 12) - (8, 65) "C:\Users\Mar\Desktop\Alquileres_Express\Alquileres_Express.UI\Components\Pages\HerramientasEmpleados.razor"
+</script>
 
 @code {
 

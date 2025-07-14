@@ -38,7 +38,9 @@
         }
         else
         {
-            <table class="table table-striped table-hover text-center">
+            @if(_listaBusqueda.Count() != 0)
+            {
+                <table class="table table-striped table-hover text-center">
                 <thead class="table-dark">
                     <tr>
                         <th>NOMBRE</th>
@@ -113,54 +115,20 @@
                     }
                 </tbody>
             </table>
+            }
+            else
+            {
+             <div class="empty-state">
+                 <div class="empty-icon">
+                     <i class="fas fa-user"></i>
+                 </div>
+                 <h3 class="empty-title">No hay usuarios registrados</h3>
+                 <p class="empty-subtitle">
+                     Intenta ajustar la busqueda o agregar nuevos registros.
+                 </p>
+             </div>
+            }
         }
-    </div>
-</div>
-
-<div class="container mt-4">
-    <div class="card shadow p-4">
-        <h2 class="text-center text-primary">📋 Listado de Usuarios eliminados</h2>
-        <table class="table table-striped table-hover text-center">
-                <thead class="table-dark">
-                    <tr>
-                        <th>NOMBRE</th>
-                        <th>APELLIDO</th>
-                        <th>CORREO</th>
-                        <th>FECHA DE NACIMIENTO</th>
-                        <th>ROL</th>
-                        <th>NÚMERO DE PERSONAL</th>
-                        <th>ACCIÓN</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @foreach (var usuario in _listaBusqueda)
-                {
-                    if (usuario.Borrado)
-                    {
-                        <tr>
-                            <td>@usuario.Nombre</td>
-                            <td>@usuario.Apellido</td>
-                            <td>@usuario.Correo</td>
-                            <td>@usuario.FechaNacimiento.ToShortDateString()</td>
-                            <td>
-                                <span class="badge @(GetBadgeClass(usuario.Rol))">@usuario.Rol</span>
-                            </td>
-                            <td>
-                                 <span class="fw-bold text-success">@usuario.Id</span>
-                            </td>
-                            <td>
-                                <NavLink class="nav-link"
-                                    href="@($"/verUsuario/?{(usuario.Rol == RolUsuario.Cliente ? "clienteid" : "personalid")}={usuario.Id}")">
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i> Ver usuario
-                                    </button>
-                                </NavLink>
-                            </td>
-                        </tr>
-                    }
-                }
-                </tbody>
-          </table>
     </div>
 </div>
 
@@ -239,7 +207,7 @@
     void DescenderGerente(int id)
     {
         casoDeUsoBuscarPersonalDescenderGerente.Ejecutar(id);
-        NavigationManager.NavigateTo("/listadoUsuario?mensaje=Operacion exitosa", true);
+        NavigationManager.NavigateTo("/listadoUsuario?mensaje=Descenso exitoso", true);
     }
     void DarDeBaja(int id)
     {
