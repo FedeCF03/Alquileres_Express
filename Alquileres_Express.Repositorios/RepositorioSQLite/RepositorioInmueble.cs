@@ -59,7 +59,7 @@ public class RepositorioInmueble : IRepositorioInmueble
     public Inmueble ObtenerInmueblePorNombre(string nombre)
     {
         using var _context = new Alquileres_ExpressContext();
-        var inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Nombre!.Equals(nombre)) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+        var inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Nombre!.ToLower() == nombre.ToLower()) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
         return inmueble;
     }
 

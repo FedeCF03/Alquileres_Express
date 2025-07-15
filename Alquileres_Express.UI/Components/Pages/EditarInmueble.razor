@@ -9,11 +9,7 @@
 @inject ValidadorInmueble ValidadorInmueble
 @attribute [Authorize(Roles = "Gerente,Empleado")]
 
-<h1 class="form-label">Nombre</h1>
-<input placeholder="@inmueble.Nombre" type="text" @bind="inmuebleAuxiliar.Nombre" class="form-control mb-2" />
 
- <h1 class="form-label">Precio por noche</h1>
-<input type="number" @bind="inmuebleAuxiliar.Precio" class="form-control mb-2" />
 
 @if (botonActivado)
 {
@@ -29,12 +25,6 @@
     </select>
 }
 
-<h1 for="type">Elija una política de cancelación:</h1>
-<select  @bind=inmuebleAuxiliar.PoliticaDeCancelacion class="form-select mb-2">
-<option value="@PoliticaDeCancelacion.SinCosto" >Sin costo</option>
-<option value="@PoliticaDeCancelacion.VeintePorcientoDeReembolso">Con 20% de reembolso</option>
-<option value="@PoliticaDeCancelacion.NoReembolsable">No reembolsable</option>
-</select>
 
 <script>
     window.initializeMap = function (dotNetHelper, lat, lng) {
@@ -132,8 +122,264 @@
         }
     </div>
 }
+                                                                              <!-- #region     ACA ARRANCA EL BU -->
+<div class="container">
+        <div class="form-header">
+            <h1><i class="fas fa-home"></i> Editar Inmueble</h1>
+            <p>Modifica los detalles de tu propiedad</p>
+        </div>
 
+        <form id="inmuebleForm">
+            <!-- Información básica -->
+            <div class="section">
+                <h3><i class="fas fa-info-circle"></i> Información Básica</h3>
+                
+                <div class="mb-3">
+                    <label class="form-label">Nombre del Inmueble</label>
+                    <input placeholder="@inmueble.Nombre" type="text" @bind="inmuebleAuxiliar.Nombre" class="form-control mb-2" />
+                </div>
 
+                <div class="mb-3">
+                    <label class="form-label">Precio por Noche</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" @bind="inmuebleAuxiliar.Precio" class="form-control mb-2" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Política de Cancelación</label>
+                    <select  @bind=inmuebleAuxiliar.PoliticaDeCancelacion class="form-select mb-2">
+                        <option value="">Selecciona una política</option>
+                        <option value="@PoliticaDeCancelacion.SinCosto" >Sin costo</option>
+                        <option value="@PoliticaDeCancelacion.VeintePorcientoDeReembolso">Con 20% de reembolso</option>
+                        <option value="@PoliticaDeCancelacion.NoReembolsable">No reembolsable</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Toggle para detalles adicionales -->
+            <div class="toggle-section">
+                <button type="button" class="toggle-btn" id="toggleDetails">
+                    <i class="fas fa-plus"></i> Mostrar Detalles Adicionales
+                </button>
+            </div>
+
+            <!-- Detalles adicionales (inicialmente ocultos) -->
+            <div id="additionalDetails" style="display: none;">
+                <div class="section">
+                    <h3><i class="fas fa-map-marker-alt"></i> Ubicación</h3>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" class="form-control" placeholder="Ej: Calle Principal 123">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Ciudad</label>
+                        <input type="text" class="form-control" placeholder="Ej: Buenos Aires">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Inmueble</label>
+                        <select class="form-select">
+                            <option value="">Selecciona el tipo</option>
+                            <option value="vivienda">Vivienda</option>
+                            <option value="negocio">Negocio</option>
+                            <option value="garaje">Garaje</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Ubicación en el Mapa</label>
+                        <div class="map-container">
+                            <div id="map" style="height: 300px; background: #e9ecef; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                <div style="text-align: center;">
+                                    <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                    <p>Mapa de Google Maps se cargará aquí</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3><i class="fas fa-bed"></i> Características</h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Cantidad de Baños</label>
+                                <input type="number" class="form-control" placeholder="0" min="0">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Cantidad de Camas</label>
+                                <input type="number" class="form-control" placeholder="0" min="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de fotos -->
+            <div class="photos-section">
+                <h3><i class="fas fa-images"></i> Fotos del Inmueble</h3>
+                
+                <div class="photo-upload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h5>Subir Fotos</h5>
+                    <p class="text-muted">Arrastra y suelta las fotos aquí o haz clic para seleccionar</p>
+                    <input type="file" class="form-control" accept=".png,.jpeg,.jpg" multiple style="display: none;" id="fileInput">
+                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> Seleccionar Fotos
+                    </button>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <span class="photo-counter">
+                        <i class="fas fa-image"></i> 0 fotos subidas
+                    </span>
+                    <button type="button" class="btn btn-primary" id="uploadBtn">
+                        <i class="fas fa-upload"></i> Subir Fotos
+                    </button>
+                </div>
+
+                <!-- Grid de imágenes -->
+                <div class="image-grid" id="imageGrid">
+                    <!-- Las imágenes se mostrarán aquí dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Mensajes de error -->
+            <div id="errorContainer"></div>
+
+            <!-- Botones de acción -->
+            <div class="button-group">
+                <button type="button" class="btn btn-danger">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle para mostrar/ocultar detalles adicionales
+        document.getElementById('toggleDetails').addEventListener('click', function() {
+            const details = document.getElementById('additionalDetails');
+            const button = this;
+            
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-minus"></i> Ocultar Detalles Adicionales';
+                button.classList.add('active');
+            } else {
+                details.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-plus"></i> Mostrar Detalles Adicionales';
+                button.classList.remove('active');
+            }
+        });
+
+        // Simulación de subida de fotos
+        let photoCount = 0;
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const imageGrid = document.getElementById('imageGrid');
+        const photoCounter = document.querySelector('.photo-counter');
+
+        fileInput.addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                uploadBtn.disabled = false;
+            }
+        });
+
+        uploadBtn.addEventListener('click', function() {
+            const files = fileInput.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const imageCard = document.createElement('div');
+                    imageCard.className = 'image-card';
+                    imageCard.innerHTML = `
+                        <img src="${e.target.result}" alt="Foto ${photoCount + 1}">
+                        <button onclick="removeImage(this)"><i class="fas fa-trash"></i></button>
+                    `;
+                    
+                    imageGrid.appendChild(imageCard);
+                    photoCount++;
+                    updatePhotoCounter();
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            fileInput.value = '';
+            uploadBtn.disabled = true;
+        });
+
+        function removeImage(button) {
+            button.parentElement.remove();
+            photoCount--;
+            updatePhotoCounter();
+        }
+
+        function updatePhotoCounter() {
+            photoCounter.innerHTML = `<i class="fas fa-image"></i> ${photoCount} fotos subidas`;
+        }
+
+        // Validación del formulario
+        document.getElementById('inmuebleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Aquí puedes agregar la lógica de validación y envío
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = '';
+            
+            // Ejemplo de validación
+            const nombre = document.querySelector('input[type="text"]').value;
+            const precio = document.querySelector('input[type="number"]').value;
+            
+            if (!nombre || !precio) {
+                showError('Por favor completa todos los campos requeridos.');
+                return;
+            }
+            
+            if (photoCount === 0) {
+                showError('Debes subir al menos una foto del inmueble.');
+                return;
+            }
+            
+            // Si todo está bien, mostrar mensaje de éxito
+            showSuccess('¡Inmueble actualizado correctamente!');
+        });
+
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> ${message}
+                </div>
+            `;
+        }
+
+        function showSuccess(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> ${message}
+                </div>
+            `;
+        }
+    </script>
 
 @code {
     private int fotoActual = 0;
