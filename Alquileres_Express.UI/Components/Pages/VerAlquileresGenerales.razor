@@ -410,7 +410,7 @@
         Inmueble? inmueble = casoDeUsoObtenerInmueble.Ejecutar(alquiler.InmuebleId);
         Cliente? cliente = casoDeUsoBuscarClientePorId.Ejecutar(alquiler.ClienteId);
         servicioEnviarEmail.EnviarEmail(cliente!.Correo, "Alquiler cancelado", "La política de cancelación del inmueble es: ", inmueble.DevolverPoliticaDeCancelacion() + ". Por favor, comuníquese con algún empleado en el caso de que se devuelva dinero.");
-        NavigationManager.NavigateTo($"/alquileres-de-inmueble/{id}", true); 
+        NavigationManager.NavigateTo($"/alquileres-totales", true); 
 
     }
     public async Task AñadirLlave(int alquilerId,  int clienteId, bool esEntrega )

@@ -301,7 +301,7 @@
 
 
     List<Valoracion> ListaValoraciones { get; set; } = new List<Valoracion>();
-
+    ContadorDeFrecuencias<string> contadorFechas = new ();
     private List<RangoDeFechas> FechasReservadas { get; set; } = [];
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
@@ -400,12 +400,15 @@
         !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado)).ToList().ForEach(alquiler =>
         {
             FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio.AddDays(1), alquiler.FechaDeFin.AddDays(-1)));
+            contadorFechas.Agregar(alquiler.FechaDeInicio.ToShortDateString()); 
+            contadorFechas.Agregar(alquiler.FechaDeFin.ToShortDateString());
         });
     }
 
     private bool NoEsHabil(DateTimeOffset date)
     {
-        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date.AddHours(14) < DateTime.Now;
+
+        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date.AddHours(14) < DateTime.Now || contadorFechas.Frecuencia(date.DateTime.ToShortDateString()) == 2;
     }
 
     private void VerificarFechas()
@@ -420,18 +423,14 @@
         {
             mensajeError = "Debe elegir por lo menos una noche.";
             podesPagar = false;
-            return;if (StartDate.Value.Date == EndDate.Value.Date)
-        {
-            mensajeError = "Debe elegir por lo menos una noche.";
-            podesPagar = false;
             return;
-        }
         }
         for (DateTime date = StartDate.Value.Date; date <= EndDate.Value.Date; date = date.AddDays(1))
         {
             if (NoEsHabil(date))
             {
                 mensajeError = $"Una o más fechas seleccionadas no están disponibles. Por favor, elija fechas que no estén bloqueadas.";
+                StateHasChanged();
                 podesPagar = false;
                 return;
             }
