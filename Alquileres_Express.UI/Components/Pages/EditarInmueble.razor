@@ -231,7 +231,7 @@
                     <i class="fas fa-cloud-upload-alt"></i>
                     <h5>Subir Fotos</h5>
                     <p class="text-muted">Arrastra y suelta las fotos aquí o haz clic para seleccionar</p>
-                    <input type="file" class="form-control" accept=".png,.jpeg,.jpg" multiple style="display: none;" id="fileInput">
+                    <input onchange="CaptureFiles" type="file" class="form-control" accept=".png,.jpeg,.jpg" multiple style="display: none;" id="fileInput">
                     <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click()">
                         <i class="fas fa-folder-open"></i> Seleccionar Fotos
                     </button>

@@ -92,7 +92,7 @@
                 <AuthorizeView Roles=" Gerente, Empleado">
                 @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
                 {
-                    if (alquiler.PuedeEntregarLlave())
+                    if (alquiler.PuedeEntregarLlave() && alquiler.GetEstadoDeAlquiler() == EstadoDeAlquiler.Vigente)
                     {
                         <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
                             <i class= "fas fa-times" > </i> Registrar entrega 
@@ -126,6 +126,10 @@
                 {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler)" >
                         <i class="fas fa-times"></i> Cancelar
                     </button>
+
+                    <span class="status-label terminado">
+                            <i class="fas fa-check"></i> Vigente
+                    </span>
                 }
                 
                 @if (estado == EstadoDeAlquiler.Terminado)

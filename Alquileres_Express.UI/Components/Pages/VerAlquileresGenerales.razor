@@ -64,8 +64,8 @@
                     Rango de Fechas
                 </label>
                 <div class="date-range">
-                <input type="date" @bind="FechaInicio" @oninput="AplicarFiltros" class="filter-input" />
-                    <input type="date" @bind="FechaFin" @oninput="AplicarFiltros" class="filter-input"  />
+                <input type="date" @bind="FechaInicio" @bind:after="AplicarFiltros" class="filter-input" />
+                <input type="date" @bind="FechaFin" @bind:after="AplicarFiltros" class="filter-input" />
                 </div>
             </div>
 
@@ -160,7 +160,7 @@
             <div class="rental-actions">
                 @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
                 {
-                    if (alquiler.PuedeEntregarLlave())
+                    if (alquiler.PuedeEntregarLlave() && alquiler.GetEstadoDeAlquiler() == EstadoDeAlquiler.Vigente)
                     {
                         <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
                             <i class= "fas fa-times" > </i> Registrar entrega 
@@ -193,6 +193,10 @@
                             <i class="fas fa-times"></i> 
                             Cancelar
                         </button>
+
+                        <span class="status-label terminado">
+                            <i class="fas fa-check"></i> Vigente
+                         </span>
                     }
                     
                     @if (estado == EstadoDeAlquiler.Terminado)
@@ -290,8 +294,10 @@
                 getInmuebles();
             }
         }
-        filtrarEntreFechas(DateTime.Today, DateTime.Today);
-        Console.WriteLine("");
+        alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date == DateTime.Today.Date || f.FechaDeFin.Date ==
+        DateTime.Today.Date)
+        .ToList();
+         Console.WriteLine("");
     }
     private void getInmuebles()
     {
@@ -326,7 +332,7 @@
         StateHasChanged();
     }
 
-    private void AplicarFiltros(ChangeEventArgs e)
+    private void AplicarFiltros()
     {   
         if (FechaInicio > FechaFin)
         {
@@ -336,9 +342,7 @@
         }else
         {
             alquileresAux.Clear();
-            alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date >= FechaInicio.Date &&
-            f.FechaDeInicio.Date <= FechaFin.Date || f.FechaDeFin.Date >= FechaInicio.Date &&
-            f.FechaDeFin.Date <= FechaFin.Date).ToList();
+            filtrarEntreFechas(FechaInicio, FechaFin);
             filtroRapido = "";
         }
 
@@ -363,10 +367,9 @@
                 filtroRapido = "todos";
                 break;
             case "hoy":
-                filtrarEntreFechas(DateTime.Today, DateTime.Today);
-                filtroRapido = "hoy";
-                FechaInicio = DateTime.Today;
-                FechaFin = DateTime.Today;
+                alquileresAux.Clear();
+                alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date == DateTime.Today.Date || f.FechaDeFin.Date == DateTime.Today.Date)
+                .ToList();
                 break;
             case "semana":
                 int diferencia = (7 + (DateTime.Now.DayOfWeek - DayOfWeek.Monday)) % 7;
@@ -375,9 +378,9 @@
                 alquileresAux.Clear();
                 FechaInicio = fechaInicioSemana;
                 FechaFin = fechaFinSemana;
-                alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date >= fechaInicioSemana.Date && 
-                f.FechaDeInicio.Date <= fechaFinSemana.Date ||  f.FechaDeFin.Date >= fechaInicioSemana.Date &&
-                f.FechaDeFin.Date <= fechaFinSemana.Date).ToList();
+                alquileresAux = alquileres.Where(f => (f.FechaDeInicio.Date >= fechaInicioSemana.Date && 
+                f.FechaDeInicio.Date <= fechaFinSemana.Date) || (f.FechaDeFin.Date >= fechaInicioSemana.Date &&
+                f.FechaDeFin.Date <= fechaFinSemana.Date)).ToList();
                 filtroRapido = "semana";
                 break;
             default:
@@ -389,6 +392,7 @@
     }
 
     private void AplicarFiltrosBusqueda(ChangeEventArgs e){     // fede crack
+       
         filtroTexto = e.Value?.ToString() ?? string.Empty;
         if (string.IsNullOrEmpty(filtroTexto))
         {
