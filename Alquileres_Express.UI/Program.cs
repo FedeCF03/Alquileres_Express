@@ -11,6 +11,7 @@ using Microsoft.Extensions.FileProviders;
 using Alquileres_Express.Repositorios.RepositorioSQLite;
 using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
 using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoPagarEfectivo;
+using System.Diagnostics;
 
 
 var builder = WebApplication.CreateBuilder(args);

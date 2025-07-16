@@ -6,6 +6,7 @@
 @using Alquileres_Express.Repositorios.Context
 @using Microsoft.EntityFrameworkCore
 @using BlazorDateRangePicker
+
 @inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
 @rendermode InteractiveServer
 @inject NavigationManager Navegador
@@ -78,6 +79,7 @@
     DateTimeOffset? StartDate { get; set; }
     DateTimeOffset? EndDate { get; set; }
     private List<RangoDeFechas> FechasReservadas { get; set; } = [];
+    ContadorDeFrecuencias<string> contadorFechas = new ();
     private string mensajeError = string.Empty;
     private bool podesPagar { get; set; } = false;
     private Inmueble? inmueble;
@@ -172,12 +174,14 @@
         !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado) && a.Pagado).ToList().ForEach(alquiler =>
         {
             FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio.AddDays(1), alquiler.FechaDeFin.AddDays(-1)));
+            contadorFechas.Agregar(alquiler.FechaDeInicio.ToShortDateString()); 
+            contadorFechas.Agregar(alquiler.FechaDeFin.ToShortDateString());
         });
         Console.WriteLine($"Fechas reservadas: {FechasReservadas.Count}");
     }
     private bool NoEsHabil(DateTimeOffset date)
     {
-        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date.AddHours(14) < DateTime.Now;
+        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date.AddHours(14) < DateTime.Now || contadorFechas.Frecuencia(date.DateTime.ToShortDateString()) == 2;
     }
     private void VerificarFechas()
     {
