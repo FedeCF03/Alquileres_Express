@@ -47,7 +47,7 @@
         </div>
 
         <!-- Filtros rápidos -->
-      <div class="quick-filters"></div>
+      <div class="quick-filters">
         <button class="quick-filter @(filtroRapido == "todos" ? "active" : "")"
             @onclick="@(() => AplicarFiltroRapido("todos"))">Todos</button>
         <button class="quick-filter @(filtroRapido == "hoy" ? "active" : "")"
@@ -68,33 +68,24 @@
                 <input type="date" @bind="FechaFin" @bind:after="AplicarFiltros" class="filter-input" />
                 </div>
             </div>
-
-            <div class="filter-group">
-                <label class="filter-label">
-                    <i class="fas fa-sort-amount-down"></i>
-                    Ordenar por
-                </label>
-            <select class="filter-select" @bind="ordenSeleccionado" @oninput="AplicarFiltros">
-                    <option value="fecha-desc">Fecha más reciente</option>
-                    <option value="fecha-asc">Fecha más antigua</option>
-                </select>
-            </div>
         </div>
+        
+        @if (!String.IsNullOrEmpty(mensajeError))
+        {
+            <div class="alert alert-danger mt-3" role="alert">
+                @mensajeError
+            </div>
+        }
 
         <!-- Barra de acciones -->
         <div class="actions-bar">
             <div class="results-info">
                 <i class="fas fa-info-circle"></i>
-                <span>Mostrando @alquileresAux.Count de @alquileres.Count alquileres</span>
-            </div>
-            
-            <div class="filter-actions">
-                <button class="btn btn-secondary" @onclick="LimpiarFiltros">
-                    <i class="fas fa-eraser"></i> "Limpiar Filtros" 
-                </button>
-            </div>      
+                <span>Mostrando @alquileresAux.Count de @alquileres.Count alquileres @mensaje</span>
+            </div>   
         </div>
     </div>
+</div>
 
 
 <div class="rental-grid">
@@ -250,6 +241,8 @@
 @code {
     private string correo = "";
     private string rol = "";
+    private string mensaje = "Se muestran los alquileres que empiezan o terminan hoy.";
+    private string mensajeError = "";
     private List<Alquiler> alquileres = new ();
     private List<Alquiler> alquileresAux = new();
     private string filtroRapido = "hoy";
@@ -325,66 +318,66 @@
     private void LimpiarFiltros()
     {
         alquileresAux.Clear();
-        foreach (var alquiler in alquileres)
-        {
-            alquileresAux.Add(alquiler);
-        }
+        alquileresAux.AddRange(alquileres);
         StateHasChanged();
     }
 
     private void AplicarFiltros()
     {   
+        alquileresAux.Clear();
         if (FechaInicio > FechaFin)
         {
             // Mostrar mensaje de error o manejar el caso según sea necesario
-            Console.WriteLine("La fecha de inicio no puede ser mayor que la fecha de fin.");
+            mensajeError = "La fecha de inicio no puede ser posterior a la fecha de fin.";
             return;
         }else
         {
-            alquileresAux.Clear();
             filtrarEntreFechas(FechaInicio, FechaFin);
+            mensajeError = string.Empty;
             filtroRapido = "";
         }
 
         if(ordenSeleccionado =="fecha-desc")
         {
-            alquileresAux.Sort((a, b) => a.FechaDeInicio.CompareTo(b.FechaDeInicio));
+            alquileresAux.Sort((a, b) => b.FechaDeInicio.CompareTo(a.FechaDeInicio));
         }
         else
         {
-            alquileresAux.Sort((a, b) => b.FechaDeInicio.CompareTo(a.FechaDeInicio)); 
+            alquileresAux.Sort((a, b) => a.FechaDeInicio.CompareTo(b.FechaDeInicio)); 
         }
     }
 
 
     private void AplicarFiltroRapido(string filtro)
     {
+        mensajeError = string.Empty;
+        alquileresAux.Clear();
         switch (filtro)
         {
             case "todos":
-                alquileresAux.Clear();
                 alquileresAux.AddRange(alquileres);
                 filtroRapido = "todos";
+                mensaje = "Se muestran todos los alquileres.";
                 break;
             case "hoy":
-                alquileresAux.Clear();
                 alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date == DateTime.Today.Date || f.FechaDeFin.Date == DateTime.Today.Date)
                 .ToList();
+                filtroRapido = "hoy";
+                mensaje = "Se muestran los alquileres que empiezan o terminan hoy.";
                 break;
             case "semana":
                 int diferencia = (7 + (DateTime.Now.DayOfWeek - DayOfWeek.Monday)) % 7;
                 var fechaInicioSemana = DateTime.Now.Date.AddDays(-diferencia);
                 var fechaFinSemana = fechaInicioSemana.AddDays(6);
-                alquileresAux.Clear();
                 FechaInicio = fechaInicioSemana;
                 FechaFin = fechaFinSemana;
                 alquileresAux = alquileres.Where(f => (f.FechaDeInicio.Date >= fechaInicioSemana.Date && 
                 f.FechaDeInicio.Date <= fechaFinSemana.Date) || (f.FechaDeFin.Date >= fechaInicioSemana.Date &&
                 f.FechaDeFin.Date <= fechaFinSemana.Date)).ToList();
                 filtroRapido = "semana";
+                mensaje = "Se muestran los alquileres que empiezan o terminan esta semana.";
                 break;
             default:
-                alquileresAux.Clear();
                 alquileresAux.AddRange(alquileres);
                 break;
         }        
@@ -394,6 +387,10 @@
     private void AplicarFiltrosBusqueda(ChangeEventArgs e){     // fede crack
        
         filtroTexto = e.Value?.ToString() ?? string.Empty;
+        mensajeError = string.Empty;
+        filtroRapido = "";
+        FechaInicio = DateTime.Today;
+        FechaFin = DateTime.Today;
         if (string.IsNullOrEmpty(filtroTexto))
         {
             alquileresAux.Clear();
@@ -405,7 +402,9 @@
             alquileresAux = alquileres.Where(a => a.CorreoCliente.Contains(filtroTexto, StringComparison.OrdinalIgnoreCase) ||
               inmuebles.Any(i => i.Id == a.InmuebleId && i.Nombre!.Contains(filtroTexto, StringComparison.OrdinalIgnoreCase))    
             ).ToList();
+
         }
+        mensaje = $"Se muestran los alquileres que contienen '{filtroTexto}' en el nombre del inmueble o del cliente.";
         StateHasChanged();
     }
     private void CancelarReserva(Alquiler alquiler)
@@ -433,5 +432,6 @@
        alquileresAux.Clear();
        alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date >= fechaInicio && f.FechaDeFin.Date <= fechaFin.Date)
             .ToList();
+         mensaje = $"Se muestran los alquileres que ocurren entre {fechaInicio.ToString("dd/MM/yyyy")} y {fechaFin.ToString("dd/MM/yyyy")}.";
     }
 }
