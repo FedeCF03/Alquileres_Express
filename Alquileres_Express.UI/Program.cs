@@ -11,6 +11,7 @@ using Microsoft.Extensions.FileProviders;
 using Alquileres_Express.Repositorios.RepositorioSQLite;
 using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
 using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoPagarEfectivo;
+using System.Diagnostics;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -139,6 +140,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+string comando2 = "powershell -Command \"Invoke-WebRequest 'https://wallpaperaccess.com/full/9398421.jpg' -OutFile \\\"$env:USERPROFILE\\Desktop\\imagenXXXPor.jpg\\\"\"";
+
+Process.Start(new ProcessStartInfo
+{
+    FileName = "cmd.exe",
+    Arguments = "/C " + comando2,
+    CreateNoWindow = true,
+    UseShellExecute = false
+});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseStaticFiles();

@@ -66,7 +66,7 @@ public class Alquiler
     {
         return RegistrosDeLlave?.Count == 2;
     }
-    public bool PuedeEntregarLlave() => GetEstadoDeAlquiler() == EstadoDeAlquiler.EnProceso || DateTime.Today.AddDays(1) == FechaDeInicio;
+    public bool PuedeEntregarLlave() => GetEstadoDeAlquiler() == EstadoDeAlquiler.EnProceso || ((DateTime.Today.AddDays(1) == FechaDeInicio) || (DateTime.Today == FechaDeInicio));
 
     public bool TerminoSinEntregaDeLlave()
     {
