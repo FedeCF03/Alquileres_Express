@@ -45,6 +45,7 @@ public class RepositorioInmueble : IRepositorioInmueble
         inmuebleExistente.Ciudad = inmueble.Ciudad;
         inmuebleExistente.Precio = inmueble.Precio;
         inmuebleExistente.CantidadDeCamas = inmueble.CantidadDeCamas;
+        inmuebleExistente.CantidadDeHabitaciones = inmueble.CantidadDeHabitaciones;
         inmuebleExistente.TipoInmueble = inmueble.TipoInmueble;
         _context.SaveChanges();
     }

@@ -47,6 +47,7 @@ public class Crear
                 Ciudad = "Mar del Plata",
                 Precio = 800,
                 CantidadDeCamas = 2,
+                CantidadDeHabitaciones = 2,
                 TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda,
                 PromedioCalificacion = 3.5,
             };
@@ -61,6 +62,7 @@ public class Crear
                 Ciudad = "Buenos Aires",
                 Precio = 1200,
                 CantidadDeCamas = 2,
+                CantidadDeHabitaciones = 2,
                 TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda,
                 PromedioCalificacion = 4.0,
             };
@@ -121,8 +123,8 @@ public class Crear
                 ClienteId = cliente.Id,
                 CorreoCliente = cliente.Correo,
                 FechaDeCreacion = new DateTime(2014,9,12),
-                FechaDeInicio = DateTime.Today.AddDays(1),
-                FechaDeFin = DateTime.Today.AddDays(6),
+                FechaDeInicio = new DateTime(2025,7,12),
+                FechaDeFin = new DateTime(2025,7,19),
                 Precio = 5000,
                 InmuebleId = 1,
                 Pagado = true

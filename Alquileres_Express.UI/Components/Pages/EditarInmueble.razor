@@ -190,8 +190,14 @@
             {
                 <h1 class="form-label">Cantidad de Baños</h1>
                 <input type="number" @bind="inmuebleAuxiliar.Banios" class="form-control mb-2" />
+                <h1 class="form-label">Cantidad de Habitaciones</h1>
+                <input type="number" @bind="inmuebleAuxiliar.CantidadDeHabitaciones" class="form-control mb-2" />
                 <h1 class="form-label">Cantidad de Camas</h1>
                 <input type="number" @bind="inmuebleAuxiliar.CantidadDeCamas" class="form-control mb-2" />
+                <div class="mb-3">
+                    <label class="form-label">Dirección</label>
+                    <input placeholder="@inmueble.Direccion" type="text" @bind="inmuebleAuxiliar.Direccion" class="form-control mb-2" />
+                </div>
                 <h1 class="form-label">Ubicación en el Mapa</h1>
 
                 <div id="map" style="height: 400px; width: 80%;">
@@ -244,6 +250,8 @@
     {
         try
         {
+            bool ok = inmueble!.Alquileres!.All(a =>a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Cancelado || a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Terminado);
+
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
             botonActivado = inmueble.Alquileres == null || inmueble.Alquileres.Count == 0 || inmueble.Alquileres.All(a =>a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Cancelado || a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Terminado);
             inmuebleAuxiliar = new Inmueble
@@ -258,7 +266,8 @@
                 Banios = inmueble.Banios,
                 CantidadDeCamas = inmueble.CantidadDeCamas,
                 CoordLat = inmueble.CoordLat,
-                CoordLong = inmueble.CoordLong
+                CoordLong = inmueble.CoordLong,
+                CantidadDeHabitaciones = inmueble.CantidadDeHabitaciones,
             };
 
            fotos = inmueble.Fotos ?? [];
