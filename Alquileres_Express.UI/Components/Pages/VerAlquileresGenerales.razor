@@ -404,13 +404,15 @@
         }
         StateHasChanged();
     }
-    private void CancelarReserva(Alquiler alquiler)
+    private  async Task CancelarReserva(Alquiler alquiler)
     {
         casoDeUsoAlquilerCancelarAlquiler.Ejecutar(alquiler.Id);
         Inmueble? inmueble = casoDeUsoObtenerInmueble.Ejecutar(alquiler.InmuebleId);
         Cliente? cliente = casoDeUsoBuscarClientePorId.Ejecutar(alquiler.ClienteId);
         servicioEnviarEmail.EnviarEmail(cliente!.Correo, "Alquiler cancelado", "La política de cancelación del inmueble es: ", inmueble.DevolverPoliticaDeCancelacion() + ". Por favor, comuníquese con algún empleado en el caso de que se devuelva dinero.");
-        NavigationManager.NavigateTo($"/alquileres-de-inmueble/{id}", true); 
+        mensajeLlave = "✔️ Alquiler cancelado correctamente.";
+        await Task.Delay(5000);
+        NavigationManager.NavigateTo($"/alquileres-totales/", true);
 
     }
     public async Task AñadirLlave(int alquilerId,  int clienteId, bool esEntrega )
@@ -427,7 +429,7 @@
     }
     private void filtrarEntreFechas( DateTime fechaInicio, DateTime fechaFin){
        alquileresAux.Clear();
-       alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date >= fechaInicio && f.FechaDeFin.Date <= fechaFin.Date)
+       alquileresAux = alquileres.Where(f => f.FechaDeInicio.Date == fechaInicio || f.FechaDeFin.Date == fechaFin.Date)
             .ToList();
     }
 }

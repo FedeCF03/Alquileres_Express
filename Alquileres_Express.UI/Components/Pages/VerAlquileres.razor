@@ -297,11 +297,13 @@
         return inmuebles!.FirstOrDefault(i => i.Id == inmuebleId)!;
     }
 
-    private void CancelarReserva(Alquiler alquiler)
+    private async Task CancelarReserva(Alquiler alquiler)
     {
         Cliente clienteDeAlquiler = casoDeUsoBuscarClientePorId.Ejecutar(alquiler.ClienteId)!;
         casoDeUsoAlquilerCancelarAlquiler.Ejecutar(alquiler.Id);
         Inmueble? inmueble = casoDeUsoObtenerInmueble.Ejecutar(alquiler.InmuebleId);
+        mensajeLlave = "✔️ Alquiler cancelado correctamente.";
+        await Task.Delay(5000);
         servicioEnviarEmail.EnviarEmail(clienteDeAlquiler!.Correo, "Alquiler cancelado", "La política de cancelación del inmueble es: ", inmueble.DevolverPoliticaDeCancelacion() + ". Por favor, comuníquese con algún empleado en el caso de que se devuelva dinero.");
         NavigationManager.NavigateTo($"/alquileres/{id}", true);    
 
