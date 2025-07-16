@@ -213,12 +213,14 @@
             Nav.NavigateTo("/login");
         }
     }
-    private void CancelarReserva(Alquiler alquiler)
+    private async Task CancelarReserva(Alquiler alquiler)
     {
         casoDeUsoAlquilerCancelarAlquiler.Ejecutar(alquiler.Id);
         Inmueble? inmueble = casoDeUsoObtenerInmueble.Ejecutar(alquiler.InmuebleId);
         Cliente? cliente = casoDeUsoBuscarClientePorId.Ejecutar(alquiler.ClienteId);
-        servicioEnviarEmail.EnviarEmail(cliente!.Correo, "Alquiler cancelado", "La política de cancelación del inmueble es: ", inmueble.DevolverPoliticaDeCancelacion() + ". Por favor, comuníquese con algún empleado en el caso de que se devuelva dinero.");
+        mensajeLlave = "✔️ Alquiler cancelado correctamente.";
+        await Task.Delay(5000);
+        servicioEnviarEmail.EnviarEmail("tomicarp12@gmail.com", "Alquiler cancelado", "La política de cancelación del inmueble es: ", inmueble.DevolverPoliticaDeCancelacion() + ". Por favor, comuníquese con algún empleado en el caso de que se devuelva dinero.");
         Nav.NavigateTo($"/alquileres-de-inmueble/{id}", true);    
 
     }
