@@ -53,7 +53,7 @@ public class RepositorioInmueble : IRepositorioInmueble
     public Inmueble ObtenerInmueblePorId(int id)
     {
         using var _context = new Alquileres_ExpressContext();
-        var inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Id == id) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+        var inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres)!.ThenInclude(a => a.RegistrosDeLlave).Include(i => i.Fotos).FirstOrDefault(i => i.Id == id) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
         return inmueble;
     }
 
@@ -146,7 +146,7 @@ public class RepositorioInmueble : IRepositorioInmueble
     public decimal obtenerIngresosDeInmueble(int id)
     {
         using var _context = new Alquileres_ExpressContext();
-        decimal num = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).FirstOrDefault(i => i.Id == id).Alquileres.Where(a => a.Pagado).Sum(a => a.Precio);
+        decimal num = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).FirstOrDefault(i => i.Id == id).Alquileres!.Where(a => a.Pagado).Sum(a => a.Precio);
         return num;
     }
     public void PromedioValoracion(int idInmueble)
