@@ -247,7 +247,7 @@
             }
             if (rol == "Cliente" && cliente.Correo != correo)
             {
-                NavigationManager.NavigateTo("/?mensaje=No tenes permisos papi&EsMensajeDeError=true");
+                NavigationManager.NavigateTo("/?mensaje=No tenes permisos&EsMensajeDeError=true");
             }
             if (rol == "Gerente" || rol == "Empleado")
             {
@@ -339,7 +339,7 @@
         mensajeLlave = esEntrega
         ? "✔️ Entrega registrada correctamente."
         : "🔄 Devolución registrada correctamente.";
-        await Task.Delay(1500);
+        await Task.Delay(3500);
 
         NavigationManager.NavigateTo($"/alquileres/{id}", true);
     }

@@ -56,12 +56,6 @@
         <div class="filtro-bloque">
             <label class="filtro-label">Nombre del inmueble</label>
             <input type="text" @bind="nombreABuscar" class="filtro-input" placeholder="Ej: Casa del Lago" />
-            @if (!string.IsNullOrWhiteSpace(mensajeErrorNombre))
-            {
-                <div class="filtro-error">@mensajeErrorNombre</div>
-            }
-            <button class="btn btn-primary" @onclick="ResetearInmuebles">Mostrar todos</button>
-
         </div>
     }
 
@@ -105,12 +99,6 @@
                 <div class="filtro-error">@mensajeErrorCantidadPersonas</div>
             }
         </div>
-
-        <div class="filtro-bloque">
-            <label class="filtro-checkbox">
-                <input type="checkbox" @bind="ordenarPorMejorValoradas" /> Ordenar por mejor valoradas
-            </label>
-        </div>
     }
 
     <button class="boton-filtro buscar" @onclick="Filtrar">Buscar</button>
@@ -136,8 +124,6 @@
     private string mensajeErrorPrecio = string.Empty;
     private string mensajeErrorLocalidad = string.Empty;
     private string mensajeErrorCantidadPersonas = string.Empty;
-    private string mensajeErrorNombre = string.Empty;
-    private bool ordenarPorMejorValoradas = false;
 
     protected override void OnInitialized()
     {
@@ -156,13 +142,9 @@
         {
             if (string.IsNullOrWhiteSpace(nombreABuscar))
             {
-                mensajeErrorNombre = "El nombre no puede estar vacío.";
+                ResetearInmuebles();
                 StateHasChanged();
                 return;
-            }
-            else
-            {
-                mensajeErrorNombre = string.Empty;
             }
             inmuebles.Clear();
             try
@@ -213,10 +195,6 @@
 
             inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(casoDeUsoListarInmuebles.ListarNoDisponibles());
         }
-        if (ordenarPorMejorValoradas)
-        {
-            inmuebles = inmuebles.OrderByDescending(i => i.PromedioCalificacion).ToList();
-        }
         StateHasChanged();
     }
     private void irInmueble(int id)
@@ -230,6 +208,7 @@
     {
         buscarPorNombre = true;
         mostrarFiltros = false;
+        nombreABuscar = string.Empty;
         ResetearInmuebles();
     }
 
@@ -237,12 +216,12 @@
     {
         buscarPorNombre = false;
         mostrarFiltros = true;
+        nombreABuscar = string.Empty;
         ResetearInmuebles();
     }
 
     private void ResetearInmuebles()
     {
         inmuebles = casoDeUsoListarInmuebles.ListarNoDisponibles();
-        nombreABuscar = string.Empty;
     }
 }

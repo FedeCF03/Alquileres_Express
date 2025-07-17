@@ -93,6 +93,7 @@
     {
     @foreach (var alquiler in alquileresAux)
         {
+            var cliente = casoDeUsoBuscarClientePorId.Ejecutar(alquiler.ClienteId);
             var inmueble = GetInmuebleById(alquiler.InmuebleId);
             @if (inmueble != null)
             {
@@ -123,7 +124,7 @@
                     <span class="detail-label">Dirección:</span>
                     <span class="detail-value">@inmueble.Direccion</span>
                 </div>
-
+                
                 <div class="detail-item">
                     <i class="fas fa-calendar-check detail-icon"></i>
                     <span class="detail-label">Check-in:</span>
@@ -257,6 +258,7 @@
     [Parameter]
     public int id { get; set; } = 0;
     Personal? personal;
+    Cliente? clienete;
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();

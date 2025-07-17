@@ -21,8 +21,11 @@
 @inject CasoDeUsoPromedioValoracion casoDeUsoPromedioValoracion
 @inject CasoDeUsoEliminarInmueble CasoDeUsoEliminarInmueble
 @inject CasoDeUsoListarLlaves casoDeUsoListarLlaves
+ <Cuadro @ref=dialogo Mensaje="¿Está seguro que desea eliminar el inmueble?" OnConfirmado="()=>EliminarInmueble(Id)"/>
 
 
+@if (inmueble != null)
+{
 <div class="property-page">
     <!-- Hero Section -->
     <div class="hero-section">
@@ -144,7 +147,7 @@
                             </div>
                             <div class="feature">
                                 <i class="fas fa-exclamation-triangle"></i>
-                                <span>Politica de cancelacion:@inmueble.PoliticaDeCancelacion</span>
+                                <span>Politica de cancelacion: @inmueble.DevolverPoliticaDeCancelacion()</span>
                             </div>
                             <div class="feature">
                                 <i class="fas fa-home"></i>
@@ -238,11 +241,15 @@
                         <AuthorizeView Roles="Empleado,Gerente">
                             <Authorized>
                                 <div class="booking-actions mt-3">
-                                    <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
-                                        <button class="btn btn-sm btn-primary">
+                                    @if (inmueble.Disponible)
+                                    {
+                                       <NavLink class="nav-link" href="@($"/registrar-alquiler/{Id}")">
+                                            <button class="btn btn-sm btn-primary">
                                             <i class="fas fa-user-check"></i> Registrar alquiler presencial
-                                        </button>
-                                    </NavLink>
+                                            </button>
+                                        </NavLink>
+                                    }
+                                    
                                     <NavLink class="nav-link" href="@($"/alquileres-de-inmueble/{Id}")">
                                         <button class="btn btn-sm btn-primary">
                                             <i class="fas fa-user-check"></i> Ver alquileres
@@ -270,7 +277,7 @@
                                         <i class="fas fa-user-check"></i> Editar inmueble
                                     </button>
                                 </NavLink>
-                                <button class="btn btn-sm btn-primary" @onclick="() => EliminarInmueble(Id)">
+                                <button class="btn btn-sm btn-primary" @onclick="ConfirmarReseteo">
                                     <i class="fas fa-user-check"></i> Eliminar inmueble
                                 </button>
 
@@ -286,14 +293,14 @@
     </div>
 </div>
 
-
+}
 
 @code {
     [Parameter]
     public int Id { get; set; }
     DateTimeOffset? StartDate { get; set; }
     DateTimeOffset? EndDate { get; set; }
-    private Inmueble? inmueble = new Inmueble();
+    private Inmueble? inmueble;
     private bool podesPagar { get; set; } = false;
     private string mensajeError = string.Empty;
     private int fotoActual = 0;
@@ -303,9 +310,7 @@
     Personal? personal { get; set; }
     Cliente? cliente { get; set; }
     private int promedioValoracion;
-
-
-    List<Valoracion> ListaValoraciones { get; set; } = new List<Valoracion>();
+    Cuadro dialogo = null!;
     ContadorDeFrecuencias<string> contadorFechas = new ();
     private List<RangoDeFechas> FechasReservadas { get; set; } = [];
     [CascadingParameter]
@@ -321,12 +326,23 @@
             rol = user.FindFirst(ClaimTypes.Role)?.Value!;
             personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
             cliente = CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
-
-            ListaValoraciones = casoDeUsoListarValoraciones.Ejecutar(Id);
         }
-        inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
-        promedioValoracion = obtenerPromedioValoracion(inmueble.Id);
-
+        try
+        {
+            inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            promedioValoracion = obtenerPromedioValoracion(inmueble.Id);
+        }
+        catch
+        {
+            NavigationManager.NavigateTo("/?mensaje=Inmueble no encontrado&EsMensajeDeError=true", true);
+            return;
+        }
+        if (rol != null && rol.Equals("Cliente") && inmueble != null && !inmueble.Disponible)
+        {
+            NavigationManager.NavigateTo("/?mensaje=El inmueble no está disponible&EsMensajeDeError=true", true);
+            return;
+        }
+        
     }
 
     void FotoSiguiente()
@@ -475,6 +491,10 @@
         
         NavigationManager.NavigateTo("/?mensaje=Inmueble eliminado correctamente");    
     }
+     private void ConfirmarReseteo()
+   {
+       dialogo.Mostrar();
+   }
 }
 
 <style>

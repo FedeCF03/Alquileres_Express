@@ -82,7 +82,7 @@
     ContadorDeFrecuencias<string> contadorFechas = new ();
     private string mensajeError = string.Empty;
     private bool podesPagar { get; set; } = false;
-    private Inmueble? inmueble;
+    private Inmueble inmueble = new();
     Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
     private decimal calcularPrecio(DateTime fechaInicio, DateTime fechaFin, decimal? monto)
     {
@@ -98,31 +98,34 @@
         {
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
             CrearRangosDeFechaReservados(inmueble!.Alquileres!.GroupJoin(casoDeUsoListarLlaves.Ejecutar(), 
-                    alquiler => alquiler.Id, 
-                    llave => llave.AlquilerId, 
-                    (alquiler, llavesCollection) => new Alquiler 
-                    {
-                        Id = alquiler.Id,
-                        InmuebleId = alquiler.InmuebleId,
-                        ClienteId = alquiler.ClienteId,
-                        NombreDePersonal = alquiler.NombreDePersonal,
-                        ApellidoDePersonal = alquiler.ApellidoDePersonal,
-                        CorreoCliente = alquiler.CorreoCliente,
-                        FechaDeCreacion = alquiler.FechaDeCreacion,
-                        FechaDeInicio = alquiler.FechaDeInicio,
-                        FechaDeFin = alquiler.FechaDeFin,
-                        Precio = alquiler.Precio,
-                        Cancelado = alquiler.Cancelado,
-                        Pagado = alquiler.Pagado,
-                        RegistrosDeLlave = llavesCollection.ToList()
-                    }).ToList());
-            Console.WriteLine();
-
+                alquiler => alquiler.Id, 
+                llave => llave.AlquilerId, 
+                (alquiler, llavesCollection) => new Alquiler 
+                {
+                    Id = alquiler.Id,
+                    InmuebleId = alquiler.InmuebleId,
+                    ClienteId = alquiler.ClienteId,
+                    NombreDePersonal = alquiler.NombreDePersonal,
+                    ApellidoDePersonal = alquiler.ApellidoDePersonal,
+                    CorreoCliente = alquiler.CorreoCliente,
+                    FechaDeCreacion = alquiler.FechaDeCreacion,
+                    FechaDeInicio = alquiler.FechaDeInicio,
+                    FechaDeFin = alquiler.FechaDeFin,
+                    Precio = alquiler.Precio,
+                    Cancelado = alquiler.Cancelado,
+                    Pagado = alquiler.Pagado,
+                    RegistrosDeLlave = llavesCollection.ToList()
+                }).ToList());
         }
-        catch (Exception)
+        catch
         {
             // Manejo de errores, por ejemplo, redirigir a una página de error o mostrar un mensaje
             Navegador.NavigateTo("/?mensaje=Inmueble no encontrado&EsMensajeDeError=true");
+        }
+        if (!inmueble.Disponible)
+        {
+            Navegador.NavigateTo("/?mensaje=El inmueble no está disponible&EsMensajeDeError=true", true);
+            return;
         }
     }
 
@@ -150,7 +153,9 @@
                 throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
             if (inmueble == null)
                 throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
-
+            if(!inmueble.Disponible){
+                throw new InvalidOperationException("El inmueble no se encuentra disponible.");
+            }
             decimal precio = calcularPrecio(StartDate.Value.DateTime, EndDate.Value.DateTime, inmueble!.Precio);
             Alquiler alquiler = new Alquiler(correoCliente, StartDate.Value.DateTime, EndDate.Value.DateTime, precio, Id,
             personal.Nombre, personal.Apellido)

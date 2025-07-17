@@ -1,4 +1,4 @@
-@page "/editar-inmueble/{id:int}"
+@page "/editar-inmueble-lindillo/{id:int}"
 @rendermode InteractiveServer
 @inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
 @inject CasoDeUsoEditarInmueble casoDeUsoEditarInmueble
@@ -45,7 +45,7 @@
     }
 </script>
 
-<div class="container" > 
+<div class="container">
         <div class="form-header">
             <h1><i class="fas fa-home"></i> Editar Inmueble</h1>
             <p>Modifica los detalles de tu propiedad</p>
@@ -77,84 +77,78 @@
                         <option value="@PoliticaDeCancelacion.NoReembolsable">No reembolsable</option>
                     </select>
                 </div>
-                @if(botonActivado)
-                {
-                            <div class="mb-3">
-                                <label class="form-label">Dirección</label>
-                                <input placeholder="@inmueble.Direccion" type="text" @bind="inmuebleAuxiliar.Direccion" class="form-control mb-2" />
-                            </div>
+            </div>
+            </form>
+            @if(botonActivado)
+            {
+                <div id="additionalDetails" style="display: none;">
+                    <div class="section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Ubicación</h3>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <input placeholder="@inmueble.Direccion" type="text" @bind="inmuebleAuxiliar.Direccion" class="form-control mb-2" />
+                        </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Ciudad</label>
-                                <input placeholder="@inmueble.Ciudad" type="text" @bind="inmuebleAuxiliar.Ciudad" class="form-control mb-2" />
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ciudad</label>
+                            <input placeholder="@inmueble.Ciudad" type="text" @bind="inmuebleAuxiliar.Ciudad" class="form-control mb-2" />
+                        </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Tipo de Inmueble</label>
-                                <select @bind="inmuebleAuxiliar.TipoInmueble" class="form-select mb-2">
-                                    <option value="@TipoDeInmueble.Vivienda">Vivienda</option>
-                                    <option value="@TipoDeInmueble.Negocio">Negocio</option>
-                                    <option value="@TipoDeInmueble.Garaje">Garaje</option>
-                                </select>
-                            </div>
-                        <div class="section">
-                            <h3><i class="fas fa-bed"></i> Características</h3>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <h1 class="form-label">Cantidad de Baños</h1>
-                                        <input type="number" @bind="inmuebleAuxiliar.Banios" class="form-control mb-2" />
-                                        </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <h1 class="form-label">Cantidad de Habitaciones</h1>
-                                        <input type="number" @bind="inmuebleAuxiliar.CantidadDeHabitaciones" class="form-control mb-2" />
-                                        
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <h1 class="form-label">Cantidad de Camas</h1>
-                                        <input type="number" @bind="inmuebleAuxiliar.CantidadDeCamas" class="form-control mb-2" />
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Inmueble</label>
+                            <select @bind="inmuebleAuxiliar.TipoInmueble" class="form-select mb-2">
+                                <option value="@TipoDeInmueble.Vivienda">Vivienda</option>
+                                <option value="@TipoDeInmueble.Negocio">Negocio</option>
+                                <option value="@TipoDeInmueble.Garaje">Garaje</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ubicación en el Mapa</label>
+                            <div class="map-container">
+                                <div id="map" style="height: 300px; background: #e9ecef; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                    <div style="text-align: center;">
+                                        <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                        <p>Mapa de Google Maps se cargará aquí</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                }
-            </div>
-            
-            </form>
-            
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-bed"></i> Características</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Cantidad de Baños</label>
+                                    <input type="number" class="form-control" placeholder="0" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Cantidad de Camas</label>
+                                    <input type="number" class="form-control" placeholder="0" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
 
             <!-- Sección de fotos -->
             <div class="photos-section">
+                <h3><i class="fas fa-images"></i> Fotos del Inmueble</h3>
                 <div class="photo-upload">
                     <i class="fas fa-cloud-upload-alt"></i>
                     <h5>Subir Fotos</h5>
+                    <input type="file" class="form-control" accept=".png,.jpeg,.jpg" multiple style="display: none;" id="fileInput">
                     <div class="mb-3">
-                          <!-- INPUT oculto -->
-                        <InputFile id="fileInput"
-                                accept=".png,.jpeg,.jpg"
-                                @key="@(inputFileId)"
-                                OnChange="CaptureFiles"
-                                multiple
-                                class="d-none" />
-
-                        <!-- BOTÓN personalizado que activa el input -->
-                        <label for="fileInput" class="btn btn-outline-primary">
-                            <i class="fas fa-folder-open"></i> Seleccionar Fotos
-                        </label>
+                        <InputFile accept=".png,.jpeg,.jpg" @key="@(inputFileId)" OnChange="CaptureFiles" multiple class="file-input-custom" />
                     </div>
                 </div>
-                    @if (browser != null && browser.FileCount > 0)
-                    {
-                       <p style="color: black;"> @browser.FileCount fotos cargadas. Presione "Subir fotos" para guardarlas. </p>
-                    }
-                    else
-                    {
-                        <p style="color: black;">No hay fotos seleccionadas.</p>
-                    }
                     <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
                     <p> Fotos subidas: @fotos.Count</p>
 
@@ -163,7 +157,11 @@
                             <div class="alert alert-danger">
                                 <p>@errorPorFaltaDeFotos</p>
                             </div>
-                        }   
+                        }
+                    <div class="button-group">
+                        <button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
+                        <button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
+                    </div>    
 
                 <div class="image-list">
                     @foreach (var foto in fotos)
@@ -195,19 +193,21 @@
                     }
                 </div>
             }
+    </div>
 
-            @if (botonActivado)
-            {
-                <div id="map" style="height: 400px; width: 80%;">
-                    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ" async defer></script>
-                </div>
-            }
-
-             <div class="button-group">
-                 <button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
-                 <button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
-             </div> 
-</div>
+    @if (botonActivado)
+    {
+        <h1 class="form-label">Cantidad de Baños</h1>
+        <input type="number" @bind="inmuebleAuxiliar.Banios" class="form-control mb-2" />
+        <h1 class="form-label">Cantidad de Camas</h1>
+        <input type="number" @bind="inmuebleAuxiliar.CantidadDeCamas" class="form-control mb-2" />
+        <h1 class="form-label">Fotos del Inmueble</h1>
+        
+        <div id="map" style="height: 400px; width: 80%;">
+            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ" async
+                defer></script>
+        </div>
+    }
 
 @code {
     private int fotoActual = 0;
@@ -248,8 +248,6 @@
     {
         try
         {
-            bool ok = inmueble!.Alquileres!.All(a =>a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Cancelado || a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Terminado);
-
             inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
             botonActivado = inmueble.Alquileres == null || inmueble.Alquileres.Count == 0 || inmueble.Alquileres.All(a =>a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Cancelado || a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Terminado);
             inmuebleAuxiliar = new Inmueble
@@ -264,8 +262,7 @@
                 Banios = inmueble.Banios,
                 CantidadDeCamas = inmueble.CantidadDeCamas,
                 CoordLat = inmueble.CoordLat,
-                CoordLong = inmueble.CoordLong,
-                CantidadDeHabitaciones = inmueble.CantidadDeHabitaciones,
+                CoordLong = inmueble.CoordLong
             };
 
            fotos = inmueble.Fotos ?? [];
@@ -370,7 +367,6 @@
         finally 
         {
             inputFileId = Guid.NewGuid();
-            browser = null;
             StateHasChanged();
         }
     }

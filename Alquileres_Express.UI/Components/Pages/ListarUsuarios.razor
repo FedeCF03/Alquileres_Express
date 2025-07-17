@@ -12,6 +12,8 @@
 @inject CasoDeUsoEliminarPersonal casoDeUsoEliminarPersonal
 @rendermode InteractiveServer
 
+ 
+
 @if (!String.IsNullOrEmpty(Mensaje))
 {
         <div class="toast-message">
@@ -95,7 +97,8 @@
                                         }
                                         @if ((usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado))
                                         {
-                                            <button class="btn btn-sm btn-outline-primary" @onclick="() => DarDeBaja(usuario.Id)">
+                                            <Cuadro @ref=dialogo Mensaje="¿Está seguro que desea eliminar al empleado?" OnConfirmado="()=>DarDeBaja(usuario.Id)"/>
+                                            <button class="btn btn-sm btn-outline-primary" @onclick="Resetear">
                                                 <i class="fas fa-eye"></i> Dar de baja
                                             </button>
                                         }
@@ -135,7 +138,7 @@
     private string? Mensaje { get; set; } 
     List<Usuario> _lista = new List<Usuario>();
     List<Usuario> _listaBusqueda = new List<Usuario>();
-
+    Cuadro dialogo = null!;
     string? ErrorMessage;
     private string searchTerm = "";
 
@@ -216,6 +219,10 @@
     {
         casoDeUsoBuscarPersonalAscenderAGerente.Ejecutar(id);
         NavigationManager.NavigateTo("/listadoUsuario?mensaje=Ascenso exitoso", true);
+    }
+    void Resetear()
+    {
+        dialogo.Mostrar();
     }
 
 }
