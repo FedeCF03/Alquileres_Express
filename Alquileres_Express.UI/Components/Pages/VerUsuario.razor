@@ -16,8 +16,8 @@
 
 @if (usuario != null && rol != null)
 {
-<div class="perfil-contenedor">
-    <h2 class="titulo">@usuario.Nombre</h2>
+    <div class="perfil-contenedor">
+        <h2 class="titulo">@usuario.Nombre</h2>
 
         <div class="perfil-card">
             <div><strong>@(usuario.Rol.Equals(RolUsuario.Cliente) ? "Número de cliente" : "Número de personal"):</strong>
@@ -31,7 +31,6 @@
             @if (usuario.Rol == RolUsuario.Cliente)
             {
                 <div class="botones">
-                    <button class="btn-editar" @onclick="() => CambiarContraseña(usuario.Id)">Cambiar contraseña</button>
                     <button @onclick="@(() => NavigationManager.NavigateTo($"/alquileres/{ClienteId}"))" class="btn-navlink">
                         <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Ver alquileres
                         <AuthorizeView Roles="Gerente">

@@ -73,7 +73,7 @@
     {
         if (servicioCambiarContrasena.Verificar(user))
         {
-            NavigationManager.NavigateTo("/login", true);
+            NavigationManager.NavigateTo("/login/?mensaje=Cambio de contraseña exitoso", true);
         }
         else
         {

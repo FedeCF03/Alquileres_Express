@@ -14,6 +14,15 @@
 @inject NavigationManager NavigationManager
 @inject ServicioGenerarCodigo servicioGenerarCodigo
 @inject ServicioEnviarEmail servicioEnviarEmail
+@if (!String.IsNullOrEmpty(Mensaje))
+{
+
+    <div class="toast-message">
+        @Mensaje
+    </div>
+
+}
+
 <div class="login-container">
     <div class="login-card">
 
@@ -49,6 +58,8 @@
     </div>
 </div>
 @code {
+    [SupplyParameterFromQuery]
+    public string? Mensaje { get; set; }
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
     [SupplyParameterFromForm]

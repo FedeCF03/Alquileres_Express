@@ -1,4 +1,4 @@
- @page "/cambiar-contrasena"
+@page "/cambiar-contrasena"
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Components.Authorization
@@ -64,9 +64,8 @@
             user.Codigo = servicioGenerarCodigo.GenerarCodigoAleatorio();
             Console.WriteLine($"Codigo de verificacion: {user.Codigo}");
             errores.Add(servicioCambiarContrasena.Añadir(user));
-          
-            servicioEnviarEmail.EnviarEmail(user.CorreoElectronico, "Cambio de contraseña", "Codigo de verificacion : ",
-         user.Codigo.ToString());
+
+            servicioEnviarEmail.EnviarEmail(user.CorreoElectronico, "Cambio de contraseña", "Codigo de verificacion : ",user.Codigo.ToString());
             NavigationManager.NavigateTo("/verificar-codigo-cambio-contrasena",
             true);
         }
@@ -83,7 +82,7 @@
     }
 
 
- 
+
 
 
 }
