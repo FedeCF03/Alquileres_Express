@@ -93,7 +93,6 @@
     {
     @foreach (var alquiler in alquileresAux)
         {
-            var cliente = casoDeUsoBuscarClientePorId.Ejecutar(alquiler.ClienteId);
             var inmueble = GetInmuebleById(alquiler.InmuebleId);
             @if (inmueble != null)
             {
@@ -123,6 +122,11 @@
                     <i class="fas fa-map-marker-alt detail-icon"></i>
                     <span class="detail-label">Dirección:</span>
                     <span class="detail-value">@inmueble.Direccion</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-map-marker-alt detail-icon"></i>
+                    <span class="detail-label">Correo del cliente</span>
+                    <span class="detail-value">@alquiler.CorreoCliente</span>
                 </div>
                 
                 <div class="detail-item">
