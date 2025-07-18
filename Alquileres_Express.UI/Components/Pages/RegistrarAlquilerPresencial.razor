@@ -48,7 +48,7 @@
                 <label class="fw-bold mb-2">Seleccionar Fechas:</label>
                 <DateRangePicker @bind-StartDate="StartDate" @bind-EndDate="EndDate"
                     DaysEnabledFunction="(d)=>!NoEsHabil(d)" class="form-control form-control-lg"
-                    placeholder="Selecciona fechas..." OnRangeSelect="VerificarFechas" />
+                    placeholder="Selecciona fechas..." OnRangeSelect="VerificarFechas" MaxDate="fechaMaxima"/>
             </div>
         </div>
 
@@ -78,6 +78,7 @@
     private string ErrorMessage = "";
     DateTimeOffset? StartDate { get; set; }
     DateTimeOffset? EndDate { get; set; }
+    DateTimeOffset fechaMaxima = DateTime.Today.AddDays(365);
     private List<RangoDeFechas> FechasReservadas { get; set; } = [];
     ContadorDeFrecuencias<string> contadorFechas = new ();
     private string mensajeError = string.Empty;

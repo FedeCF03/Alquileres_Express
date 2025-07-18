@@ -23,18 +23,6 @@ public class Crear
                 FechaNacimiento = new DateTime(1990, 1, 1),
                 Rol = Aplicacion.Enumerativo.RolUsuario.Gerente,
             });
-            context.Add(new Personal
-            {
-                Nombre = "Mario",
-                Apellido = "Castro",
-                Correo = "gonzalo@gmail.com",
-                Dni = "12312312",
-                Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
-                Direccion = "Calle Falsa 123",
-                FechaNacimiento = new DateTime(1990, 1, 1),
-                Rol = Aplicacion.Enumerativo.RolUsuario.Empleado
-                ,
-            });
 
             Inmueble inmueble = new()
             {
@@ -130,17 +118,17 @@ public class Crear
                 Pagado = true
             };
 
-            // var alquiler2 = new Alquiler
-            // {
-            //     ClienteId = cliente.Id,
-            //     CorreoCliente = cliente.Correo,
-            //     FechaDeCreacion = new DateTime(2015,1,1),
-            //     FechaDeInicio = DateTime.Today.AddDays(-20),
-            //     FechaDeFin = DateTime.Today.AddDays(-15),
-            //     Precio = 6500,
-            //     InmuebleId = 1,
-            //     Pagado = true
-            // };
+            var alquiler2 = new Alquiler
+            {
+                ClienteId = cliente.Id,
+                CorreoCliente = cliente.Correo,
+                FechaDeCreacion = new DateTime(2015,1,1),
+                FechaDeInicio = DateTime.Today.AddDays(-20),
+                FechaDeFin = DateTime.Today.AddDays(-15),
+                Precio = 6500,
+                InmuebleId = 1,
+                Pagado = true
+            };
 
             // var alquiler3 = new Alquiler
             // {
@@ -167,11 +155,10 @@ public class Crear
 
             
             
-            context.Alquileres.AddRange(alquiler1);
+            context.Alquileres.AddRange(alquiler1, alquiler2);
             context.SaveChanges();
-            var registro1 = new RegistroDeLlave(alquiler1.Id, 1,1, true);
-            var registro2 = new RegistroDeLlave(alquiler1.Id, 1,1, false);
-            context.AddRange(registro1, registro2);
+            //var registro1 = new RegistroDeLlave(alquiler1.Id, 1,1, true);
+            //context.AddRange(registro1);
             inmueble!.Alquileres!.Add(alquiler1);
 
             

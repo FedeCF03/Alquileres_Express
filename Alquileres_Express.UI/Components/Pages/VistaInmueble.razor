@@ -196,7 +196,7 @@
                                 <DateRangePicker StartDatePlaceholder="CHECK-IN" EndDatePlaceholder="CHECK-OUT"
                                     @bind-StartDate="StartDate" @bind-EndDate="EndDate"
                                     DaysEnabledFunction="(d) => !NoEsHabil(d)" class="hidden-picker"
-                                    placeholder="Select dates..." OnRangeSelect="VerificarFechas" />
+                                    placeholder="Select dates..." OnRangeSelect="VerificarFechas" MaxDate="fechaMaxima"/>
                             </div>
 
                             @if (!string.IsNullOrEmpty(mensajeError))
@@ -300,6 +300,7 @@
     public int Id { get; set; }
     DateTimeOffset? StartDate { get; set; }
     DateTimeOffset? EndDate { get; set; }
+    DateTimeOffset fechaMaxima = DateTime.Today.AddDays(365);
     private Inmueble? inmueble;
     private bool podesPagar { get; set; } = false;
     private string mensajeError = string.Empty;
