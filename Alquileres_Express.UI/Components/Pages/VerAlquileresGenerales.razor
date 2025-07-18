@@ -123,12 +123,13 @@
                     <span class="detail-label">Dirección:</span>
                     <span class="detail-value">@inmueble.Direccion</span>
                 </div>
+
                 <div class="detail-item">
-                    <i class="fas fa-map-marker-alt detail-icon"></i>
-                    <span class="detail-label">Correo del cliente</span>
+                    <i class="fas fa-envelope detail-icon"></i>
+                    <span class="detail-label">Correo del cliente:</span>
                     <span class="detail-value">@alquiler.CorreoCliente</span>
                 </div>
-                
+ 
                 <div class="detail-item">
                     <i class="fas fa-calendar-check detail-icon"></i>
                     <span class="detail-label">Check-in:</span>
@@ -262,7 +263,6 @@
     [Parameter]
     public int id { get; set; } = 0;
     Personal? personal;
-    Cliente? clienete;
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -443,3 +443,9 @@
          mensaje = $"Se muestran los alquileres que ocurren entre {fechaInicio.ToString("dd/MM/yyyy")} y {fechaFin.ToString("dd/MM/yyyy")}.";
     }
 }
+@* <style>
+    .detail-icon {
+    color: #0d6efd; /* azul Bootstrap o el que uses */
+    margin-right: 6px;
+}
+</style> *@
