@@ -1,26 +1,25 @@
 @page "/login"
-@inject IHttpContextAccessor HttpContextAccessor
-@using System.Security.Claims
-@using Alquileres_Express.Aplicacion
-@using Alquileres_Express.Aplicacion.Entidades
-@using Alquileres_Express.Aplicacion.Interfaces
-@using Alquileres_Express.Aplicacion.Servicios
-@using Alquileres_Express.Repositorios
-@using Alquileres_Express.Aplicacion.CasosDeUso
-@using Alquileres_Express.Repositorios.RepositoriosSQLite
 @using Microsoft.AspNetCore.Authentication
-@using Microsoft.AspNetCore.Authorization;
 @using Microsoft.AspNetCore.Authentication.Cookies
-
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Net.Mail
-@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
+@using System.Security.Claims
+@using System.ComponentModel.DataAnnotations
+@inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
+@inject CasoDeUsoBuscarClientePorCorreo casoDeUsoBuscarClientePorCorreo
+@inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
+@inject CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion
+@inject NavigationManager NavigationManager
+@inject ServicioGenerarCodigo servicioGenerarCodigo
+@inject ServicioEnviarEmail servicioEnviarEmail
 <div class="login-container">
     <div class="login-card">
-        <h3 class="login-title">Iniciar Sesión</h3>
 
-        <EditForm Model="@user" OnValidSubmit="IniciarSesion" FormName="loginForm">
+        <h3 class="login-title">Iniciar sesión</h3>
+
+        <EditForm Model="@user" OnValidSubmit="IniciarSesionDeUna" FormName="loginForm">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -35,17 +34,17 @@
                     placeholder="Ingrese su contraseña" />
             </div>
             <div class="login-links">
-                <a href="/forgot-password" class="link-secondary">¿Olvidaste tu contraseña?</a>
-                <a href="/register" class="link-secondary">Regístrarse</a>
+                <a href="/cambiar-contrasena" class="link-secondary">¿Olvidaste tu contraseña?</a>
             </div>
-
             <button type="submit" class="btn-primary">Ingresar</button>
+
         </EditForm>
-        @if (ErrorMessage)
+
+
+
+        @foreach (var error in errores)
         {
-            <div class="alert alert-danger mt-3">
-                <strong>Error:</strong> Credenciales incorrectas.
-            </div>
+            <div class="alert alert-danger mt-2">@error</div>
         }
     </div>
 </div>
@@ -54,42 +53,96 @@
     public HttpContext? HttpContext { get; set; }
     [SupplyParameterFromForm]
     private LoginModel user { get; set; } = new();
-    private CasoDeUsoBuscarCliente casoDeUsoBuscarCliente = new CasoDeUsoBuscarCliente(new RepositorioCliente());
-    private CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal = new CasoDeUsoBuscarPersonal(new RepositorioPersonal());
-    private CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion = new
-    CasoDeUsoActualizarEstadoDobleAutenticacion(new RepositorioPersonal());
-    private bool ErrorMessage { get; set; } = false;
+    private List<string> errores { get; set; } = [];
+    private bool cambiarContraseña { get; set; } = false;
+
+    private PasswordResetModel passwordResetModel { get; set; } = new();
+    private async Task IniciarSesionComoGerenteFake()
+    {
+        user.Correo = "marfacucosas@gmail.com";
+        user.Rol = RolUsuario.Gerente;
+        await guardarEnCookie("jorge");
+
+    }
+    private async Task IniciarSesionDeUna()
+    {
+        Usuario? user2 = (Usuario?)casoDeUsoBuscarCliente.Ejecutar(user.Correo, user.Contraseña) ?? (Usuario?)
+        casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
+        if (user2 == null)
+        {
+            return;
+        }
+        user.Rol = user2.Rol;
+        await guardarEnCookie("jorge");
+
+    }
     private async Task IniciarSesion()
     {
-        Personal personal = casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
-        if (personal != null)
+        errores.Clear();
+        if (string.IsNullOrEmpty(user.Correo))
+        {
+            errores.Add("Por favor, ingrese un correo.");
+        }
+        else if (!user.Correo.Contains('@'))
+        {
+            errores.Add("El correo ingresado no es válido.");
+        }
+        if (string.IsNullOrEmpty(user.Contraseña))
+        {
+            errores.Add("Por favor, ingrese una contraseña.");
+        }
+        if (errores.Count > 0)
+        {
+            return;
+        }
+
+
+        Cliente? cliente = null;
+        Personal? personal = casoDeUsoBuscarPersonal.Ejecutar(user.Correo, user.Contraseña);
+        if (personal != null && !personal.Borrado)
         {
             user.Rol = personal.Rol;
             if (personal.Rol == RolUsuario.Gerente)
             {
-                String codigo = ServicioEnviarEmail.EnviarEmailDobleAutenticacion(personal.Correo);
+                String codigo = servicioGenerarCodigo.GenerarCodigoAleatorio();
+                servicioEnviarEmail.EnviarEmail(personal.Correo, "Codigo de autenticacion", "Su codigo de autenticacion es : ", codigo);
                 casoDeUsoActualizarEstadoDobleAutenticacion.Ejecutar(personal.Id, codigo);
                 NavigationManager.NavigateTo("/verificacion-doble-autenticacion");
             }
+
+            else
+            {
+                await guardarEnCookie(personal.Nombre);
+                NavigationManager.NavigateTo("/?justLogged=true");
+            }
+
         }
         else
         {
-            Cliente cliente = casoDeUsoBuscarCliente.Ejecutar(user.Correo, user.Contraseña);
+            cliente = casoDeUsoBuscarCliente.Ejecutar(user.Correo, user.Contraseña);
             if (cliente != null)
             {
                 user.Rol = cliente.Rol;
-                await guardarEnCookie();
+                await guardarEnCookie(cliente.Nombre);
             }
             else
             {
-                ErrorMessage = true;
-                throw new Exception("Credenciales incorrectas");
+                cliente = null;
+                errores.Add("Email o contraseña incorrectos.");
             }
         }
 
+
+    }
+    private void VolverALogin()
+    {
+        cambiarContraseña = false;
+        user = new LoginModel();
+        errores.Clear();
     }
 
-    private async Task guardarEnCookie()
+
+    private async Task guardarEnCookie(string nombre)
     {
 
         var claims = new List<Claim> {
@@ -99,15 +152,38 @@ new Claim(ClaimTypes.Role, user.Rol.ToString())
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         await HttpContext.SignInAsync(principal);
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo($"/?mensaje=¡Hola {nombre} Bienvenido/a.");
+
+    }
+
+    private async Task EnviarInstruccionesCambioContraseña()
+    {
+
+
     }
     public class LoginModel
     {
-        public string Contraseña { get; set; }
+        public string? Contraseña { get; set; }
         public RolUsuario Rol { get; set; }
-        public string Correo { get; set; }
+        public string? Correo { get; set; }
+    }
+
+    public class PasswordResetModel
+    {
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "Formato de email inválido")]
+        public string Correo { get; set; } = "";
     }
 
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
 
 }

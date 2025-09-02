@@ -1,4 +1,111 @@
-@page "/personal"
+@page "/agregar-personal"
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize(Roles = "Gerente")]
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Mvc
+@inject CasoDeUsoAltaPersonal casoDeUsoAltaPersonal
+@inject ValidadorUsuario validadorUsuario
 @rendermode InteractiveServer
+@using BlazorDateRangePicker
 
-@inject NavigationManager Navegadsor
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center text-primary">👥 Agregar empleado</h2>
+        <p class="text-center text-muted">Complete los siguientes campos para registrar a un nuevo miembro del personal.</p>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-user"></i> Nombre</label>
+                <input @bind="nuevoPersonal.Nombre" class="form-control form-control-lg" placeholder="Ingrese el nombre" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-user"></i> Apellido</label>
+                <input @bind="nuevoPersonal.Apellido" class="form-control form-control-lg" placeholder="Ingrese el apellido" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-id-card"></i> DNI</label>
+                <input type="number" @bind="nuevoPersonal.Dni" class="form-control form-control-lg" placeholder="Ingrese el DNI" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-envelope"></i> Correo</label>
+                <input @bind="nuevoPersonal.Correo" class="form-control form-control-lg" placeholder="Ingrese el correo electrónico" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-lock"></i> Contraseña</label>
+                <input @bind="nuevoPersonal.Contraseña" type="password" class="form-control form-control-lg" placeholder="Ingrese la contraseña" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-map-marker-alt"></i> Dirección</label>
+                <input @bind="nuevoPersonal.Direccion" class="form-control form-control-lg" placeholder="Ingrese la dirección" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold"><i class="fas fa-calendar-alt"></i> Fecha de Nacimiento</label>
+                <div class="border rounded p-2">
+                    <DateRangePicker @bind-EndDate="selectedDate" MinDate="minDate"
+                        MaxDate="DateTime.Now" SingleDatePicker="true" />
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-lg btn-success w-50" @onclick="Aceptar">
+                <i class="fas fa-check"></i> Agregar empleado
+            </button>
+        </div>
+
+        @foreach (var error in errores)
+        {
+            <div class="alert alert-danger mt-3 text-center">@error</div>
+        }
+
+        <div class="alert alert-success mt-3 text-center" role="alert"
+            style="display: @(string.IsNullOrEmpty(mensajeExito) ? "none" : "block")">
+            @mensajeExito
+        </div>
+    </div>
+</div>
+
+@code {
+    private Personal nuevoPersonal { get; set; } = new();
+    private string mensajeExito = string.Empty;
+    private DateTimeOffset? selectedDate;
+    private DateTime minDate = new DateTime(DateTime.Now.Year - 100, 1, 1);
+    private List<string> errores = [];
+
+    private void Aceptar()
+    {
+        mensajeExito = string.Empty;
+        errores.Clear();
+        if (selectedDate == null)
+        {
+            errores = validadorUsuario.Ejecutar(nuevoPersonal);
+            errores.Add("Por favor, seleccioná una fecha de nacimiento.");
+            return;
+        }
+
+        try
+        {
+            nuevoPersonal.FechaNacimiento = selectedDate.Value.DateTime;
+            if (!casoDeUsoAltaPersonal.Ejecutar(nuevoPersonal, out errores))
+                return;
+            errores.Clear();
+            nuevoPersonal = new();
+            selectedDate = null;
+            mensajeExito = "Empleado agregado correctamente.";
+        }
+        catch (Exception ex)
+        {
+            errores.Add(ex.Message);
+        }
+    }
+}

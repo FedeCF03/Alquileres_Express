@@ -2,27 +2,36 @@ using MercadoPago.Config;
 using MercadoPago.Client.Preference;
 using MercadoPago.Resource.Preference;
 using Microsoft.Extensions.Configuration;
+using System;
+using Alquileres_Express.Aplicacion.Interfaces;
+using Alquileres_Express.Aplicacion.Entidades;
+using Alquileres_Express.Aplicacion.Servicios;
 
 public class MercadoPagoService
 {
-    public MercadoPagoService(IConfiguration configuration)
+    ServicioEnviarEmail _servicioEnviarEmail { get; set; }
+    IRepositorioAlquiler _repositorioAlquiler { get; set; }
+    ServicioVerificarPago _servicioVerificarPago { get; set; }
+    public MercadoPagoService(IConfiguration configuration, IRepositorioAlquiler repositorioAlquiler, ServicioVerificarPago servicioVerificarPago)
     {
-        // Se recomienda usar IConfiguration para no hardcodear el token
-        MercadoPagoConfig.AccessToken = "APP_USR-4758729501201277-052522-20570b3514929dcdd539c2ecd6ff1b30-2456261951";
+        _servicioVerificarPago = servicioVerificarPago;
+        _repositorioAlquiler = repositorioAlquiler;
+        MercadoPagoConfig.AccessToken = "TEST-2709845014061287-060518-dfd5917bcf575f80fc7e47d5e16eae72-769910256";
     }
 
-    public async Task<string> CrearPreferenciaAsync()
+    public async Task<string> CrearPreferenciaAsync(string titulo, Alquiler alquiler)
 
     {
         var request = new PreferenceRequest
         {
             Items = new List<PreferenceItemRequest>
             {
+
                 new PreferenceItemRequest
                 {
-                    Title = "Producto de prueba",
+                    Title = titulo,
                     Quantity = 1,
-                    UnitPrice = 1000m,
+                    UnitPrice = alquiler.Precio,
                     CurrencyId = "ARS"
                 }
             },
@@ -30,13 +39,16 @@ public class MercadoPagoService
             {
                 Success = "https://localhost:5153/success",
                 Failure = "https://localhost:5153/failure",
-                Pending = "https://localhost:5153/pending"
             },
-            AutoReturn = "approved"
-        };
+            AutoReturn = "approved",
 
+        };
         var client = new PreferenceClient();
+
         Preference preference = await client.CreateAsync(request);
-        return preference.InitPoint; // URL para redirigir al checkout
+        _servicioVerificarPago.AgregarPagoPendiente(new PagoPendiente(preference.Id, alquiler));
+        return preference.SandboxInitPoint; // URL para redirigir al checkout
+
     }
+
 }

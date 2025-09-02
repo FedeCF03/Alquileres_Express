@@ -1,0 +1,420 @@
+@page "/editar-inmueble-lindillo/{id:int}"
+@rendermode InteractiveServer
+@inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
+@inject CasoDeUsoEditarInmueble casoDeUsoEditarInmueble
+@inject IRepositorioFoto repositorioFotos
+@inject ServicioFotos ServicioFotos
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+@inject ValidadorInmueble ValidadorInmueble
+@attribute [Authorize(Roles = "Gerente,Empleado")]
+
+
+<script>
+    window.initializeMap = function (dotNetHelper, lat, lng) {
+        function waitForGoogleMaps() {
+            if (window.google && google.maps) {
+                const initialPosition = { lat: lat, lng: lng };
+
+                const map = new google.maps.Map(document.getElementById("map"), {
+                    center: initialPosition,
+                    zoom: 12,
+                });
+
+                const marker = new google.maps.Marker({
+                    position: initialPosition,
+                    map: map,
+                    draggable: true,
+                });
+
+                marker.addListener("dragend", () => {
+                    const position = marker.getPosition();
+                    dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', position.lat(), position.lng());
+                });
+
+                map.addListener("click", (event) => {
+                    marker.setPosition(event.latLng);
+                    dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', event.latLng.lat(), event.latLng.lng());
+                });
+            } else {
+                setTimeout(waitForGoogleMaps, 100);
+            }
+        }
+
+        waitForGoogleMaps();
+    }
+</script>
+
+<div class="container">
+        <div class="form-header">
+            <h1><i class="fas fa-home"></i> Editar Inmueble</h1>
+            <p>Modifica los detalles de tu propiedad</p>
+        </div>
+
+        <form id="inmuebleForm">
+            <!-- Información básica -->
+            <div class="section">
+                <h3><i class="fas fa-info-circle"></i> Información Básica</h3>
+                
+                <div class="mb-3">
+                    <label class="form-label">Nombre del Inmueble</label>
+                    <input placeholder="@inmueble.Nombre" type="text" @bind="inmuebleAuxiliar.Nombre" class="form-control mb-2" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Precio por Noche</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" @bind="inmuebleAuxiliar.Precio" class="form-control mb-2" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Política de Cancelación</label>
+                    <select  @bind=inmuebleAuxiliar.PoliticaDeCancelacion class="form-select mb-2">
+                        <option value="@PoliticaDeCancelacion.SinCosto" >Sin costo</option>
+                        <option value="@PoliticaDeCancelacion.VeintePorcientoDeReembolso">Con 20% de reembolso</option>
+                        <option value="@PoliticaDeCancelacion.NoReembolsable">No reembolsable</option>
+                    </select>
+                </div>
+            </div>
+            </form>
+            @if(botonActivado)
+            {
+                <div id="additionalDetails" style="display: none;">
+                    <div class="section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Ubicación</h3>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <input placeholder="@inmueble.Direccion" type="text" @bind="inmuebleAuxiliar.Direccion" class="form-control mb-2" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ciudad</label>
+                            <input placeholder="@inmueble.Ciudad" type="text" @bind="inmuebleAuxiliar.Ciudad" class="form-control mb-2" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Inmueble</label>
+                            <select @bind="inmuebleAuxiliar.TipoInmueble" class="form-select mb-2">
+                                <option value="@TipoDeInmueble.Vivienda">Vivienda</option>
+                                <option value="@TipoDeInmueble.Negocio">Negocio</option>
+                                <option value="@TipoDeInmueble.Garaje">Garaje</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ubicación en el Mapa</label>
+                            <div class="map-container">
+                                <div id="map" style="height: 300px; background: #e9ecef; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                    <div style="text-align: center;">
+                                        <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                        <p>Mapa de Google Maps se cargará aquí</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-bed"></i> Características</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Cantidad de Baños</label>
+                                    <input type="number" class="form-control" placeholder="0" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Cantidad de Camas</label>
+                                    <input type="number" class="form-control" placeholder="0" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Sección de fotos -->
+            <div class="photos-section">
+                <h3><i class="fas fa-images"></i> Fotos del Inmueble</h3>
+                <div class="photo-upload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h5>Subir Fotos</h5>
+                    <input type="file" class="form-control" accept=".png,.jpeg,.jpg" multiple style="display: none;" id="fileInput">
+                    <div class="mb-3">
+                        <InputFile accept=".png,.jpeg,.jpg" @key="@(inputFileId)" OnChange="CaptureFiles" multiple class="file-input-custom" />
+                    </div>
+                </div>
+                    <button @onclick="GuardarFotos" class="btn btn-primary">Subir fotos</button>
+                    <p> Fotos subidas: @fotos.Count</p>
+
+                    @if (errorPorFaltaDeFotos != string.Empty)
+                        {
+                            <div class="alert alert-danger">
+                                <p>@errorPorFaltaDeFotos</p>
+                            </div>
+                        }
+                    <div class="button-group">
+                        <button class="btn btn-primary" @onclick="GuardarCambios">Guardar Cambios</button>
+                        <button class="btn btn-danger" @onclick="@(() => Nav.NavigateTo($"/inmueble/{inmueble.Id}"))">Cancelar</button>
+                    </div>    
+
+                <div class="image-list">
+                    @foreach (var foto in fotos)
+                    {
+                        <div class="image-card">
+                            <img src="@foto.Url" class="foto" />
+                            <button @onclick="()=>EliminarFoto(foto)">Eliminar</button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (erroresDeFotos.Count > 0)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var error in erroresDeFotos)
+                    {
+                        <p>@error</p>
+                    }
+                </div>
+            }
+
+            @if (errores.Count > 0)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var error in errores)
+                    {
+                        <p>@error</p>
+                    }
+                </div>
+            }
+    </div>
+
+    @if (botonActivado)
+    {
+        <h1 class="form-label">Cantidad de Baños</h1>
+        <input type="number" @bind="inmuebleAuxiliar.Banios" class="form-control mb-2" />
+        <h1 class="form-label">Cantidad de Camas</h1>
+        <input type="number" @bind="inmuebleAuxiliar.CantidadDeCamas" class="form-control mb-2" />
+        <h1 class="form-label">Fotos del Inmueble</h1>
+        
+        <div id="map" style="height: 400px; width: 80%;">
+            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ" async
+                defer></script>
+        </div>
+    }
+
+@code {
+    private int fotoActual = 0;
+    private string[] imagenes = new string[0];
+    [Parameter]
+    public int Id { get; set; }
+    private Inmueble inmueble = new Inmueble();
+    private string mensajeError = string.Empty;
+    public HttpContext? HttpContext { get; set; }
+    private long maxFileSize = 1024 * 1024 * 5; // 5 MB
+    private int maxAllowedFiles = 30;
+    private List<String> errores = new();
+    private List<String> erroresDeFotos = new();
+    private string errorPorFaltaDeFotos = string.Empty;
+    private List<Foto> fotos = [];
+    private List<Foto> fotosEliminadas = [];
+   
+    private Guid inputFileId = Guid.NewGuid();
+    private InputFileChangeEventArgs? browser;
+    private bool botonActivado = false;
+
+    private Inmueble inmuebleAuxiliar = new Inmueble();
+
+    void FotoSiguiente()
+    {
+        fotoActual = (fotoActual + 1) % imagenes.Length;
+        StateHasChanged();
+    }
+
+    void FotoAnterior()
+    {
+        fotoActual = (fotoActual - 1 + imagenes.Length) % imagenes.Length;
+        StateHasChanged();
+    }
+    
+
+    protected override void OnParametersSet()
+    {
+        try
+        {
+            inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            botonActivado = inmueble.Alquileres == null || inmueble.Alquileres.Count == 0 || inmueble.Alquileres.All(a =>a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Cancelado || a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Terminado);
+            inmuebleAuxiliar = new Inmueble
+            {
+                Id = inmueble.Id,
+                Nombre = inmueble.Nombre,
+                Direccion = inmueble.Direccion,
+                Precio = inmueble.Precio,
+                Ciudad = inmueble.Ciudad,
+                TipoInmueble = inmueble.TipoInmueble,
+                Disponible = inmueble.Disponible,
+                Banios = inmueble.Banios,
+                CantidadDeCamas = inmueble.CantidadDeCamas,
+                CoordLat = inmueble.CoordLat,
+                CoordLong = inmueble.CoordLong
+            };
+
+           fotos = inmueble.Fotos ?? [];
+        }
+        catch (Exception ex)
+        {
+            Nav.NavigateTo($"/?mensaje={ex.Message}&esMensajeDeError=true", true);
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+         if (firstRender)
+        {
+            var dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initializeMap", dotNetRef, @inmuebleAuxiliar.CoordLat, @inmuebleAuxiliar.CoordLong);
+        }
+    }
+    [JSInvokable]
+    public void ActualizarCoordenadas(double lat, double lng)
+    {
+        inmuebleAuxiliar.CoordLat = lat;
+        inmuebleAuxiliar.CoordLong = lng;
+        StateHasChanged(); 
+    }
+
+    
+    private void GuardarCambios()
+    {
+        errores.Clear();
+        if (fotos.Count == 0)
+        {
+            errorPorFaltaDeFotos = "Debe cargar al menos una foto del inmueble.";
+            errores = ValidadorInmueble.Ejecutar(inmuebleAuxiliar);
+            StateHasChanged();
+            return;
+        }
+        try
+        {
+            if (erroresDeFotos.Count == 0 & casoDeUsoEditarInmueble.Ejecutar(inmuebleAuxiliar,RolUsuario.Gerente, out errores)){
+                ServicioFotos.EliminarFotosPorInmueble(inmueble.Id);
+                ServicioFotos.EliminarFotosDelDirectorio(fotosEliminadas);
+                ServicioFotos.PersistirFotos(fotos, inmueble.Id);
+                Nav.NavigateTo("/?mensaje=Inmueble editado correctamente");
+            }
+        }
+        catch (KeyNotFoundException ex)
+        {
+            Nav.NavigateTo($"/?mensaje={ex.Message}&esMensajeDeError=true", true);
+        }
+        
+
+    }
+
+    private void EliminarFoto(Foto foto)
+    {
+        fotos.Remove(foto);
+        fotosEliminadas.Add(foto);
+        StateHasChanged();
+    }
+    
+    private void GuardarFotos()
+    {
+        try
+        {
+            errorPorFaltaDeFotos = string.Empty;
+            erroresDeFotos.Clear();
+            if (browser == null || browser.FileCount == 0)
+            {
+                errorPorFaltaDeFotos = ("No se ha seleccionado ningúna foto.");
+                return;
+            }
+            
+
+            if (browser.FileCount > maxAllowedFiles || 
+                (fotos.Count + browser.FileCount) > maxAllowedFiles)
+            {
+                errorPorFaltaDeFotos=($"El número de máximo de fotos que puede cargar es {maxAllowedFiles}.");
+                return;
+            }   
+            foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))
+            {
+                try{
+                    if (file.Size > maxFileSize)
+                    {
+                        erroresDeFotos.Add($"La foto {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
+                        return;
+
+                    }
+
+                    else
+                    {
+                        crearArchivo(file);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    erroresDeFotos.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
+                }
+            }
+        }
+        finally 
+        {
+            inputFileId = Guid.NewGuid();
+            StateHasChanged();
+        }
+    }
+    private void CaptureFiles(InputFileChangeEventArgs e)
+    {
+        browser = e;
+    }
+
+    private async void crearArchivo(IBrowserFile file)
+    {
+        string newFileName = Path.ChangeExtension(
+                    Path.GetRandomFileName(), 
+                    Path.GetExtension(file.Name));
+                    
+                var pathFotosInmuebles = Path.GetFullPath(
+                    Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                       "wwwroot", "images","fotosInmuebles"));
+
+                Directory.CreateDirectory(pathFotosInmuebles);
+
+                var path = Path.Combine(pathFotosInmuebles, newFileName);
+        
+                await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+                fotos.Add(new Foto
+                {
+                    Url = $"/images/fotosInmuebles/{newFileName}",
+                    Nombre = newFileName,
+                });
+                StateHasChanged();
+    }
+
+}
+
+<style>
+    .image-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.image-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+
+</style>

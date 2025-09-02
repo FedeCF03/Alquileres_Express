@@ -4,8 +4,10 @@ namespace Alquileres_Express.Aplicacion.Interfaces;
 public interface IRepositorioFoto
 {
     public Foto ObtenerFotoPorId(int id);
-    public void AgregarFoto(Foto foto);
+    public int AgregarFoto(Foto foto);
+    public void AgregarFotos(List<Foto> fotos);
     public void EliminarFoto(int id);
+    public void EliminarFotosPorInmueble(int idInmueble);
     public List<Foto> ObtenerTodasLasFotos();
     public List<Foto> ObtenerFotosPorInmueble(int idInmueble);
 

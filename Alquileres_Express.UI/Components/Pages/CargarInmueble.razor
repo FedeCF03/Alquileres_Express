@@ -9,116 +9,205 @@
 @using Alquileres_Express.Aplicacion.Enumerativo
 @inject IConfiguration config
 @inject IHttpContextAccessor HttpContextAccessor
-@attribute [Authorize]
+@inject ServicioFotos ServicioFotos
+@inject ValidadorInmueble ValidadorInmueble
+
+@attribute [Authorize (Roles = "Gerente")]
 @inject IJSRuntime JS
 
+
 <PageTitle>Cargar inmueble</PageTitle>
-<AuthorizeView Roles="Gerente, Admin">
-    <h3>Bienvenido Administrador</h3>
 
-<EditForm FormName="a" Model="inmueble" OnValidSubmit="Cargar">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-<label class="form-label">Cargar Inmueble</label>
-<label class="form-label">Por favor, complete los siguientes campos:</label>
-<label class="form-label">Nombre del Inmueble</label>
-<input required=true type="text" @bind="inmueble.Nombre" placeholder="Nombre del Inmueble" class="form-control mb-2" />
-<label class="form-label">Ciudad del Inmueble</label>
-<input required=true type=" text" @bind="inmueble.Ciudad" placeholder="Ciudad del Inmueble" class="form-control mb-2" />
-<label class="form-label">Dirección del Inmueble</label>
-<input required=true type="text" @bind="inmueble.Direccion" placeholder="Dirección del Inmueble" class="form-control mb-2" />
-<label class="form-label">Precio del Inmueble</label>
-<input required=true type="number" @bind="inmueble.Precio" placeholder="Precio del Inmueble" class="form-control mb-2" />
-<label class="form-label">Cantidad de camas del Inmueble</label>
-<input required=true type="number" @bind="inmueble.CantidadDeCamas" placeholder="Cantidad de camas" class="form-control mb-2" />
-<label class="form-label">Cantidad de baños del Inmueble</label>
-<input required=true type="number" @bind="inmueble.Banios" placeholder="Cantidad de baños" class="form-control mb-2" />
-<label for="type">Elija un tipo de inmueble:</label>
+<div class="container mt-5">
+    <div class="card shadow p-4">
+        <h2 class="text-center text-primary mb-4"><i class="fas fa-building"></i> Cargar Inmueble</h2>
+        <p class="text-center text-muted">Por favor, completá los campos para publicar el nuevo inmueble</p>
 
-<select @bind=inmueble.TipoInmueble required=true name="cars" id="cars">
-<option value=@TipoDeInmueble.Vivienda >Vivienda</option>
-<option value="@TipoDeInmueble.Negocio">Negocio</option>
-<option value="@TipoDeInmueble.Garaje">Garaje</option>
-</select>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Nombre</label>
+                <input required @bind="inmueble.Nombre" class="form-control form-control-lg" placeholder="Ej: Departamento en Palermo" />
+            </div>
 
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Ciudad</label>
+                <input required @bind="inmueble.Ciudad" class="form-control form-control-lg" placeholder="Ej: Buenos Aires" />
+            </div>
 
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Dirección</label>
+                <input required @bind="inmueble.Direccion" class="form-control form-control-lg" placeholder="Ej: Av. Santa Fe 1234" />
+            </div>
 
-<p> Por favor, elija una ubicación en el mapa para el Inmueble con el marcador</p> 
- <div id="map" style="height: 400px; width: 80%;">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Precio por noche</label>
+                <input required type="number" @bind="inmueble.Precio" class="form-control form-control-lg" placeholder="$5000" />
+            </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ&callback=initMap" async
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Camas</label>
+                <input required type="number" @bind="inmueble.CantidadDeCamas" class="form-control form-control-lg" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Habitaciones</label>
+                <input required type="number" @bind="inmueble.CantidadDeHabitaciones" class="form-control form-control-lg" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Baños</label>
+                <input required type="number" @bind="inmueble.Banios" class="form-control form-control-lg" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Tipo de inmueble</label>
+                <select @bind="inmueble.TipoInmueble" class="form-select form-select-lg">
+                    <option value="@TipoDeInmueble.Vivienda">Vivienda</option>
+                    <option value="@TipoDeInmueble.Negocio">Negocio</option>
+                    <option value="@TipoDeInmueble.Garaje">Garaje</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Política de cancelación</label>
+                <select @bind="inmueble.PoliticaDeCancelacion" class="form-select form-select-lg">
+                    <option value="@PoliticaDeCancelacion.SinCosto">Sin costo</option>
+                    <option value="@PoliticaDeCancelacion.VeintePorcientoDeReembolso">Con 20% de reembolso</option>
+                    <option value="@PoliticaDeCancelacion.NoReembolsable">No reembolsable</option>
+                </select>
+            </div>
+        </div>
+
+        <p> Por favor, elija una ubicación en el mapa para el Inmueble con el marcador</p> 
+ <div id="map" class="my-4" style="height: 400px; width: 80%;">
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_9xydGamrZY4fHXdj39zwJPV-4FCUzbQ" async
     defer></script>
 <script>
     function initializeMap(dotNetHelper) {
-        const initialPosition = { lat: -34.6037, lng: -58.3816 }; // Coordenadas de Buenos Aires
+        function waitForGoogleMaps() {
+        if (window.google && google.maps) {
+            const initialPosition = { lat: -34.6037, lng: -58.3816 };
+            const initialMarkerPosition = { lat: 0, lng: 0 };
 
-        const map = new google.maps.Map(document.getElementById("map"), {
-            center: initialPosition,
-            zoom: 12,
-        });
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: initialPosition,
+                zoom: 12,
+            });
 
-        const marker = new google.maps.Marker({
-            position: initialPosition,
-            map: map,
-            draggable: true,
-        });
+            const marker = new google.maps.Marker({
+                position: initialMarkerPosition,
+                map: map,
+                draggable: true,
+            });
 
-        // Actualizar coordenadas al mover el marcador
-        marker.addListener("dragend", () => {
-            const position = marker.getPosition();
-            dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', position.lat(), position.lng());
-        });
+            marker.addListener("dragend", () => {
+                const position = marker.getPosition();
+                dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', position.lat(), position.lng());
+            });
 
-        // Permitir al usuario colocar un nuevo marcador al hacer clic en el mapa
-        map.addListener("click", (event) => {
-            marker.setPosition(event.latLng);
-            dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', event.latLng.lat(), event.latLng.lng());
-        });
+            map.addListener("click", (event) => {
+                marker.setPosition(event.latLng);
+                dotNetHelper.invokeMethodAsync('ActualizarCoordenadas', event.latLng.lat(), event.latLng.lng());
+            });
+        } else {
+            // Intentá de nuevo en 100ms si Google aún no está listo
+            setTimeout(waitForGoogleMaps, 100);
+        }
     }
+
+    waitForGoogleMaps();
+};
 
 </script>
 </div> 
 
-<button class="btn btn-primary" @onclick="() => Cargar()">Cargar Inmueble</button>
-</EditForm>
 
-<InputFile OnChange="CaptureFiles" multiple />
-<button @onclick="GuardarFotos" class="btn btn-primary">Cargar Archivos</button>
+        <div class="mt-4">
+            <label class="form-label fw-bold">Fotos del inmueble</label>
+            <InputFile accept=".jpg,.png,.jpeg" id="input" @key=@(inputFileId) OnChange="CaptureFiles" multiple />
+            <button @onclick="GuardarFotos" class="btn btn-outline-primary mt-2">Subir fotos</button>
+            <p>Fotos subidas: @fotos.Count</p>
 
-@if (errores.Count > 0)
-    {
-        <div class="alert alert-danger">
-            @foreach (var error in errores)
+            @if (!string.IsNullOrEmpty(errorPorFaltaDeFotos))
             {
-                <p>@error</p>
+                <div class="alert alert-danger">@errorPorFaltaDeFotos</div>
             }
+
+            <div class="row mt-3">
+                @foreach (var foto in fotos)
+                {
+                    <div class="col-md-3 mb-3">
+                        <div class="card">
+                            <img class="card-img-top" src="@foto.Url" />
+                            <div class="card-body text-center">
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarFoto(foto)">Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
-    }
 
-</AuthorizeView>
+        <div class="text-center mt-4">
+            <button class="btn btn-success btn-lg w-50" @onclick="Cargar">Cargar inmueble</button>
+        </div>
 
-<AuthorizeView Roles="Cliente">
-    <h3>Bienvenido Cliente</h3>
-    <p>Solo los administradores pueden cargar inmuebles.</p>
-</AuthorizeView>
+        @foreach (var error in errores)
+        {
+            <div class="alert alert-danger mt-3">@error</div>
+        }
+
+        @foreach (var error in erroresDeFotos)
+        {
+            <div class="alert alert-danger mt-3">@error</div>
+        }
+    </div>
+</div>
+
 
 @code {
     Inmueble inmueble = new();
     public HttpContext? HttpContext { get; set; }
-
     private double Latitud { get; set; }
     private double Longitud { get; set; }
-    private async Task Cargar()
+    private string mensajeError = string.Empty;
+    private long maxFileSize = 1024 * 1024 * 5; // 5 MB
+    private int maxAllowedFiles = 30;
+    private List<String> errores = new();
+    private string errorPorFaltaDeFotos = string.Empty;
+    private List<string> erroresDeFotos = [];
+    private List<Foto> fotos = new();
+    private Guid inputFileId = Guid.NewGuid();
+    private InputFileChangeEventArgs? browser;
+    private void Cargar()
     {
-        RolUsuario rol = (RolUsuario)Enum.Parse(typeof(RolUsuario), HttpContext.Request.Cookies["Rol"]); 
-        CasoDeUsoAltaInmueble.Ejecutar(inmueble,rol);
+        inmueble.CoordLat = Latitud;
+        inmueble.CoordLong = Longitud;
+        inmueble.Disponible = true;
+        errores.Clear();
+        if (fotos.Count == 0)
+        {
+            errorPorFaltaDeFotos = "Debe cargar al menos una foto del inmueble.";
+            errores = ValidadorInmueble.Ejecutar(inmueble);
+            StateHasChanged();
+            return;
+        }   
+        if (erroresDeFotos.Count == 0 && CasoDeUsoAltaInmueble.Ejecutar(inmueble,RolUsuario.Gerente, out errores) != -1){
+            ServicioFotos.PersistirFotos(fotos, inmueble.Id);
+            Nav.NavigateTo("/?mensaje=Inmueble cargado correctamente");
+        }
+        else
+        {
+            StateHasChanged();
+        }
     }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
          if (firstRender)
         {
-            // Crear una referencia al objeto .NET para pasar a JavaScript
             var dotNetRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("initializeMap", dotNetRef);
         }
@@ -136,48 +225,62 @@
         
     }
 
-    private long maxFileSize = 1024 * 1024 * 5; // 5 MB
-    private int maxAllowedFiles = 30;
-    private List<String> errores = new();
 
-    private InputFileChangeEventArgs browser;
-
-    
-    private async Task GuardarFotos()
+    private void EliminarFoto(Foto foto)
     {
-        if (browser == null)
-        {
-            errores.Add("No se ha seleccionado ningún archivo.");
-            return;
-        }
 
-        if (browser.FileCount > maxAllowedFiles)
+        fotos.Remove(foto);
+        File.Delete(Path.Combine(ServicioFotos.DevolverPathDelDirectorio(), foto.Nombre));
+        StateHasChanged();
+    }
+    
+    private void GuardarFotos()
+    {
+        try
         {
-            errores.Add($"No se pueden cargar más de {maxAllowedFiles} archivos.");
-            return;
-        }
-        errores.Clear();
-        foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))
-        {
-            try{
-                if (file.Size > maxFileSize)
-                {
-                    errores.Add($"El archivo {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
-                }
-                else{
-                crearArchivo(file);
-                }
-
-            }
-            catch (Exception ex)
+            erroresDeFotos.Clear();
+            if (browser == null || browser.FileCount == 0)
             {
-                errores.Add($"Error al cargar el archivo {file.Name}: {ex.Message}");
+                errorPorFaltaDeFotos=("No se ha seleccionado ningúna foto.");
+                return;
             }
-    } }
-    private async Task CaptureFiles(InputFileChangeEventArgs e)
+            errorPorFaltaDeFotos = string.Empty;
+
+            if (browser.FileCount > maxAllowedFiles || (browser.FileCount + fotos.Count) > maxAllowedFiles)
+            {
+                errorPorFaltaDeFotos=($"El número de máximo de fotos que puede cargar es {maxAllowedFiles}.");
+                return;
+            }   
+            foreach(var file in browser.GetMultipleFiles(maxAllowedFiles))
+            {
+                try{
+                    if (file.Size > maxFileSize)
+                    {
+                        erroresDeFotos.Add($"La foto {file.Name} excede el tamaño máximo permitido de 5 MB y no se podrá agregar. Por favor elija otra foto");
+                    }
+
+                    else
+                    {
+                        crearArchivo(file);
+                    }
+
+                }
+                catch (Exception)
+                {
+                    erroresDeFotos.Add($"Error al cargar la foto {file.Name}");
+                }
+            }
+        }
+        finally 
+        {
+            inputFileId = Guid.NewGuid();
+            browser = null;
+            StateHasChanged();
+        }
+    }
+    private void CaptureFiles(InputFileChangeEventArgs e)
     {
         browser = e;
-        
     }
 
     private async void crearArchivo(IBrowserFile file)
@@ -189,9 +292,7 @@
                 var pathFotosInmuebles = Path.GetFullPath(
                     Path.Combine(
                         Directory.GetCurrentDirectory(),
-                        "..", 
-                        "Alquileres_Express.Repositorios", 
-                        "FotosInmuebles"));
+                       "wwwroot", "images","fotosInmuebles"));
 
                 Directory.CreateDirectory(pathFotosInmuebles);
 
@@ -199,5 +300,58 @@
         
                 await using FileStream fs = new(path, FileMode.Create);
                 await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+                fotos.Add(new Foto
+                {
+                    Url = $"/images/fotosInmuebles/{newFileName}",
+                    Nombre = newFileName,
+                });
+                StateHasChanged();
     }
+
 }
+
+<style>
+    .image-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.image-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+.custom-file-input {
+  color: transparent;
+}
+.custom-file-input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+.custom-file-input::before {
+  content: 'Select some files';
+  color: black;
+  display: inline-block;
+  background: -webkit-linear-gradient(top, #f9f9f9, #e3e3e3);
+  border: 1px solid #999;
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  text-shadow: 1px 1px #fff;
+  font-weight: 700;
+  font-size: 10pt;
+}
+.custom-file-input:hover::before {
+  border-color: black;
+}
+.custom-file-input:active {
+  outline: 0;
+}
+.custom-file-input:active::before {
+  background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9); 
+}
+</style>

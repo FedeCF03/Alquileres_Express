@@ -1,0 +1,219 @@
+@page "/registrar-alquiler/{id:int}"
+@using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler
+@using Alquileres_Express.Aplicacion.CasosDeUso
+@using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoPagarEfectivo
+@using Alquileres_Express.Aplicacion.Entidades
+@using Alquileres_Express.Repositorios.Context
+@using Microsoft.EntityFrameworkCore
+@using BlazorDateRangePicker
+
+@inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
+@rendermode InteractiveServer
+@inject NavigationManager Navegador
+@inject CasoDeUsoRegistrarAlquilerPresencial casoDeUsoRegistrarAlquiler
+@inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
+@inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
+@inject CasoDeUsoPagarEfectivo casoDeUsoPagarEfectivo
+@inject CasoDeUsoListarLlaves casoDeUsoListarLlaves
+@attribute [Authorize(Roles = "Gerente,Empleado")]
+
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="card-title text-center text-primary">📌 Registrar Alquiler Presencial</h2>
+
+        <!-- Mensaje de error -->
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger text-center">@ErrorMessage</div>
+        }
+
+        <div class="row">
+            <!-- Información del cliente -->
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label class="fw-bold">Correo del Cliente:</label>
+                    <input @bind="correoCliente" class="form-control form-control-lg"
+                        placeholder="Ingresa el correo..." />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="fw-bold">Número de Personal:</label>
+                    <InputNumber @bind-Value="numeroPersonal" class="form-control form-control-lg no-spinner" />
+                </div>
+            </div>
+
+            <!-- Calendario de fechas -->
+            <div class="col-md-6">
+                <label class="fw-bold mb-2">Seleccionar Fechas:</label>
+                <DateRangePicker @bind-StartDate="StartDate" @bind-EndDate="EndDate"
+                    DaysEnabledFunction="(d)=>!NoEsHabil(d)" class="form-control form-control-lg"
+                    placeholder="Selecciona fechas..." OnRangeSelect="VerificarFechas" MaxDate="fechaMaxima"/>
+            </div>
+        </div>
+
+        <!-- Precio y botón de registro -->
+        <div class="text-center mt-4">
+            @if (!podesPagar)
+            {
+                <button class="btn btn-secondary btn-lg" disabled>Registrar alquiler</button>
+            }
+            else
+            {
+                <div class="text-success fs-5 fw-bold">💲 Precio total: $@calcularPrecio(StartDate!.Value.DateTime,
+                                    EndDate!.Value.DateTime, inmueble!.Precio).ToString("F2")</div>
+            <button class="btn btn-success btn-lg mt-3" @onclick="RegistrarPagoEfectivo">✅ Registrar alquiler</button>
+                        }
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; } // Recibe el ID del inmueble desde la URL
+
+    private string correoCliente = "";
+    private int numeroPersonal;
+    private string ErrorMessage = "";
+    DateTimeOffset? StartDate { get; set; }
+    DateTimeOffset? EndDate { get; set; }
+    DateTimeOffset fechaMaxima = DateTime.Today.AddDays(365);
+    private List<RangoDeFechas> FechasReservadas { get; set; } = [];
+    ContadorDeFrecuencias<string> contadorFechas = new ();
+    private string mensajeError = string.Empty;
+    private bool podesPagar { get; set; } = false;
+    private Inmueble inmueble = new();
+    Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
+    private decimal calcularPrecio(DateTime fechaInicio, DateTime fechaFin, decimal? monto)
+    {
+        if (monto == null)
+            throw new ArgumentException("El monto debe tener valor");
+        int dias = (int)(fechaFin - fechaInicio).TotalDays;
+        decimal precioTotal = dias * monto.Value;
+        return precioTotal;
+    }
+    protected override void OnParametersSet()
+    {
+        try
+        {
+            inmueble = casoDeUsoObtenerInmueble.Ejecutar(Id);
+            CrearRangosDeFechaReservados(inmueble!.Alquileres!.GroupJoin(casoDeUsoListarLlaves.Ejecutar(), 
+                alquiler => alquiler.Id, 
+                llave => llave.AlquilerId, 
+                (alquiler, llavesCollection) => new Alquiler 
+                {
+                    Id = alquiler.Id,
+                    InmuebleId = alquiler.InmuebleId,
+                    ClienteId = alquiler.ClienteId,
+                    NombreDePersonal = alquiler.NombreDePersonal,
+                    ApellidoDePersonal = alquiler.ApellidoDePersonal,
+                    CorreoCliente = alquiler.CorreoCliente,
+                    FechaDeCreacion = alquiler.FechaDeCreacion,
+                    FechaDeInicio = alquiler.FechaDeInicio,
+                    FechaDeFin = alquiler.FechaDeFin,
+                    Precio = alquiler.Precio,
+                    Cancelado = alquiler.Cancelado,
+                    Pagado = alquiler.Pagado,
+                    RegistrosDeLlave = llavesCollection.ToList()
+                }).ToList());
+        }
+        catch
+        {
+            // Manejo de errores, por ejemplo, redirigir a una página de error o mostrar un mensaje
+            Navegador.NavigateTo("/?mensaje=Inmueble no encontrado&EsMensajeDeError=true");
+        }
+        if (!inmueble.Disponible)
+        {
+            Navegador.NavigateTo("/?mensaje=El inmueble no está disponible&EsMensajeDeError=true", true);
+            return;
+        }
+    }
+
+    private void RegistrarPagoEfectivo()
+    {
+        try
+        {
+            if (StartDate == null || EndDate == null)
+            {
+                ErrorMessage = "Debe seleccionar un rango de fechas.";
+                return;
+            }
+            //validando
+
+            //casoDeUsoRegistrarAlquiler.Ejecutar(correoCliente, Id, StartDate.Value.DateTime, EndDate.Value.DateTime,
+            //numeroPersonal);
+
+            Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
+            Cliente? cliente = _context.Clientes.FirstOrDefault(c => c.Correo.ToLower() == correoCliente.ToLower());
+            Personal? personal = _context.Personal.FirstOrDefault(p => p.Id == numeroPersonal);
+            Inmueble? inmueble = _context.Inmuebles.FirstOrDefault(i => i.Id == Id);
+            if (cliente == null)
+                throw new InvalidOperationException("El correo no esta vinculado a ningun cliente.");
+            if (personal == null || personal.Borrado)
+                throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
+            if (inmueble == null)
+                throw new InvalidOperationException("El número de personal no está vinculado a ningún miembro del personal.");
+            if(!inmueble.Disponible){
+                throw new InvalidOperationException("El inmueble no se encuentra disponible.");
+            }
+            decimal precio = calcularPrecio(StartDate.Value.DateTime, EndDate.Value.DateTime, inmueble!.Precio);
+            Alquiler alquiler = new Alquiler(correoCliente, StartDate.Value.DateTime, EndDate.Value.DateTime, precio, Id,
+            personal.Nombre, personal.Apellido)
+            { ClienteId = cliente.Id };
+            //RegistroDeLlave registro = casoDeUsoRegistrarEntrega.Ejecutar(alquiler.Id, personal.Id, cliente.Id);
+            //alquiler.Entrega = registro;
+
+            // Llama al caso de uso para registrar el pago en efectivo
+            casoDeUsoPagarEfectivo.PagarEfectivo(alquiler, inmueble.Id, StartDate.Value.DateTime, EndDate.Value.DateTime);
+            Navegador.NavigateTo($"/?mensaje=¡Se registro el alquiler exitosamente!");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+    private void CrearRangosDeFechaReservados(List<Alquiler> alquileres)
+    {
+        FechasReservadas.Clear();
+        alquileres.Where(a => !a.Cancelado &&
+        !a.GetEstadoDeAlquiler().Equals(EstadoDeAlquiler.Terminado) && a.Pagado).ToList().ForEach(alquiler =>
+        {
+            FechasReservadas.Add(new RangoDeFechas(alquiler.FechaDeInicio.AddDays(1), alquiler.FechaDeFin.AddDays(-1)));
+            contadorFechas.Agregar(alquiler.FechaDeInicio.ToShortDateString()); 
+            contadorFechas.Agregar(alquiler.FechaDeFin.ToShortDateString());
+        });
+        Console.WriteLine($"Fechas reservadas: {FechasReservadas.Count}");
+    }
+    private bool NoEsHabil(DateTimeOffset date)
+    {
+        return FechasReservadas.Any(rango => rango.Contains(date.Date)) || date.Date.AddHours(14) < DateTime.Now || contadorFechas.Frecuencia(date.DateTime.ToShortDateString()) == 2;
+    }
+    private void VerificarFechas()
+    {
+        if (StartDate == null || EndDate == null)
+        {
+            mensajeError = "Debe seleccionar un rango de fechas.";
+            podesPagar = false;
+            return;
+        }
+        if (StartDate.Value.Date == EndDate.Value.Date)
+        {
+            mensajeError = "Debe elegir por lo menos una noche.";
+            podesPagar = false;
+            return;
+        }
+        for (DateTime date = StartDate.Value.Date; date <= EndDate.Value.Date; date = date.AddDays(1))
+        {
+            if (NoEsHabil(date))
+            {
+                mensajeError = $"Una o más fechas seleccionadas no están disponibles. Por favor, elija fechas que no estén bloqueadas.";
+                StateHasChanged();
+                podesPagar = false;
+                return;
+            }
+        }
+        mensajeError = string.Empty;
+        podesPagar = true;
+    }
+}

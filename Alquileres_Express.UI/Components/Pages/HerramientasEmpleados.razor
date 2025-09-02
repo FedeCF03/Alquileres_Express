@@ -1,0 +1,225 @@
+@page "/Herramientas"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@using BlazorDateRangePicker
+@using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler
+@inject CasoDeUsoObtenerCantidadDeClientesEntreFechas CasoDeUsoObtenerCantidadDeClientesEntreFechas
+@inject CasoDeUsoObtenerValorDeAlquileresEntreFechas CasoDeUsoObtenerValorDeAlquileresEntreFechas
+
+@attribute [Authorize(Roles = "Gerente,Empleado")]
+
+<div class="decorative-elements">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+</div>
+
+<div class="container">
+    <h1 class="title">Operaciones Disponibles</h1>
+    <div class="buttons-grid">
+        <a class="operation-btn empleado" href="/registrar-cliente-presencial">
+            <span class="btn-icon">👷‍♂️</span>
+            Agregar cliente
+        </a>
+
+        <AuthorizeView Roles="Gerente">
+            <Authorized>
+                <a class="operation-btn empleado" href="/agregar-personal">
+                    <span class="btn-icon">👷‍♂️</span>
+                    Agregar empleado
+                </a>
+
+                <a class="operation-btn ALQUILERES" href="/cargar-inmueble">
+                    <span class="btn-icon">📋</span>
+                    Cargar inmueble
+                </a>
+
+                <a class="operation-btn listar" href="/cantidadDeAlquileres">
+                    <span class="btn-icon">👥</span>
+                    Cantidad de alquileres
+                </a>
+
+                <a class="operation-btn listar" href="/listadoClientesNuevos">
+                    <span class="btn-icon">👥</span>
+                    Nuevos clientes
+                </a>
+            </Authorized>
+        </AuthorizeView>
+        <!-- 
+            <button class="operation-btn historial" onclick="verHistorial()">
+                <span class="btn-icon">📋</span>
+                Ver Historial de Llaves
+            </button>
+
+            
+                                                                                -->
+        <!--                 LOS METODOS COMENTADOS SON PARA LA 2DA EMT O NO LOS TENEMOS IMPLEMENTADOS TODAVIA       -->
+        <a class="operation-btn empleado" href="/listadoUsuario">
+            <span class="btn-icon">👥</span>
+            Listar usuarios
+        </a>
+
+        <a class="operation-btn ALQUILERES" href="/InmueblesNoDisponibles">
+            <span class="btn-icon">🔑</span>
+            Inmuebles no disponibles
+        </a>
+
+        <a class="operation-btn ALQUILERES" href="/alquileres-totales">
+            <span class="btn-icon">🏠</span>
+            Menu general de alquileres
+        </a>
+
+    </div>
+</div>
+
+<script>
+    // Funciones para cada operación
+    function registrarEntrega() {
+        // Lógica para registrar entrega de llaves
+        alert('Función: Registrar Entrega de Llaves');
+        console.log('Ejecutando: Registrar Entrega de Llaves');
+    }
+
+    function registrarDevolucion() {
+        // Lógica para registrar devolución de llaves
+        alert('Función: Registrar Devolución de Llaves');
+        console.log('Ejecutando: Registrar Devolución de Llaves');
+    }
+
+    function registrarEmpleado() {
+        // Lógica para registrar empleado
+        alert('Función: Registrar Empleado');
+        console.log('Ejecutando: Registrar Empleado');
+    }
+
+    function verHistorial() {
+        // Lógica para ver historial de llaves
+        alert('Función: Ver Historial de Llaves');
+        console.log('Ejecutando: Ver Historial de Llaves');
+    }
+
+    function listarUsuarios() {
+        // Lógica para listar usuarios
+        alert('Función: Listar Usuarios');
+        console.log('Ejecutando: Listar Usuarios');
+    }
+
+    // Efecto de entrada para los botones
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('.operation-btn');
+        buttons.forEach((button, index) => {
+            using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
+            #line default
+            #line hidden
+            #nullable restore
+            #line(8, 12) - (8, 65) "C:\Users\Mar\Desktop\Alquileres_Express\Alquileres_Express.UI\Components\Pages\HerramientasEmpleados.razor"
+</script>
+
+@code {
+
+    private bool mostrarTarjeta { get; set; } = false; // Cambiá esto a false para ocultarla
+    private bool esParaInmuebles { get; set; } = false;
+    private bool esParaClientes { get; set; } = false;
+
+
+    void MostrarIngresos()
+    {
+        if (!esParaInmuebles)
+        {
+            esParaClientes = false;
+            esParaInmuebles = true;
+            mostrarTarjeta = true;
+            StateHasChanged();
+        }
+        else
+        {
+            esParaInmuebles = false;
+            mostrarTarjeta = false;
+            StateHasChanged();
+        }
+    }
+
+    void MostrarClientes()
+    {
+        if (!esParaClientes)
+        {
+            esParaInmuebles = false;
+            esParaClientes = true;
+            mostrarTarjeta = true;
+            StateHasChanged();
+        }
+        else
+        {
+            esParaInmuebles = false;
+            mostrarTarjeta = false;
+            StateHasChanged();
+        }
+    }
+
+    private string mensajeError = string.Empty;
+
+    DateTimeOffset? StartDate { get; set; }
+    DateTimeOffset? EndDate { get; set; }
+
+    private decimal totalAlquileres()
+    {
+        decimal total = 0;
+        DateTime fecha1 = StartDate?.UtcDateTime ?? DateTime.MinValue;
+        DateTime fecha2 = EndDate?.UtcDateTime ?? DateTime.MinValue;
+        total = CasoDeUsoObtenerValorDeAlquileresEntreFechas.Ejecutar(fecha1, fecha2);
+        return total;
+    }
+
+    private int cantidadClientes()
+    {
+        int num = 0;
+        DateTime fecha1 = StartDate?.UtcDateTime ?? DateTime.MinValue;
+        DateTime fecha2 = EndDate?.UtcDateTime ?? DateTime.MinValue;
+        num = CasoDeUsoObtenerCantidadDeClientesEntreFechas.Ejecutar(fecha1, fecha2);
+        return num;
+    }
+
+    private void VerificarFechas()
+    {
+        if (StartDate == null || EndDate == null)
+        {
+            mensajeError = "Debe seleccionar un rango de fechas.";
+            return;
+        }
+        if (StartDate.Value.Date == EndDate.Value.Date)
+        {
+            mensajeError = "Debe elegir por lo menos una noche.";
+            return;
+        }
+        mensajeError = string.Empty;
+    }
+
+}
+
+<style>
+    .property-rating i {
+        font-size: 1rem;
+    }
+
+    .property-rating .text-secondary {
+        font-size: 0.9rem;
+    }
+
+    .promedio-numero {
+        font-size: 1.25rem;
+        /* o probá con 1.3rem si querés más presencia */
+        font-weight: 600;
+        color: #343a40;
+        /* o el color que combine con tu estética */
+    }
+
+    .hidden-picker {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+</style>

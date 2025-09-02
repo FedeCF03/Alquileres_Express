@@ -2,70 +2,95 @@ using Alquileres_Express.Aplicacion;
 using Alquileres_Express.Aplicacion.Entidades;
 using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Repositorios.Context;
+using Microsoft.EntityFrameworkCore;
 
-namespace Alquileres_Express.Repositorios.RepositoriosSQLite;
+namespace Alquileres_Express.Repositorios.RepositorioSQLite;
 
 public class RepositorioPersonal : IRepositorioPersonal
 {
-    readonly Alquileres_ExpressContext _context = new Alquileres_ExpressContext();
     public void AgregarPersonal(Personal p)
     {
-        bool existe = _context.Personal.Any(x => x.Correo.ToLower() == p.Correo.ToLower());
+        using Alquileres_ExpressContext _context = new();
+        bool existe = (_context.Clientes.Any(x => x.Correo.ToLower() == p.Correo.ToLower())) || (_context.Personal.Any(x => x.Correo.ToLower() == p.Correo.ToLower()));
         if (existe)
-            throw new InvalidOperationException("El correo ya está registrado por otro cliente.");
+            throw new InvalidOperationException("El correo ya está registrado por otro usuario.");
+        bool dniExiste = _context.Clientes.Any(x => x.Dni == p.Dni) || _context.Personal.Any(x => x.Dni == p.Dni);
+        if (dniExiste)
+            throw new InvalidOperationException("El DNI ya está registrado por otro usuario.");
         p.Contraseña = BCrypt.Net.BCrypt.HashPassword(p.Contraseña.Trim());
+        p.Rol = Aplicacion.Enumerativo.RolUsuario.Empleado;
         _context.Personal.Add(p);
         _context.SaveChanges();
     }
 
-    public void ModificarPersonal(Personal c)
+    public void EliminarPersonal(int id)
     {
-
-    }
-
-    public void EliminarPersonal(Personal c)
-    {
+        using Alquileres_ExpressContext _context = new();
+        var personal = _context.Personal.Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Id == id);
+        if (personal != null)
+        {
+            if (personal.RegistrosDeLlave.Count > 0)
+            {
+                //  _context.RegistroDeLlave.where(r => r.PersonalId == id).ToList().ForEach(r => _context.RegistrosDeLlave.PersonalId = null);
+            }
+            personal.Borrado = true;
+            _context.SaveChanges();
+        }
+        else
+        {
+            throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
+        }
 
     }
     public Personal ObtenerPersonalPorId(int id)
     {
-        return null;
+        using Alquileres_ExpressContext _context = new();
+        return _context.Personal.Where(i => i.Borrado == false).Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Id == id) ?? throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
     }
     public List<Personal> ObtenerTodosElPersonal()
     {
-        return null;
-    }
-    public List<Personal> ObtenerPersonalPorNombre(string nombre)
-    {
-        return null;
+        using Alquileres_ExpressContext _context = new();
+        return _context.Personal.Where(i => i.Borrado == false).Include(c => c.RegistrosDeLlave).ToList();
     }
 
     public Personal ObtenerPersonalPorDNI(string dni)
     {
-        throw new NotImplementedException();
+        using Alquileres_ExpressContext _context = new();
+        var per = _context.Personal.Where(i => i.Borrado == false).Include(p => p.RegistrosDeLlave).FirstOrDefault(p => p.Dni == dni);
+        if (per != null)
+        {
+            return per;
+        }
+        throw new KeyNotFoundException($"No existe el personal con DNI {dni}. Por favor, intente de nuevo o pruebe otro personal.");
     }
 
-    public Personal ObtenerPersonalPorMail(string mail)
+    public Personal? ObtenerPersonalPorMail(string mail)
     {
-        throw new NotImplementedException();
+        using Alquileres_ExpressContext _context = new();
+        var per = _context.Personal.Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
+           if (per != null)
+        {
+            return per;
+        }
+        return null;
+
     }
 
     public Personal? ObtenerPersonalPorMailYContraseña(string mail, string contraseña)
     {
-
-        contraseña = BCrypt.Net.BCrypt.HashPassword(contraseña);
-
-        var per = _context.Personal.FirstOrDefault(p => p.Correo == mail && p.Contraseña == contraseña);
-        if (per == null)
+        using Alquileres_ExpressContext _context = new();
+        var per = _context.Personal.Include(c => c.RegistrosDeLlave).FirstOrDefault(p => p.Correo == mail);
+        if (per != null && BCrypt.Net.BCrypt.Verify(contraseña, per.Contraseña))
         {
-            return null;
+            return per;
         }
-        return per;
-
+        return null;
     }
+
 
     public void ActualizarEstadoDobleAutenticacion(int id, string codigoDeSeguridad)
     {
+        using Alquileres_ExpressContext _context = new();
         var personal = _context.Personal.FirstOrDefault(p => p.Id == id);
         if (personal != null)
         {
@@ -75,8 +100,9 @@ public class RepositorioPersonal : IRepositorioPersonal
 
     }
 
-    public Personal ValidarCodigoDeSeguridad(String correo, String codigoDeSeguridad)
+    public Personal? ValidarCodigoDeSeguridad(string correo, string codigoDeSeguridad)
     {
+        using Alquileres_ExpressContext _context = new();
         var personal = _context.Personal.FirstOrDefault(p => p.Correo == correo && p.CodigoDeSeguridad == int.Parse(codigoDeSeguridad));
         if (personal != null)
         {
@@ -84,7 +110,70 @@ public class RepositorioPersonal : IRepositorioPersonal
             _context.SaveChanges();
             // Resetear el código de seguridad después de la validación
         }
-        return personal ?? null;
+        return personal;
+
+    }
+
+
+    public bool ModificarPersonal(Personal personal)
+    {
+        using Alquileres_ExpressContext _context = new();
+        var personalExistente = _context.Personal.FirstOrDefault(p => p.Id == personal.Id);
+        if (personalExistente == null)
+            return false; // O lanzar una excepción, según el caso
+
+        personalExistente.Nombre = personal.Nombre;
+        personalExistente.Apellido = personal.Apellido;
+        personalExistente.Correo = personal.Correo;
+        personalExistente.Direccion = personal.Direccion;
+        personalExistente.Dni = personal.Dni;
+        personalExistente.FechaNacimiento = personal.FechaNacimiento;
+
+        _context.SaveChanges();
+        return true;
+    }
+    public bool SeRepiteDNI(Personal cliente)
+    {
+        using Alquileres_ExpressContext _context = new();
+        Usuario? u = _context.Clientes.FirstOrDefault(c => c.Dni.Equals(cliente.Dni));
+
+        Usuario? u2 = _context.Personal.FirstOrDefault(p => p.Dni.Equals(cliente.Dni) && p.Id != cliente.Id);
+        return u != null || u2 != null;
+
+    }
+    public bool SeRepiteCorreo(Personal cliente)
+    {
+        using Alquileres_ExpressContext _context = new();
+        return _context.Clientes.FirstOrDefault(c => c.Correo.ToLower().Equals(cliente.Correo.ToLower())) != null ||
+        _context.Personal.FirstOrDefault(p => p.Correo.ToLower().Equals(cliente.Correo.ToLower()) && p.Id != cliente.Id) != null;
+    }
+
+    public void DescenderGerente(int id)
+    {
+        using Alquileres_ExpressContext _context = new();
+        var personal = _context.Personal.FirstOrDefault(p => p.Id == id);
+        if (personal != null)
+        {
+            personal.Rol = Aplicacion.Enumerativo.RolUsuario.Empleado;
+            _context.SaveChanges();
+        }
+        else
+        {
+            throw new KeyNotFoundException($"No existe el personal con ID {id}. Por favor, intente de nuevo o pruebe otro personal.");
+        }
+
+    }
+
+    public void AscenderAGerente(int id)
+    {
+        using Alquileres_ExpressContext _context = new();
+        var personal = _context.Personal.FirstOrDefault(p => p.Id == id);
+        if (personal != null)
+        {
+
+            personal.Rol = Aplicacion.Enumerativo.RolUsuario.Gerente;
+            _context.SaveChanges();
+        }
 
     }
 }

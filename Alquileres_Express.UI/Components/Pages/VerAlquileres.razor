@@ -1,0 +1,346 @@
+@page "/alquileres/{Id:int}"
+@attribute [Authorize]
+
+@using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject CasoDeUsoObtenerAlquileresPorCorreo casoDeUsoObtenerAlquileresPorCorreo
+@inject CasoDeUsoObtenerTodosLosAlquileres casoDeUsoObtenerTodosLosAlquileres
+@inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
+@inject CasoDeUsoAlquilerCancelarAlquiler casoDeUsoAlquilerCancelarAlquiler
+@inject CasoDeUsoObtenerAlquilerPorId casoDeUsoObtenerAlquilerPorId
+@inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
+@inject CasoDeUsoAñadirLlave casoDeUsoAlquilerAñadirLlave
+@inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject CasoDeUsoCalificarInmueble casoDeUsoCalificarInmueble
+@inject ServicioEnviarEmail servicioEnviarEmail
+@inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
+
+@rendermode InteractiveServer
+
+@if (!string.IsNullOrEmpty(mensajeLlave))
+{
+    <div class="alert alert-success text-center mt-3" role="alert">
+        @mensajeLlave
+    </div>
+}
+
+<AuthorizeView Roles="Cliente">
+    <Authorized>
+        <div class="page-header">
+            <h1><i class="fas fa-home"></i> Mis Alquileres</h1>
+            <p>Gestiona tus reservas de manera fácil y rápida</p>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        
+        <div class="page-header">
+            <h1><i class="fas fa-home"></i> Alquileres de @cliente?.Nombre</h1>
+            <p>Gestiona los alquileres del cliente de manera fácil y rápida</p>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+<div class="rental-grid">
+    @if (alquileres != null && alquileres.Count > 0)
+    {
+        @foreach (var alquiler in alquileres)
+        {
+            var inmueble = GetInmuebleById(alquiler.InmuebleId);
+            @if (inmueble != null)
+            {
+                <div class="rental-card">
+                    <div class="rental-image">
+                        <NavLink href="@($"/inmueble/{alquiler.InmuebleId}")">
+                            <img src="@getImagenInmueble(alquiler.InmuebleId)" alt="@inmueble.Nombre" href />
+                        </NavLink>
+                        <div class="price-badge">
+            @if (alquiler.Precio > 0)
+            {
+                <i class="fas fa-dollar-sign"></i> @alquiler.Precio.ToString("N0")
+            }
+            else
+            {
+                <span style="color: red;">Sin precio</span>
+            }
+            
+        </div>
+        
+                    </div>
+                    <div class="rental-content">
+                        <div class="rental-header">
+                            <h3>@inmueble.Nombre</h3>
+                        </div>
+                        <div class="rental-details">
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt detail-icon"></i>
+                                <span class="detail-label">Dirección:</span>
+                                <span class="detail-value">@inmueble.Direccion</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-check detail-icon"></i>
+                                <span class="detail-label">Check-in:</span>
+                                <span class="detail-value">@alquiler.FechaDeInicio.ToString("dd/MM/yyyy")</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-times detail-icon"></i>
+                                <span class="detail-label">Check-out:</span>
+                                <span class="detail-value">@alquiler.FechaDeFin.ToString("dd/MM/yyyy")</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-clock detail-icon"></i>
+                                <span class="detail-label">Duración:</span>
+                                <span class="detail-value duration-highlight">@((alquiler.FechaDeFin - alquiler.FechaDeInicio).Days)
+                                    Noches</span>
+                            </div>
+                        </div> 
+                        <div class="rental-actions">
+                         <AuthorizeView Roles="Gerente, Empleado">
+                            @if ( alquiler.RegistrosDeLlave == null || alquiler.RegistrosDeLlave.Count == 0)
+                            {
+                                if (alquiler.PuedeEntregarLlave())
+                                {
+                                    <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, true)" >
+                                        <i class= "fas fa-times" > </i> Registrar entrega 
+                                    </button>
+                                }
+                                
+                            } 
+                            else 
+                            {
+                                <a class="btn btn-primary btn-sm shadow-sm d-flex align-items-center gap-2" 
+                                    href="@($"/ListarLlaves/{alquiler.Id}/{id}")">
+                                    <i class="fas fa-list"></i> Historial de llaves
+                                </a>                                
+                                if(alquiler.RegistrosDeLlave.Count == 2)
+                                {
+                                    <p><i class= "fas fa-check" > </i> Entrega y devolución registrada</p>
+                                }
+                                else
+                                {
+                                    <button class= "btn btn-danger" type = "button" @onclick="() => AñadirLlave(alquiler.Id, alquiler.ClienteId, false)" >
+                                            <i class= "fas fa-times" > </i> Registrar devolucion 
+                                    </button >
+                                }
+                                    
+                            }
+                            </AuthorizeView>
+                            @if (!alquiler.Cancelado)
+                            {
+                                var estado = alquiler.GetEstadoDeAlquiler();  
+                                
+                            @if (estado == EstadoDeAlquiler.Vigente )
+                            {   <button class="btn btn-danger" type="button" @onclick=" () => CancelarReserva(alquiler)" >
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+
+                                <span class="status-label terminado">
+                                    <i class="fas fa-check"></i> Vigente
+                                </span>
+                            }
+                            
+                            @if (estado == EstadoDeAlquiler.Terminado)
+                            {
+                                <AuthorizeView Roles="Cliente">
+                                    <Authorized>      
+                                        @if (!YaFueCalificado(alquiler.InmuebleId))
+                                        {
+                                            <button class="btn btn-review me-2"
+                                            @onclick="() => SeleccionarAlquiler(alquiler.Id)">
+                                            <i class="fas fa-star"></i> Calificar
+                                        </button>
+                                        }
+                                        else
+                                        {
+                                          <span class="text-success fw-semibold">
+                                            <i class="fas fa-check-circle"></i> Ya calificado
+                                          </span>
+                                        }
+
+                                        @if (alquilerSeleccionadoId == alquiler.Id)
+                                        {
+                                            <IngresarValoracion AlquilerId="@alquiler.Id"
+                                            InmuebleId="@alquiler.InmuebleId"
+                                            ClienteId="@cliente!.Id"
+                                            OnClose="CerrarFormulario" />
+                                        }
+                                    </Authorized>
+                                </AuthorizeView>
+                                @if(alquiler.TieneDevolucion() || alquiler.TerminoSinEntregaDeLlave()){
+                                    <span class="status-label terminado">
+                                        <i class="fas fa-check"></i> Terminado
+                                    </span>
+                                }
+                                else 
+                                {
+                                    <span class="status-label pendiente">
+                                        <i class="fas fa-clock"></i> Devolución pendiente
+                                    </span>
+                                }
+                            }
+                            else if (estado == EstadoDeAlquiler.EnProceso)
+                                {
+                                    <span class="status-label en-proceso">
+                                        <i class="fas fa-spinner"></i> En Proceso
+                                    </span>
+                                }
+                             
+                            }
+                            else
+                            {
+                                <span class="status-label" style="background: #e74c3c; color: white;">
+                                    <i class="fas fa-ban"></i> Cancelado
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+    else
+    {
+        <div class="no-rentals">
+            <div class="no-rentals-icon">
+                <i class="fas fa-home" style="font-size: 4rem; opacity: 0.7; margin-bottom: 1rem;"></i>
+            </div>
+            <h3>No tienes alquileres</h3>
+            <p>Aún no has realizado ninguna reserva.</p>
+        </div>
+    }
+</div> 
+
+        <div class="alert alert-success mt-3 text-center" role="alert"
+            style="display: @(string.IsNullOrEmpty(mensajeLlave) ? "none" : "block")">
+            @mensajeLlave
+        </div>
+@code {
+    private string correo = "";
+    private string rol = "";
+    private List<Alquiler>? alquileres = new ();
+    private List<Inmueble> inmuebles = new();
+    private string mensajeLlave = string.Empty;
+    private int alquilerSeleccionadoId = 0; 
+    
+
+    [Parameter]
+    public int id { get; set; } = 0;
+    Cliente? cliente;
+    Personal? personal;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity!.IsAuthenticated)
+        {
+            correo = user.Identity.Name!;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value!;
+            cliente = casoDeUsoBuscarClientePorId.Ejecutar(id);
+            if (cliente == null)
+            {
+                NavigationManager.NavigateTo("/?mensaje=Cliente no encontrado&EsMensajeDeError=true");
+                return; 
+            }
+            if (rol == "Cliente" && cliente.Correo != correo)
+            {
+                NavigationManager.NavigateTo("/?mensaje=No tenes permisos&EsMensajeDeError=true");
+            }
+            if (rol == "Gerente" || rol == "Empleado")
+            {
+                personal = CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+            }
+            alquileres = cliente.Alquileres;
+
+            if (alquileres != null && alquileres.Count > 0)
+            {
+                getInmuebles();
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+
+    void SeleccionarAlquiler(int id) => alquilerSeleccionadoId = id;
+    void CerrarFormulario() => alquilerSeleccionadoId = 0;
+
+    private void getInmuebles()
+    {
+        try
+        {
+            inmuebles = casoDeUsoListarInmuebles.ListarTodos();
+            inmuebles = inmuebles.FindAll(i => alquileres!.Any(a => a.InmuebleId == i.Id));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener los inmuebles: {ex.Message}");
+        }
+    }
+
+    private string getImagenInmueble(int inmuebleId)
+    {
+        var inmueble = inmuebles.FirstOrDefault(i => i.Id == inmuebleId);
+
+        // Verificar que el inmueble existe y tiene fotos
+        if (inmueble?.Fotos != null && inmueble.Fotos.Count > 0)
+        {
+            return inmueble.Fotos[0].Url;
+        }
+
+        // Retornar imagen por defecto si no hay foto
+        return "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+    }
+
+    private Inmueble GetInmuebleById(int inmuebleId)
+    {
+        return inmuebles!.FirstOrDefault(i => i.Id == inmuebleId)!;
+    }
+
+    private async Task CancelarReserva(Alquiler alquiler)
+    {
+        Cliente clienteDeAlquiler = casoDeUsoBuscarClientePorId.Ejecutar(alquiler.ClienteId)!;
+        casoDeUsoAlquilerCancelarAlquiler.Ejecutar(alquiler.Id);
+        Inmueble? inmueble = casoDeUsoObtenerInmueble.Ejecutar(alquiler.InmuebleId);
+        mensajeLlave = "✔️ Alquiler cancelado correctamente.";
+        await Task.Delay(5000);
+        servicioEnviarEmail.EnviarEmail(clienteDeAlquiler!.Correo, "Alquiler cancelado", "La política de cancelación del inmueble es: ", inmueble.DevolverPoliticaDeCancelacion() + ". Por favor, comuníquese con algún empleado en el caso de que se devuelva dinero.");
+        NavigationManager.NavigateTo($"/alquileres/{id}", true);    
+
+    }
+    bool YaFueCalificado(int idInmueble)
+    {
+        Inmueble? inmueble = GetInmuebleById(idInmueble);
+        Valoracion? valoracion = inmueble!.Valoraciones!.FirstOrDefault(v => v.ClienteId == id && v.InmuebleId == idInmueble);
+        if (valoracion != null)
+        {
+            return true; // Ya fue calificado
+        }
+        else 
+        {
+            return false; // No fue calificado
+        }
+    }
+
+    private void DejarResena( int id)
+    {
+        NavigationManager.NavigateTo($"/inmueble/{id}");
+    }
+
+    public async Task AñadirLlave(int alquilerId,  int clienteId, bool esEntrega )
+    {
+        RegistroDeLlave registroDeLlave = new(alquilerId, personal!.Id, clienteId,esEntrega);
+
+        casoDeUsoAlquilerAñadirLlave.Ejecutar(registroDeLlave);
+        mensajeLlave = esEntrega
+        ? "✔️ Entrega registrada correctamente."
+        : "🔄 Devolución registrada correctamente.";
+        await Task.Delay(3500);
+
+        NavigationManager.NavigateTo($"/alquileres/{id}", true);
+    }
+}

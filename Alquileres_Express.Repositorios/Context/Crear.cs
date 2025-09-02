@@ -1,29 +1,176 @@
 namespace Alquileres_Express.Repositorios.Context;
 
+using Alquileres_Express.Aplicacion.Entidades;
 using Microsoft.EntityFrameworkCore;
 
 public class Crear
 {
     public static void Inicializar()
     {
-        try
+        using var context = new Alquileres_ExpressContext();
+        if (context.Database.EnsureCreated())
         {
-            using var context = new Alquileres_ExpressContext();
-            if (context.Database.EnsureCreated())
+            Console.WriteLine("Base de datos creada exitosamente.");
+            context.Add(new Personal
             {
+                Nombre = "María",
+                Apellido = "Torres",
+                Correo = "marfacucosas@gmail.com",
+                Dni = "11111111",
+                Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
+                Direccion = "Calle Falsa 123",
+                FechaCreacionCuenta = DateTime.Now,
+                FechaNacimiento = new DateTime(1990, 1, 1),
+                Rol = Aplicacion.Enumerativo.RolUsuario.Gerente,
+            });
 
-                var connection = context.Database.GetDbConnection();
-                connection.Open();
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "PRAGMA journal_mode=DELETE;";
-                    command.ExecuteNonQuery();
-                }
-            }
+            Inmueble inmueble = new()
+            {
+                Nombre = "Casa en la playa",
+                Direccion = "Avenida del Mar 123",
+                CoordLat = -34.6037,
+                CoordLong = -58.3816,
+                Banios = 1,
+                Disponible = true,
+                Ciudad = "Mar del Plata",
+                Precio = 800,
+                CantidadDeCamas = 2,
+                CantidadDeHabitaciones = 2,
+                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda,
+                PromedioCalificacion = 3.5,
+            };
+            Inmueble inmueble2 = new ()
+            {
+                Nombre = "Casa en la ciudad",
+                Direccion = "Avenida 9 de Julio",
+                CoordLat = -34.6037,
+                CoordLong = -58.3816,
+                Banios = 1,
+                Disponible = true,
+                Ciudad = "Buenos Aires",
+                Precio = 1200,
+                CantidadDeCamas = 2,
+                CantidadDeHabitaciones = 2,
+                TipoInmueble = Aplicacion.Enumerativo.TipoDeInmueble.Vivienda,
+                PromedioCalificacion = 4.0,
+            };
+            context.Add(inmueble);
+            context.SaveChanges();
+            context.Add(inmueble2);
+            context.SaveChanges();            
+            context.Add(new Foto
+            {
+                Url = "/images/fotosInmuebles/0com0pnv.png",
+                InmuebleId = 1
+            });
+            context.Add(new Foto
+            {
+                Url = "/images/fotosInmuebles/3p43bsam.png",
+                InmuebleId = 1
+            });
+            context.Add(new Foto
+            {
+                Url = "/images/fotosInmuebles/otraFoto.png",
+                InmuebleId = inmueble2.Id
+            });
+            // o tantas como quieras...
+            context.SaveChanges();
+
+            context.SaveChanges();
+
+            var cliente = new Cliente
+            {
+                Nombre = "Lucas",
+                Apellido = "Pérez",
+                Correo = "prueba@gmail.com",
+                Dni = "22222222",
+                Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
+                Direccion = "Calle Real 456",
+                FechaCreacionCuenta = new DateTime(2014,3,19),
+                FechaNacimiento = new DateTime(1995, 5, 15),
+                Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
+            };
+            context.Add(cliente);
+            var cliente2 = new Cliente
+            {
+                Nombre = "Juan",
+                Apellido = "Sanchez",
+                Correo = "prueba2@gmail.com",
+                Dni = "22222211",
+                Contraseña = BCrypt.Net.BCrypt.HashPassword("123456"),
+                Direccion = "Calle Real 456",
+                FechaCreacionCuenta = new DateTime(2023,6,16),
+                FechaNacimiento = new DateTime(1995, 5, 15),
+                Rol = Aplicacion.Enumerativo.RolUsuario.Cliente
+            };
+            context.Add(cliente2);
+            context.SaveChanges(); // para generar el Id
+
+            var alquiler1 = new Alquiler
+            {
+                ClienteId = cliente.Id,
+                CorreoCliente = cliente.Correo,
+                FechaDeCreacion = new DateTime(2014,9,12),
+                FechaDeInicio = new DateTime(2025,7,12),
+                FechaDeFin = new DateTime(2025,7,19),
+                Precio = 5000,
+                InmuebleId = 1,
+                Pagado = true
+            };
+
+            var alquiler2 = new Alquiler
+            {
+                ClienteId = cliente.Id,
+                CorreoCliente = cliente.Correo,
+                FechaDeCreacion = new DateTime(2015,1,1),
+                FechaDeInicio = DateTime.Today.AddDays(-20),
+                FechaDeFin = DateTime.Today.AddDays(-15),
+                Precio = 6500,
+                InmuebleId = 1,
+                Pagado = true
+            };
+
+            // var alquiler3 = new Alquiler
+            // {
+            //     ClienteId = cliente2.Id,
+            //     CorreoCliente = cliente2.Correo,
+            //     FechaDeCreacion = new DateTime(2013,8,1),
+            //     FechaDeInicio = DateTime.Today.AddDays(-30),
+            //     FechaDeFin = DateTime.Today.AddDays(-25),
+            //     Precio = 6500,
+            //     InmuebleId = 1,
+            //     Pagado = true
+            // };
+            // var alquiler4 = new Alquiler
+            // {
+            //     ClienteId = cliente.Id,
+            //     CorreoCliente = cliente.Correo,
+            //     FechaDeCreacion = new DateTime(2010,3,3),
+            //     FechaDeInicio = DateTime.Today.AddDays(-10),
+            //     FechaDeFin = DateTime.Today.AddDays(-5),
+            //     Precio = 5000,
+            //     InmuebleId = 1,
+            //     Pagado = true
+            // };
+
+            
+            
+            context.Alquileres.AddRange(alquiler1, alquiler2);
+            context.SaveChanges();
+            //var registro1 = new RegistroDeLlave(alquiler1.Id, 1,1, true);
+            //context.AddRange(registro1);
+            inmueble!.Alquileres!.Add(alquiler1);
+
+            
+
+            context.SaveChanges();
+           
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error al inicializar la base de datos: {ex.Message}");
-        }
-    }
+        
+        var connection = context.Database.GetDbConnection();
+        connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = "PRAGMA journal_mode=DELETE;";
+        command.ExecuteNonQuery();
+    } 
 }

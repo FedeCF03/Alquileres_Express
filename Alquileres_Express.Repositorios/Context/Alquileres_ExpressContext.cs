@@ -11,11 +11,29 @@ public class Alquileres_ExpressContext : DbContext
     public DbSet<Personal> Personal { get; set; }
     public DbSet<Alquiler> Alquileres { get; set; }
     public DbSet<RegistroDeLlave> Llaves { get; set; }
-    public DbSet<RangoDeFechas> RangoDeFechas { get; set; }
+    public DbSet<Foto> Fotos { get; set; }
+    public DbSet<Comentario> Comentarios { get; set; }
 #nullable restore
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlite("Data Source=Alquiler_Express.sqlite");
     }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<RegistroDeLlave>()
+            .HasKey(c => new { c.AlquilerId, c.EsEntrega });
+        modelBuilder.Entity<Inmueble>()
+            .HasMany(i => i.Comentarios)
+            .WithOne()
+            .HasForeignKey(c => c.InmuebleId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Comentario>()
+            .HasMany(c => c.Respuestas)
+            .WithOne()
+            .HasForeignKey(c => c.ComentarioId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+}
+
 }

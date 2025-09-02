@@ -1,17 +1,23 @@
 using Alquileres_Express.Aplicacion.Entidades;
+using Alquileres_Express.Aplicacion.Enumerativo;
 namespace Alquileres_Express.Aplicacion.Interfaces;
 
 public interface IRepositorioInmueble
 {
-    public bool AgregarInmueble(Inmueble inmueble);
-    public bool ModificarInmueble(Inmueble inmueble);
-    public bool EliminarInmueble(int id);
+    public int AgregarInmueble(Inmueble inmueble);
+    public void ModificarInmueble(Inmueble inmueble);
+    public void EliminarInmueble(int id);
     public Inmueble ObtenerInmueblePorId(int id);
-
-    public List<Inmueble> ObtenerInmueblePorNombre(string nombre);
+    public Inmueble ObtenerInmueblePorNombre(string nombre);
     public List<Inmueble> ObtenerTodosLosInmuebles();
-    public List<Inmueble> ObtenerInmueblesPorTipo(string tipo);
-    public List<Inmueble> ObtenerInmueblesPorUbicacion(string ubicacion);
+    public List<Inmueble> ObtenerInmueblesPorTipo(TipoDeInmueble tipo);
     public List<Inmueble> ObtenerInmueblesDisponibles();
-
+    public List<Inmueble> ObtenerLosInmueblesNoDisponibles();
+    public decimal obtenerIngresosDeInmueble(int id);
+    public bool SeRepiteNombre(Inmueble inmueble);
+    public List<Valoracion> ObtenerValoracionesPorInmueble(int idInmueble);
+    public void EditarValoracion(Valoracion valoracion);
+    public Task<bool> EliminarValoracion(Valoracion valoracion);
+    public void PromedioValoracion(int idInmueble);
+    public bool TieneAlquileresVigentesOPendientes(int idInmueble);
 }

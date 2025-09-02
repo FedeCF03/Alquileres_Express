@@ -2,57 +2,175 @@ namespace Alquileres_Express.Repositorios.RepositoriosSQLite;
 
 using System.Collections.Generic;
 using Alquileres_Express.Aplicacion.Entidades;
+using Alquileres_Express.Aplicacion.Enumerativo;
 using Alquileres_Express.Aplicacion.Interfaces;
 using Alquileres_Express.Repositorios.Context;
+using Microsoft.EntityFrameworkCore;
 
 public class RepositorioInmueble : IRepositorioInmueble
 {
 
-    readonly Alquileres_ExpressContext _context = new();
-
-    public bool AgregarInmueble(Inmueble inmueble)
+    public int AgregarInmueble(Inmueble inmueble)
     {
-        throw new NotImplementedException();
+        using var _context = new Alquileres_ExpressContext();
+        _context.Inmuebles.Add(inmueble);
+        _context.SaveChanges();
+        return inmueble.Id;
     }
 
-    public bool EliminarInmueble(int id)
+    public void EliminarInmueble(int id)
     {
-        throw new NotImplementedException();
+        using var _context = new Alquileres_ExpressContext();
+        Inmueble inmueble = _context.Inmuebles.Find(id) ?? throw new KeyNotFoundException($"No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+        inmueble.Borrado = true; // Marcamos el inmueble como borrado
+        _context.Entry(inmueble).State = EntityState.Modified; // Actualizamos el estado del inmueble
+        _context.SaveChanges();
     }
 
-    public bool ModificarInmueble(Inmueble inmueble)
+    public void ModificarInmueble(Inmueble inmueble)
     {
-        throw new NotImplementedException();
+
+        //lo del nombre se checke en el caso de uso, no es necesario hacerlo aquí
+        using var _context = new Alquileres_ExpressContext();
+        Inmueble inmuebleExistente = _context.Inmuebles
+        .FirstOrDefault(i => i.Id == inmueble.Id)
+        ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+
+        inmuebleExistente.Nombre = inmueble.Nombre;
+        inmuebleExistente.Direccion = inmueble.Direccion;
+        inmuebleExistente.CoordLat = inmueble.CoordLat;
+        inmuebleExistente.CoordLong = inmueble.CoordLong;
+        inmuebleExistente.Banios = inmueble.Banios;
+        inmuebleExistente.Disponible = inmueble.Disponible;
+        inmuebleExistente.Ciudad = inmueble.Ciudad;
+        inmuebleExistente.Precio = inmueble.Precio;
+        inmuebleExistente.CantidadDeCamas = inmueble.CantidadDeCamas;
+        inmuebleExistente.CantidadDeHabitaciones = inmueble.CantidadDeHabitaciones;
+        inmuebleExistente.TipoInmueble = inmueble.TipoInmueble;
+        _context.SaveChanges();
     }
 
     public Inmueble ObtenerInmueblePorId(int id)
     {
-        var inmueble = _context.Inmuebles.FirstOrDefault(x => x.Id == id) ?? throw new KeyNotFoundException($"No se encontró un inmueble con el ID {id}");
+        using var _context = new Alquileres_ExpressContext();
+        var inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres)!.ThenInclude(a => a.RegistrosDeLlave).Include(i => i.Fotos).FirstOrDefault(i => i.Id == id) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
         return inmueble;
     }
 
-    public List<Inmueble> ObtenerInmueblePorNombre(string nombre)
+    public Inmueble ObtenerInmueblePorNombre(string nombre)
     {
-        throw new NotImplementedException();
+        using var _context = new Alquileres_ExpressContext();
+        var inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Nombre!.ToLower() == nombre.ToLower()) ?? throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+        return inmueble;
     }
 
-    public List<Inmueble> ObtenerInmueblesPorTipo(string tipo)
+    public List<Inmueble> ObtenerInmueblesPorTipo(TipoDeInmueble tipo)
     {
-        throw new NotImplementedException();
+        using var _context = new Alquileres_ExpressContext();
+        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.TipoInmueble == tipo)];
     }
 
-    public List<Inmueble> ObtenerInmueblesPorUbicacion(string ubicacion)
-    {
-        throw new NotImplementedException();
-    }
 
     public List<Inmueble> ObtenerTodosLosInmuebles()
     {
-        throw new NotImplementedException();
+        using var _context = new Alquileres_ExpressContext();
+        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Borrado == false)];
     }
 
     public List<Inmueble> ObtenerInmueblesDisponibles()
     {
-        return [.. _context.Inmuebles.Where(i => i.disponible)];
+        using var _context = new Alquileres_ExpressContext();
+        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Disponible && i.Borrado == false)];
+    }
+
+    public List<Inmueble> ObtenerLosInmueblesNoDisponibles()
+    {
+        using var _context = new Alquileres_ExpressContext();
+        return [.. _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => !i.Disponible && i.Borrado == false)];
+    }
+
+    public bool SeRepiteNombre(Inmueble inmueble)
+    {
+        try
+        {
+            var inmuebleExistente = ObtenerInmueblePorNombre(inmueble.Nombre!);
+            return inmuebleExistente.Id != inmueble.Id;
+        }
+        catch (KeyNotFoundException)
+        {
+            return false;
+        }
+
+    }
+    public List<Valoracion> ObtenerValoracionesPorInmueble(int idInmueble)
+    {
+        Alquileres_ExpressContext _context = new();
+        Inmueble? inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Id == idInmueble).FirstOrDefault();
+        return inmueble!.Valoraciones!;
+    }
+
+    public void EditarValoracion(Valoracion valoracion)
+    {
+        using Alquileres_ExpressContext _context = new();
+        Inmueble? inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Id == valoracion.InmuebleId).FirstOrDefault();
+        if (inmueble == null)
+        {
+            throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+        }
+
+        Valoracion? valoracionExistente = inmueble.Valoraciones?.FirstOrDefault(v => v.Id == valoracion.Id);
+        if (valoracionExistente == null)
+        {
+            throw new KeyNotFoundException($"Error: No existe la valoracion.");
+        }
+        valoracionExistente.Calificacion = valoracion.Calificacion;
+        valoracionExistente.Comentario = valoracion.Comentario;
+        _context.SaveChanges();
+    }
+
+    public Task<bool> EliminarValoracion(Valoracion valoracion)
+    {
+        using Alquileres_ExpressContext _context = new();
+        Inmueble? inmueble = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).Where(i => i.Id == valoracion.InmuebleId).FirstOrDefault();
+        Valoracion? valoracionExistente = inmueble!.Valoraciones?.FirstOrDefault(v => v.Id == valoracion.Id);
+        if (valoracionExistente != null)
+        {
+            inmueble!.Valoraciones!.Remove(valoracionExistente);
+            _context.Entry(inmueble).State = EntityState.Modified;
+            _context.SaveChanges();
+            return Task.FromResult(true);
+        }
+        return Task.FromResult(false);
+    }
+
+    public decimal obtenerIngresosDeInmueble(int id)
+    {
+        using var _context = new Alquileres_ExpressContext();
+        decimal num = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).FirstOrDefault(i => i.Id == id).Alquileres.Where(a => a.Pagado).Sum(a => a.Precio);
+        return num;
+    }
+    public void PromedioValoracion(int idInmueble)
+    {
+        using Alquileres_ExpressContext _context = new();
+        Inmueble? inmuebleExistente = _context.Inmuebles.Include(i => i.Valoraciones).Include(i => i.Alquileres).Include(i => i.Fotos).FirstOrDefault(i => i.Id == idInmueble);
+        if (inmuebleExistente == null)
+        {
+            throw new KeyNotFoundException($"Error: No existe el inmueble. Por favor, intente de nuevo o pruebe otro inmueble.");
+        }
+
+        if (inmuebleExistente.Valoraciones != null && inmuebleExistente.Valoraciones.Count > 0)
+        {
+            double promedio = inmuebleExistente.Valoraciones.Average(v => v.Calificacion);
+            //Console.WriteLine($"[DEBUG] Promedio manual: {promedio}");
+
+            inmuebleExistente.PromedioCalificacion = promedio;
+            Console.WriteLine($"[DEBUG] Promedio GUARDADO¿: {inmuebleExistente.PromedioCalificacion}");
+
+            _context.SaveChanges();
+        }
+    }
+    public bool TieneAlquileresVigentesOPendientes(int idInmueble)
+    {
+        return ObtenerInmueblePorId(idInmueble).Alquileres!.Any(a => a.GetEstadoDeAlquiler() == EstadoDeAlquiler.EnProceso || a.GetEstadoDeAlquiler() == EstadoDeAlquiler.Vigente);
     }
 }

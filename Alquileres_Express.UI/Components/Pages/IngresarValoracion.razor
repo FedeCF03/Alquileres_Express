@@ -1,0 +1,156 @@
+@rendermode InteractiveServer
+@inject NavigationManager navegationManager
+@inject CasoDeUsoCalificarInmueble casoCalificar
+@inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
+@using Alquileres_Express.Aplicacion.Entidades
+
+@if (mostrar)
+{
+  <div class="card shadow p-4 mt-4">
+    <h4 class="text-primary mb-3">
+      <i class="fas fa-star"></i> Calificar inmueble
+    </h4>
+
+    <!-- Estrellas -->
+    <ul class="list-unstyled d-flex gap-1 mb-3">
+        @for (int i = 1; i <= 5; i++)
+        {
+            int estrella = i;      @* ⚠️ copia local *@
+            <li>
+                <i class="fas fa-star fa-2x cursor-pointer
+                     @(estrella <= calificacionSeleccionada
+                    ? "text-warning"
+                    : "text-secondary")"
+                    @onclick="() => SeleccionarCalificacion(estrella)">
+                </i>
+            </li>
+        }
+    </ul>
+
+
+    <!-- Comentario -->
+    <textarea class="form-control mb-3"
+              placeholder="Comentario (opcional)" rows="3"
+              @bind="comentario">
+    </textarea>
+
+    <!-- Botones -->
+    <div class="d-flex gap-2">
+      <button class="btn btn-success"
+        @onclick="EnviarCalificacion"
+        disabled="@estaEnviando">
+        <i class="fas fa-save"></i> Guardar
+      </button>
+
+      <button class="btn btn-outline-secondary"
+        @onclick="Cerrar"
+        disabled="@estaEnviando">
+        Cancelar
+      </button>
+
+    </div>
+
+    @if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert @(esError ? "alert-danger" : "alert-success") mt-3">
+        @mensaje
+    </div>
+
+    @* @if (!esError)
+    {
+      <div class="d-flex justify-content-start mt-3">
+        <button class="btn btn-success shadow-sm px-4 py-2 rounded-3"
+          @onclick="Finalizar">
+          <i class="fas fa-check-circle me-2"></i> Finalizar
+        </button>
+      </div>
+    } *@
+}
+
+  </div>
+}
+
+@code {
+  [Parameter] public int AlquilerId { get; set; }
+  [Parameter] public int InmuebleId { get; set; }
+  [Parameter] public int ClienteId { get; set; }
+  [Parameter] public EventCallback OnClose { get; set; }
+
+  bool mostrar = true;
+  int calificacionSeleccionada = 0;
+  string comentario = "";
+  string mensaje = "";
+  bool esError = false;
+  bool estaEnviando = false;
+
+  void SeleccionarCalificacion(int v)
+    {
+        calificacionSeleccionada = v;
+        StateHasChanged();  // fuerza re-render, aunque normalmente no haría falta
+    }
+
+
+    async Task EnviarCalificacion()
+    {
+      if (calificacionSeleccionada < 1)
+      {
+        mensaje   = "Por favor selecciona una calificación.";
+        esError   = true;
+        return;
+      }
+      estaEnviando = true;  
+      Cliente? cliente = casoDeUsoBuscarClientePorId.Ejecutar(ClienteId);
+      
+      var modelo = new Valoracion
+      {
+          InmuebleId       = InmuebleId,
+          ClienteId        = ClienteId,
+          Calificacion     = calificacionSeleccionada,
+          Comentario       = comentario,
+          NombreCliente = cliente!.Nombre,
+          ApellidoCliente = cliente!.Apellido
+      };
+      
+    
+
+    bool ok = casoCalificar.Ejecutar(InmuebleId, ClienteId, modelo);
+    if (ok)
+    {
+        mensaje = "¡Gracias! Tu reseña fue guardada.";
+        esError = false;
+        await Task.Delay(5000); // ← tiempo de visualización
+        mostrar = false;
+        navegationManager.NavigateTo($"/alquileres/{ClienteId}", true);
+        await OnClose.InvokeAsync(null);
+    }
+    else
+    {
+        mensaje = "Error: no se pudo guardar la calificación.";
+        esError = true;
+        estaEnviando = false;  // ← reactiva botones
+    }
+
+  }
+  async Task Finalizar()
+  {
+    await Cerrar();
+    navegationManager.NavigateTo($"/alquileres/{ClienteId}", true);
+  }
+
+    async Task Cerrar()
+{
+    mostrar = false;  
+    await OnClose.InvokeAsync(null);
+}
+}
+<style>
+  .btn-success {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.btn-success:hover {
+  background-color: #157347;
+  border-color: #146c43;
+}
+</style>

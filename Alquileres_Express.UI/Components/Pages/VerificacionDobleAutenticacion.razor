@@ -1,24 +1,17 @@
 @page "/verificacion-doble-autenticacion"
 @inject NavigationManager Nav
 @inject IHttpContextAccessor HttpContextAccessor
-@using System.Security.Claims
-@using Alquileres_Express.Aplicacion
-@using Alquileres_Express.Aplicacion.Entidades
-@using Alquileres_Express.Aplicacion.Interfaces
-@using Alquileres_Express.Aplicacion.Servicios
-@using Alquileres_Express.Repositorios
-@using Alquileres_Express.Repositorios.RepositoriosSQLite
-@using Microsoft.AspNetCore.Authentication
-@using Microsoft.AspNetCore.Authorization;
-@using Microsoft.AspNetCore.Authentication.Cookies
 @inject NavigationManager NavigationManager
 @using System.ComponentModel.DataAnnotations
+@using Alquileres_Express.Aplicacion.Interfaces
+@using Alquileres_Express.Repositorios.RepositorioSQLite
+@inject CasoDeUsoValidarCodigoDeSeguridad casoDeUsoValidarCodigoDeSeguridad
+<PageTitle>Verificación de Doble Autenticación</PageTitle>
 <h3>Verificación</h3>
+
 
 <EditForm Model="@modelo" OnValidSubmit="ProcesarVerificacion" FormName="CodigoVerificacion">
     <DataAnnotationsValidator />
-    <ValidationSummary />
-
     <div class="mb-3">
         <label>Email:</label>
         <InputText @bind-Value="modelo.Correo" class="form-control" />
@@ -31,9 +24,13 @@
 
     <button type="submit" class="btn btn-primary">Verificar</button>
 
-    @if (mensaje != null)
+    @foreach (var error in errores)
     {
-        <div class="alert alert-info mt-3">@mensaje</div>
+        <div class="alert alert-danger mt-2">@error</div>
+    }
+    @if (!string.IsNullOrEmpty(mensajeExito))
+    {
+        <div class="alert alert-success mt-2">@mensajeExito</div>
     }
 </EditForm>
 
@@ -41,37 +38,51 @@
 @code {
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
-    private VerificacionModel modelo = new();
-    private string? mensaje;
-    RepositorioPersonal repositorioPersonal = new RepositorioPersonal();
-    CasoDeUsoValidarCodigoDeSeguridad casoDeUsoValidarCodigoDeSeguridad = new CasoDeUsoValidarCodigoDeSeguridad(new
-    RepositorioPersonal());
+
+    [SupplyParameterFromForm]
+    private VerificacionModel modelo { get; set; } = new();
+    private List<string> errores = new();
+    private string mensajeExito = "";
     private async Task ProcesarVerificacion()
     {
-        Personal usuario = casoDeUsoValidarCodigoDeSeguridad.Ejecutar(modelo.Correo, modelo.Codigo);
+        errores.Clear();
+        if (modelo.Codigo.Equals(""))
+        {
+            errores.Add("Por favor, ingrese un código.");
+        }
+        if (string.IsNullOrEmpty(modelo.Correo))
+        {
+            errores.Add("Por favor, ingrese un correo.");
+        }
+        else
+            if (!modelo.Correo.Contains('@'))
+            {
+                errores.Add("El correo ingresado no es válido.");
+            }
+        if (errores.Count > 0)
+        {
+            return;
+        }
+        Personal? usuario = casoDeUsoValidarCodigoDeSeguridad.Ejecutar(modelo.Correo, modelo.Codigo);
         if (usuario != null)
         {
-            mensaje = "¡Verificación exitosa!";
-            await guardarEnCookie(modelo.Correo, usuario.Rol);
+            await guardarEnCookie(modelo.Correo, usuario.Rol, usuario.Nombre);
         }
         else
         {
-            mensaje = "Email o código incorrecto.";
+            errores.Add("Email o código incorrectos.");
         }
+            
     }
 
     public class VerificacionModel
-    {
-        [Required]
-        [EmailAddress]
+    {       
         public string Correo { get; set; } = "";
 
-        [Required]
-        [StringLength(4, MinimumLength = 4, ErrorMessage = "Debe tener 4 caracteres.")]
         public string Codigo { get; set; } = "";
     }
 
-    private async Task guardarEnCookie(String correo, RolUsuario rol)
+    private async Task guardarEnCookie(String correo, RolUsuario rol, string nombre)
     {
 
         var claims = new List<Claim> {
@@ -80,7 +91,7 @@ new Claim(ClaimTypes.Role, rol.ToString())
 };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
-        await HttpContext.SignInAsync(principal);
-        NavigationManager.NavigateTo("/");
+        await HttpContext!.SignInAsync(principal);
+        NavigationManager.NavigateTo($"/?mensaje=¡Hola {nombre} Bienvenido/a.");
     }
 }

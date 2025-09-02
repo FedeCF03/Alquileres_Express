@@ -1,24 +1,34 @@
-using System;
 using Alquileres_Express.Aplicacion.Enumerativo;
-namespace Alquileres_Express.Aplicacion.Entidades
-{
+using System.ComponentModel.DataAnnotations;
+
+namespace Alquileres_Express.Aplicacion.Entidades;
+
     public class Inmueble
     {
         public int Id { get; set; }
-        public string? Nombre { get; set; }
-        public string? Direccion { get; set; }
-        public string? CoordLong { get; set; }
-        public string? CoordLat { get; set; }
-        public string? Ciudad { get; set; }
-        public string? CodigoPostal { get; set; }
-        public double? Precio { get; set; }
-        public int? CantidadDeCamas { get; set; }//Cantidad habitaciones
-        public int? Banios { get; set; }
-        public TipoDeInmueble TipoInmueble { get; set; }
-        public List<Alquiler>? alquileres;
-        public Boolean disponible { get; set; }
 
-        public Boolean Equals(object? obj)
+        public string? Nombre { get; set; }
+
+        public string? Direccion { get; set; }
+        public double CoordLong { get; set; }
+        public double CoordLat { get; set; }
+        public bool Borrado { get; set; } = false;
+
+        public string? Ciudad { get; set; }
+        public decimal Precio { get; set; }
+        public int CantidadDeCamas { get; set; }//Se refiere a cantidad de personas 
+        public int CantidadDeHabitaciones { get; set; }
+        public int Banios { get; set; }
+        public TipoDeInmueble TipoInmueble { get; set; } = TipoDeInmueble.Vivienda;
+        public PoliticaDeCancelacion PoliticaDeCancelacion { get; set; } = PoliticaDeCancelacion.SinCosto;
+        public bool Disponible { get; set; }
+        public List<Foto>? Fotos { get; set; } = [];
+        public List<Alquiler>? Alquileres { get; set; } = [];
+        public List<Comentario>? Comentarios { get; set; } = [];
+        public List<Valoracion>? Valoraciones { get; set; } = [];
+        public double PromedioCalificacion { get; set; }
+
+        public override bool Equals(object? obj)
         {
             if (obj == null)
             {
@@ -30,5 +40,21 @@ namespace Alquileres_Express.Aplicacion.Entidades
             }
             return false;
         }
+
+
+        public Inmueble()
+        {
+        }
+
+        public String DevolverPoliticaDeCancelacion()
+        {
+            return PoliticaDeCancelacion switch
+            {
+                PoliticaDeCancelacion.SinCosto => "Sin costo",
+                PoliticaDeCancelacion.NoReembolsable => "No reembolsable",
+                PoliticaDeCancelacion.VeintePorcientoDeReembolso => "20% de reembolso",
+                _ => "Desconocida"
+            };
+        }
+    
     }
-}

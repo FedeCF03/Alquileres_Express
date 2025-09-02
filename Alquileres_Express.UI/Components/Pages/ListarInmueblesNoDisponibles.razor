@@ -1,0 +1,227 @@
+@page "/InmueblesNoDisponibles"
+@inject IRepositorioFoto repositorioFotos
+@inject FiltroDeInmueblesService FiltroDeInmueblesService
+@inject CasoDeUsoListarInmuebles casoDeUsoListarInmuebles
+@inject CasoDeUsoObtenerInmueble casoDeUsoObtenerInmueble
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+@inject Alquileres_Express.Aplicacion.CasosDeUso.CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject NavigationManager Navigation
+@using Alquileres_Express.Aplicacion.Servicios;
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.WebUtilities
+@rendermode InteractiveServer
+
+<PageTitle>Inmuebles no disponibles</PageTitle>
+
+<div class="contenedor-principal">
+    <!-- COLUMNA IZQUIERDA: IMÁGENES -->
+    <div class="columna-imagenes">
+        <h2>Inmuebles no disponibles</h2>
+
+        @if (inmuebles == null || !inmuebles.Any())
+        {
+            <p>No hay inmuebles disponibles.</p>
+        }
+        else
+        {
+            <div class="galeria-imagenes">
+                @foreach (var inmueble in inmuebles)
+                {
+     <div class="tarjeta-inmueble">
+                        <NavLink class="imagen-link" href="" @onclick="() => irInmueble(inmueble.Id)">
+                            <img src="@inmueble.Fotos![0].Url" alt="Foto propiedad" class="foto" />
+                        </NavLink>
+                        <div class="info-inmueble">
+                            <p class="nombre">@inmueble.Nombre</p>
+                            <p class="precio">$@inmueble.Precio</p>
+                        </div>
+                    </div>
+                    
+                }
+            </div>
+        }
+    </div>
+
+    <div class="filtros-container">
+    <h2 class="filtros-titulo">Buscar inmuebles</h2>
+
+    <div class="filtros-opciones">
+        <button class="boton-filtro primario" @onclick="MostrarBusquedaPorNombre">Buscar por nombre</button>
+        <button class="boton-filtro secundario" @onclick="MostrarBusquedaConFiltros">Buscar con filtros</button>
+    </div>
+
+    @if (buscarPorNombre)
+    {
+        <div class="filtro-bloque">
+            <label class="filtro-label">Nombre del inmueble</label>
+            <input type="text" @bind="nombreABuscar" class="filtro-input" placeholder="Ej: Casa del Lago" />
+        </div>
+    }
+
+    @if (!buscarPorNombre && mostrarFiltros)
+    {
+        <div class="filtro-bloque">
+            <label class="filtro-label">Ciudad</label>
+            <input type="text" @bind="ciudad" class="filtro-input" placeholder="Buscar ciudad..." />
+            <label class="filtro-checkbox">
+                <input type="checkbox" @bind="filtroCiudad.Aplicar" /> Aplicar filtro
+            </label>
+            @if (!string.IsNullOrWhiteSpace(mensajeErrorLocalidad))
+            {
+                <div class="filtro-error">@mensajeErrorLocalidad</div>
+            }
+        </div>
+
+        <div class="filtro-bloque">
+            <label class="filtro-label">Rango de precios</label>
+            <label class="filtro-checkbox">
+                <input type="checkbox" @bind="filtroPrecio.Aplicar" /> Aplicar filtro
+            </label>
+            <div class="filtro-rango">
+                <input type="number" @bind="precioMinimo" class="filtro-input" placeholder="Mínimo" />
+                <input type="number" @bind="precioMaximo" class="filtro-input" placeholder="Máximo" />
+            </div>
+            @if (!string.IsNullOrWhiteSpace(mensajeErrorPrecio))
+            {
+                <div class="filtro-error">@mensajeErrorPrecio</div>
+            }
+        </div>
+
+        <div class="filtro-bloque">
+            <label class="filtro-label">Cantidad de camas</label>
+            <label class="filtro-checkbox">
+                <input type="checkbox" @bind="filtroCantidadPersonas.Aplicar" /> Aplicar filtro
+            </label>
+            <input type="number" @bind="cant" class="filtro-input" placeholder="Ej: 4" />
+            @if (!string.IsNullOrWhiteSpace(mensajeErrorCantidadPersonas))
+            {
+                <div class="filtro-error">@mensajeErrorCantidadPersonas</div>
+            }
+        </div>
+    }
+
+    <button class="boton-filtro buscar" @onclick="Filtrar">Buscar</button>
+</div>
+</div>
+
+@code
+{
+    [SupplyParameterFromQuery]
+    private string? Mensaje { get; set; }
+    [SupplyParameterFromQuery]
+    private bool? EsMensajeDeError { get; set; } = false;
+    private List<Inmueble> inmuebles = new List<Inmueble>();
+    private Filtro<Inmueble> filtroPrecio = new Filtro<Inmueble>();
+    private Filtro<Inmueble> filtroCiudad = new Filtro<Inmueble>();
+    private Filtro<Inmueble> filtroCantidadPersonas = new Filtro<Inmueble>();
+    private bool buscarPorNombre = false;
+    private string? nombreABuscar;
+    private string ciudad = string.Empty;
+    private decimal precioMinimo = 0;
+    private decimal precioMaximo = 0;
+    private int? cant;
+    private string mensajeErrorPrecio = string.Empty;
+    private string mensajeErrorLocalidad = string.Empty;
+    private string mensajeErrorCantidadPersonas = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        ResetearInmuebles();
+        FiltroDeInmueblesService.AgregarFiltro(filtroPrecio);
+        FiltroDeInmueblesService.AgregarFiltro(filtroCiudad);
+        FiltroDeInmueblesService.AgregarFiltro(filtroCantidadPersonas);
+    }
+
+    private void Filtrar()
+    {
+        mensajeErrorPrecio = string.Empty;
+        mensajeErrorLocalidad = string.Empty;
+        mensajeErrorCantidadPersonas = string.Empty;
+        if (buscarPorNombre)
+        {
+            if (string.IsNullOrWhiteSpace(nombreABuscar))
+            {
+                ResetearInmuebles();
+                StateHasChanged();
+                return;
+            }
+            inmuebles.Clear();
+            try
+            {
+                var inmueble = casoDeUsoObtenerInmueble.Ejecutar(nombreABuscar);
+                if (!inmueble.Disponible)
+                    inmuebles.Add(inmueble);
+            }
+            catch
+            {
+            }
+            return;
+        }
+        if (!filtroPrecio.Aplicar && !filtroCiudad.Aplicar && !filtroCantidadPersonas.Aplicar)
+        {
+            ResetearInmuebles();
+        }
+        else
+        {
+            
+            if (filtroCiudad.Aplicar == true && string.IsNullOrWhiteSpace(ciudad))
+            {
+                mensajeErrorLocalidad = "La ciudad no puede estar vacía.";
+            }
+            else if (filtroCiudad.Aplicar == true)
+                filtroCiudad.Predicado = i => i.Ciudad!.Equals(ciudad, StringComparison.OrdinalIgnoreCase);
+
+            if (filtroPrecio.Aplicar == true && (precioMinimo < 0 || precioMaximo < 0 || precioMinimo > precioMaximo))
+            {
+                mensajeErrorPrecio = "Los precios deben ser mayores o iguales a 0 y el precio mínimo no puede ser mayor que el máximo.";
+            }
+            if (filtroPrecio.Aplicar == true)
+                filtroPrecio.Predicado = i => i.Precio >= precioMinimo && i.Precio <= precioMaximo;
+
+            if (filtroCantidadPersonas.Aplicar == true && (cant == null || cant <= 0))
+            {
+                mensajeErrorCantidadPersonas = "La cantidad de personas debe ser mayor a 0.";
+                return;
+            }
+            else if (filtroCantidadPersonas.Aplicar == true)
+                filtroCantidadPersonas.Predicado = i => i.CantidadDeCamas == cant; // Ajustar lógica si es necesario
+
+            if (mensajeErrorPrecio != string.Empty || mensajeErrorLocalidad != string.Empty || mensajeErrorCantidadPersonas != string.Empty)
+            {
+                StateHasChanged();
+                return;
+            }
+
+            inmuebles = FiltroDeInmueblesService.FiltrarInmuebles(casoDeUsoListarInmuebles.ListarNoDisponibles());
+        }
+        StateHasChanged();
+    }
+    private void irInmueble(int id)
+    {
+        Navigation.NavigateTo($"/inmueble/{id}", true);
+    }
+
+    private bool mostrarFiltros = true;
+
+    private void MostrarBusquedaPorNombre()
+    {
+        buscarPorNombre = true;
+        mostrarFiltros = false;
+        nombreABuscar = string.Empty;
+        ResetearInmuebles();
+    }
+
+    private void MostrarBusquedaConFiltros()
+    {
+        buscarPorNombre = false;
+        mostrarFiltros = true;
+        nombreABuscar = string.Empty;
+        ResetearInmuebles();
+    }
+
+    private void ResetearInmuebles()
+    {
+        inmuebles = casoDeUsoListarInmuebles.ListarNoDisponibles();
+    }
+}

@@ -1,0 +1,89 @@
+ @page "/cambiar-contrasena"
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Net.Mail
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ServicioGenerarCodigo servicioGenerarCodigo
+@using System.Security.Claims
+@using System.ComponentModel.DataAnnotations
+@inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
+@inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
+@inject CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion
+@inject NavigationManager NavigationManager
+@inject ServicioGenerarCodigo servicioGenerarCodigo
+@inject ServicioEnviarEmail servicioEnviarEmail
+@inject CasoDeUsoBuscarEmail casoDeUsoBuscarEmail
+@inject CasoDeUsoCambiarContrasena casoDeUsoCambiarContrasena
+@inject ServicioCambiarContrasena servicioCambiarContrasena
+@rendermode InteractiveServer
+
+<div class="login-container">
+    <div class="login-card">
+
+        <h3 class="login-title">Cambiar Contraseña</h3>
+
+        <EditForm Model="@user" OnValidSubmit="CambiarContraseña" FormName="passWord">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label for="username">Email</label>
+                <InputText id="username" @bind-Value="user.CorreoElectronico" class="form-control"
+                    placeholder="Ingrese su usuario" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña nueva</label>
+                <InputText id="password" @bind-Value="user.ContraseñaNueva" type="password" class="form-control"
+                    placeholder="Ingrese su contraseña" />
+            </div>
+            <button type="submit" class="btn-primary">Aceptar</button>
+
+        </EditForm>
+
+
+
+
+    </div>
+</div>
+
+@foreach (var error in errores)
+{
+    <div class="alert alert-danger mt-2">@error</div>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    private ContraseñaPendiente user { get; set; } = new();
+    private List<string> errores { get; set; } = [];
+    private void CambiarContraseña()
+    {
+        if (casoDeUsoBuscarEmail.Ejecutar(user.CorreoElectronico) && user.ContraseñaNueva != null &&
+        user.ContraseñaNueva.Length >= 6)
+        {
+            user.Codigo = servicioGenerarCodigo.GenerarCodigoAleatorio();
+            Console.WriteLine($"Codigo de verificacion: {user.Codigo}");
+            errores.Add(servicioCambiarContrasena.Añadir(user));
+          
+            servicioEnviarEmail.EnviarEmail(user.CorreoElectronico, "Cambio de contraseña", "Codigo de verificacion : ",
+         user.Codigo.ToString());
+            NavigationManager.NavigateTo("/verificar-codigo-cambio-contrasena",
+            true);
+        }
+        else if (user.ContraseñaNueva == null || user.ContraseñaNueva.Length < 6)
+        {
+            errores.Clear();
+            errores.Add("La contraseña debe tener al menos 6 caracteres");
+        }
+        else
+        {
+            errores.Clear();
+            errores.Add("El correo ingresado no existe");
+        }
+    }
+
+
+ 
+
+
+}

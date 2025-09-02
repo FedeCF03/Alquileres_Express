@@ -6,6 +6,13 @@ using Alquileres_Express.Repositorios.Context;
 using Alquileres_Express.Repositorios.RepositoriosSQLite;
 using Alquileres_Express.Aplicacion.Validadores;
 using Alquileres_Express.Aplicacion.Servicios;
+using Alquileres_Express.Repositorio;
+using Microsoft.Extensions.FileProviders;
+using Alquileres_Express.Repositorios.RepositorioSQLite;
+using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoAlquiler;
+using Alquileres_Express.Aplicacion.CasosDeUso.CasosDeUsoPagarEfectivo;
+using System.Diagnostics;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,42 +26,105 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     options.SlidingExpiration = true;
     options.AccessDeniedPath = "/";
-    options.LoginPath = "/Principal";
+    options.LoginPath = "/";
 
 });
+builder.Services.AddAuthorization();
 
-builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
-builder.Services.AddTransient<CasoDeUsoListarUsuario>();
-builder.Services.AddScoped<IRepositorioPersonal, RepositorioPersonal>();
-builder.Services.AddScoped<IRepositorioCliente, RepositorioCliente>();
-builder.Services.AddTransient<IRepositorioInmueble, RepositorioInmueble>();
 
-//builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
-//builder.Services.AddTransient<CasoDeUsoAltaUsuario>();
-builder.Services.AddTransient<CasoDeUsoBajaInmueble>();
-//builder.Services.AddTransient<CasoDeUsoBajaUsuario>();
-builder.Services.AddTransient<CasoDeUsoBuscarCliente>();
-builder.Services.AddTransient<CasoDeUsoBuscarPersonal>();
-builder.Services.AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>();
+builder.Services
+    .AddTransient<CasoDeUsoListarCLiente>()
+    .AddScoped<IRepositorioUsuario, RepositorioUsuario>()
+    .AddTransient<CasoDeUsoListarUsuarios>()
+    .AddTransient<CasoDeUsoListarRestringido>()
+    .AddScoped<CasoDeUsoCambiarContrasena>()
+    .AddTransient<CasoDeUsoAltaCliente>()
+    .AddTransient<CasoDeUsoBuscarCliente>()
+    .AddTransient<CasoDeUsoModificarCliente>()
+    .AddTransient<CasoDeUsoBajaInmueble>()
+    .AddTransient<CasoDeUsoListarInmuebles>()
+    .AddTransient<CasoDeUsoEditarInmueble>()
+    .AddTransient<CasoDeUsoBuscarClientePorId>()
+    .AddTransient<CasoDeUsoObtenerCantidadDeClientesEntreFechas>()
+    .AddTransient<CasoDeUsoObtenerValorDeAlquileresEntreFechas>()
+    .AddTransient<CasoDeUsoModificarInmueble>()
+    .AddTransient<CasoDeUsoAltaInmueble>()
+    .AddSingleton<ServicioCambiarContrasena>()
+    .AddTransient<CasoDeUsoEliminarInmueble>()
+    .AddTransient<CasoDeUsoObtenerInmueble>()
+    .AddTransient<CasoDeUsoVerInmueble>()
+    .AddTransient<CasoDeUsoObtenerIngresosDeInmueble>()
 
-// builder.Services.AddTransient<CasoDeUsoCancelarAlquiler>();
-// builder.Services.AddTransient<CasoDeUsoEditarPerfil>();
-// builder.Services.AddTransient<CasoDeUsoEliminarInmueble>();
-//builder.Services.AddTransient<CasoDeUsoListarUsuario>();
-builder.Services.AddTransient<CasoDeUsoModificarInmueble>();
-builder.Services.AddSingleton<MercadoPagoService>();
-builder.Services.AddTransient<CasoDeUsoRegistrarUsuario>();
-// builder.Services.AddTransient<CasoDeUsoVerPerfil>();
-// builder.Services.AddTransient<CasoDeUsoEliminarInmueble>();
-builder.Services.AddTransient<CasoDeUsoModificarInmueble>();
-//Agrego gonza
-builder.Services.AddScoped<IRepositorioCliente, RepositorioCliente>();
-builder.Services.AddTransient<ValidadorUsuario>();
-builder.Services.AddTransient<CasoDeUsoAltaCliente>();
-builder.Services.AddTransient<FiltroDeInmueblesService>();
-builder.Services.AddTransient<CasoDeUsoListarInmuebles>();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddCascadingAuthenticationState();
+    .AddTransient<CasoDeUsoAltaPersonal>()
+    .AddTransient<CasoDeUsoModificarPersonal>()
+    .AddTransient<CasoDeUsoActualizarEstadoDobleAutenticacion>()
+    .AddTransient<CasoDeUsoBuscarPersonal>()
+    .AddTransient<CasoDeUsoValidarCodigoDeSeguridad>()
+    .AddTransient<CasoDeUsoRegistrarCliente>()
+    .AddTransient<CasoDeUsoObtenerTodosLosAlquileres>()
+    .AddTransient<CasoDeUsoObtenerAlquileresPorCorreo>()
+    .AddTransient<CasoDeUsoBuscarPersonalPorId>()
+    .AddTransient<CasoDeUsoAñadirLlave>()
+
+    .AddTransient<CasoDeUsoAscenderAGerente>()
+    
+    .AddTransient<CasoDeUsoBuscarClientePorCorreo>()
+    .AddTransient<CasoDeUsoObtenerTodos>()
+    .AddTransient<CasoDeUsoBuscarPersonalPorCorreo>()
+
+
+    .AddScoped<IRepositorioPersonal, RepositorioPersonal>()
+    .AddScoped<IRepositorioCliente, RepositorioCliente>()
+    .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
+    .AddScoped<IRepositorioFoto, RepositorioFoto>()
+    .AddScoped<IRepositorioInmueble, RepositorioInmueble>()
+    .AddSingleton<IRepositorioAlquiler, RepositorioAlquiler>()
+    .AddScoped<IRepositorioLlave, RepositorioLlave>()
+    .AddScoped<IRepositorioComentario, RepositorioComentario>()
+    .AddTransient<CasoDeUsoListarLlaves>()
+
+    .AddTransient<CasoDeUsoAgregarComentario>()
+    .AddTransient<CasoDeUsoEditarComentario>()
+    .AddTransient<CasoDeUsoEliminarComentario>()
+    .AddTransient<CasoDeUsoListarComentarios>()
+    .AddTransient<CasoDeUsoBuscarRespuestas>()
+    .AddTransient<CasoDeUsoCalificarInmueble>()
+    .AddTransient<CasoDeUsoListarValoraciones>()
+    .AddTransient<CasoDeUsoEditarValoracion>()
+    .AddTransient<CasoDeUsoEliminarValoracion>()
+    .AddTransient<CasoDeUsoPromedioValoracion>()
+
+
+
+    .AddTransient<ValidadorComentario>()
+
+
+    .AddTransient<CasoDeUsoListarLlaves>()
+    .AddTransient<CasoDeUsoPersonalDescenderGerente>()
+    .AddTransient<CasoDeUsoEliminarPersonal>()
+    .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
+    .AddScoped<CasoDeUsoPagarEfectivo>()
+    .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
+    .AddTransient<CasoDeUsoRegistrarAlquilerPresencial>()
+    .AddTransient<CasoDeUsoPagarEfectivo>()
+    .AddSingleton<CasoDeUsoRegistrarAlquilerOnline>()
+    .AddTransient<ValidadorAlquiler>()
+    .AddTransient<ServicioEnviarEmail>()
+    .AddTransient<FiltroDeInmueblesService>()
+    .AddTransient<ServicioGenerarCodigo>()
+    .AddTransient<ValidadorInmueble>()
+    .AddTransient<ValidadorUsuario>()
+    .AddTransient<CasoDeUsoObtenerAlquilerPorId>()
+    .AddHttpContextAccessor()
+    .AddCascadingAuthenticationState()
+    .AddTransient<ServicioFotos>()
+    .AddTransient<CasoDeUsoBuscarEmail>()
+
+    .AddTransient<CasoDeUsoAlquilerCancelarAlquiler>()
+    .AddSingleton<ServicioVerificarPago>()
+    .AddSingleton<MercadoPagoService>();
+builder.WebHost.UseStaticWebAssets();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -63,18 +133,26 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
 
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-builder.Services.AddAuthorization();
-app.Run();
 
 Crear.Inicializar();
 app.Run();

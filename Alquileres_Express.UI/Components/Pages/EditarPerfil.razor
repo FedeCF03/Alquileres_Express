@@ -1,0 +1,211 @@
+@page "/editar-perfil"
+ @rendermode InteractiveServer
+ @inject NavigationManager Navegador;
+ @inject CasoDeUsoAltaCliente CasoDeUsoAltaCliente;
+ @inject CasoDeUsoAltaPersonal CasoDeUsoAltaPersonal;
+ @inject AuthenticationStateProvider AuthenticationStateProvider
+
+ @inject CasoDeUsoBuscarClientePorCorreo CasoDeUsoBuscarClientePorCorreo
+ @inject CasoDeUsoBuscarPersonalPorCorreo CasoDeUsoBuscarPersonalPorCorreo
+@inject CasoDeUsoModificarPersonal casoDeUsoModificarPersonal;
+
+@inject CasoDeUsoModificarCliente casoDeUsoModificarCliente;        
+    
+@using BlazorDateRangePicker
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Components.Authorization
+@inject CasoDeUsoAltaCliente casoDeUsoAltaCliente
+@inject IHttpContextAccessor HttpContextAccessor
+@inject ServicioEnviarEmail servicioEnviarEmail
+@attribute [Authorize]
+
+    <div class="contenedor-edicion">
+        <h2 class="titulo">Bienvenido/a, @usuarioViejo.Nombre @usuarioViejo.Apellido</h2>
+        <p class="subtitulo">Aquí puede editar sus datos personales</p>
+        <div class="tablas-contenedor">
+            <div class="tabla-card">
+                <h3>Datos actuales</h3>
+                <table>
+                    <tr><th>Nombre</th><td>@usuarioViejo.Nombre</td></tr>
+                    <tr><th>Apellido</th><td>@usuarioViejo.Apellido</td></tr>
+                    <tr><th>DNI</th><td>@usuarioViejo.Dni</td></tr>
+                    <tr><th>Correo</th><td>@usuarioViejo.Correo</td></tr>
+                    <tr><th>Dirección</th><td>@usuarioViejo.Direccion</td></tr>
+                    <tr><th>Fecha de Nacimiento</th><td>@usuarioViejo.FechaNacimiento.ToString("dd/MM/yyyy")</td></tr>
+                </table>
+            </div>
+            <div class="tabla-card">
+                <h3>Editar datos</h3>
+                <p>¡Cambiar su email cerrará su sesión y deberá iniciar sesión nuevamente!</p>
+                <div class="form-group">
+                    <input placeholder="Nombre" @bind="usuarioNuevo.Nombre" class="form-control" />
+                    <input placeholder="Apellido" @bind="usuarioNuevo.Apellido" class="form-control" />
+                    <input placeholder="DNI" @bind="usuarioNuevo.Dni" class="form-control" />
+                    <input placeholder="Correo" @bind="correoNuevo" class="form-control" />
+                    <input placeholder="Dirección" @bind="usuarioNuevo.Direccion" class="form-control" />
+                    <label>Fecha de Nacimiento</label>
+                    <div class="d-flex">
+                        <DateRangePicker 
+                            @bind-EndDate="selectedDate"
+                            MinDate="minDate"
+                            MaxDate="DateTime.Now"
+                            SingleDatePicker="true" 
+                            Placeholder="@selectedDate!.Value.DateTime.ToShortDateString()"/>
+                    </div>
+                    <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
+                    <button class="btn btn-secondary" @onclick="@(() => Navegador.NavigateTo("/Perfil"))">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@foreach (var error in errores)
+{
+    <div class="alert alert-danger">
+        @error
+    </div> 
+}
+@if (exitoso)
+{
+    <div class="alert alert-success">
+        Perfil editado exitosamente.
+    </div>
+    @if (deslogeando)
+    {
+        <div class="alert alert-info">
+            Cerrando sesión...
+        </div>
+    }
+}
+
+ @code {
+   private string? ErrorMessage;
+   private DateTimeOffset? selectedDate;
+   private string? rol;
+   private DateTime minDate = new DateTime(DateTime.Now.Year - 100, 1, 1);
+   Cliente _cliente;
+   Personal _personal; 
+
+    String? correo { get; set; }
+    string correoNuevo { get; set; } = string.Empty;
+    Cliente? cliente { get; set; }
+    Personal? personal { get; set; }
+    Usuario? usuarioNuevo {get; set; } 
+    Usuario? usuarioViejo { get; set; }
+    [CascadingParameter]
+    HttpContext? HttpContext { get; set; }
+    private bool exitoso = false;
+    private bool deslogeando = false;
+
+    List<string> errores = [];
+     protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            correo = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            cliente ??= CasoDeUsoBuscarClientePorCorreo.Ejecutar(correo);
+            personal ??= CasoDeUsoBuscarPersonalPorCorreo.Ejecutar(correo);
+            if (cliente != null)
+            {
+                _cliente = new Cliente{
+                    Nombre = new String(cliente.Nombre),
+                    Id = cliente.Id,
+                    Apellido = new String(cliente.Apellido),
+                    Dni = new String(cliente.Dni),
+                    Correo = new String(cliente.Correo),
+                    Direccion = new String(cliente.Direccion),
+                    FechaNacimiento = cliente.FechaNacimiento,
+                    Contraseña = new String(cliente.Contraseña),
+                    Rol = cliente.Rol
+                };
+                selectedDate = cliente.FechaNacimiento;
+                usuarioViejo ??= cliente;
+                usuarioNuevo ??= _cliente;
+                correoNuevo = _cliente.Correo;
+            }
+            else if (personal != null)
+            {
+                _personal = new Personal
+                {
+                    Id = personal.Id,
+                    Nombre = new String(personal.Nombre),
+                    Apellido = new String(personal.Apellido),
+                    Dni = new String(personal.Dni),
+                    Correo = new String(personal.Correo),
+                    Direccion = new String(personal.Direccion),
+                    FechaNacimiento = personal.FechaNacimiento,
+                    Contraseña = new String(personal.Contraseña),
+                    Rol = personal.Rol,
+                    CodigoDeSeguridad = personal.CodigoDeSeguridad
+
+
+                };
+                selectedDate = personal.FechaNacimiento;
+                usuarioViejo ??= personal;
+                usuarioNuevo ??= _personal;
+                correoNuevo = _personal.Correo;
+            }
+        }
+    }
+
+   async Task Aceptar()
+   {
+        errores = [];
+        if (selectedDate == null)
+        {
+            errores.Add("Por favor, seleccioná una fecha de nacimiento.");
+            return;
+        }
+        usuarioNuevo!.FechaNacimiento = selectedDate.Value.DateTime;
+        usuarioNuevo!.Correo = correoNuevo;
+        
+
+        if (usuarioNuevo.Rol.Equals(RolUsuario.Cliente))
+        {
+            if (casoDeUsoModificarCliente.Ejecutar(_cliente, out errores))
+            {
+                if(!usuarioNuevo.Correo.ToLower().Equals(correo.ToLower())){
+                    deslogeando = exitoso = true;
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/logout"));
+                }
+                else{
+                    exitoso = true;
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/Perfil"));
+                }
+               // HttpContextAccessor.HttpContext.SignOutAsync();
+               // await guardarEnCookie(); 
+            }
+        }
+        else
+            if (casoDeUsoModificarPersonal.Ejecutar(_personal, out errores))                                                      
+            {
+                if(!usuarioNuevo.Correo.ToLower().Equals(correo.ToLower())){
+                    deslogeando = exitoso = true;
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/logout"));
+                }
+                else{
+                    exitoso = true;
+                    await Task.Delay(3000).ContinueWith((a) => Navegador.NavigateTo("/Perfil"));
+                }
+               // HttpContextAccessor.HttpContext.SignOutAsync();
+               // await guardarEnCookie();
+            }
+}
+   
+    private async Task guardarEnCookie()
+    {
+
+        var claims = new List<Claim> {
+        new Claim(ClaimTypes.Name, usuarioNuevo.Correo),
+        new Claim(ClaimTypes.Role, usuarioNuevo.Rol.ToString())
+        };
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        await HttpContextAccessor.HttpContext.SignInAsync(principal);
+
+    }
+ }

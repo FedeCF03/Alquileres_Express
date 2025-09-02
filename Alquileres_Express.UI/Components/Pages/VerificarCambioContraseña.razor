@@ -1,0 +1,86 @@
+@page "/verificar-codigo-cambio-contrasena"
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Net.Mail
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ServicioGenerarCodigo servicioGenerarCodigo
+@using System.Security.Claims
+@using System.ComponentModel.DataAnnotations
+@inject CasoDeUsoBuscarCliente casoDeUsoBuscarCliente
+@inject CasoDeUsoBuscarPersonal casoDeUsoBuscarPersonal
+@inject CasoDeUsoActualizarEstadoDobleAutenticacion casoDeUsoActualizarEstadoDobleAutenticacion
+@inject NavigationManager NavigationManager
+@inject ServicioGenerarCodigo servicioGenerarCodigo
+@inject ServicioEnviarEmail servicioEnviarEmail
+@inject CasoDeUsoBuscarEmail casoDeUsoBuscarEmail
+@inject CasoDeUsoCambiarContrasena casoDeUsoCambiarContrasena
+@inject ServicioCambiarContrasena servicioCambiarContrasena
+@rendermode InteractiveServer
+
+<div class="login-container">
+    <div class="login-card">
+
+        <h3 class="login-title">Ingrese el codigo y correo</h3>
+
+        <EditForm Model="@user" OnValidSubmit="VerificarCodigo" FormName="passWord">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label for="username">Email</label>
+                <InputText id="username" @bind-Value="user.CorreoElectronico" class="form-control"
+                    placeholder="Ingrese su usuario" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">codigo</label>
+                <InputText id="password" @bind-Value="user.Codigo" class="form-control"
+                    placeholder="Ingrese su codigo" />
+            </div>
+            <button type="submit" class="btn-primary">Aceptar</button>
+
+        </EditForm>
+
+
+
+
+    </div>
+</div>
+
+@foreach (var error in errores)
+{
+    <div class="alert alert-danger mt-2">@error</div>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    private ContraseñaPendiente user { get; set; } = new();
+    private List<string> errores { get; set; } = [];
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity!.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+
+    }
+
+    private void VerificarCodigo()
+    {
+        if (servicioCambiarContrasena.Verificar(user))
+        {
+            NavigationManager.NavigateTo("/login", true);
+        }
+        else
+        {
+            errores.Clear();
+            errores.Add("El codigo o el email ingresado no son correctos");
+            return;
+        }
+    }
+
+}

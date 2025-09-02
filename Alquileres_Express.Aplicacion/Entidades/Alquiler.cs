@@ -1,35 +1,75 @@
 namespace Alquileres_Express.Aplicacion.Entidades;
+
 using Alquileres_Express.Aplicacion.Enumerativo;
+using Alquileres_Express.Aplicacion.CasosDeUso;
 
 public class Alquiler
 {
     public int Id { get; set; }
-    public Cliente Cliente { get; set; }
-    public RangoDeFechas RangoDeFechas { get; set; }
-    public double precio;
-    public bool Cancelado { get; set; }
-    public Inmueble Inmueble { get; set; }
+    public string CorreoCliente { get; set; } //Cambiar por id
+    public int ClienteId { get; set; }
+    public DateTime FechaDeCreacion { get; set; }
+    public DateTime FechaDeInicio { get; set; }
+    public DateTime FechaDeFin { get; set; }
+    public decimal Precio { get; set; }
+    public bool Cancelado { get; set; } = false;
+    public int InmuebleId { get; set; }
+    public string? NombreDePersonal { get; set; }
+    public string? ApellidoDePersonal { get; set; }
+    public List<RegistroDeLlave>? RegistrosDeLlave { get; set; }
+    public bool Pagado { get; set; } = false;
 
 
-    public EstadoDeAlquiler GetEstadoDeAlquiler()
+
+    public Alquiler() { }
+
+    public Alquiler(string correoCLiente, DateTime fechaDeInicio, DateTime fechaDeFin, decimal precio, int idInmueble)
     {
-
-        if (Cancelado)
-            return EstadoDeAlquiler.Cancelado;
-
-        if (RangoDeFechas.Contains(DateTime.Now)) //se puede cancelar el mismo día antes de las 3?
-            return EstadoDeAlquiler.EnProceso;
-
-        if (RangoDeFechas.StartDate > DateTime.Now)
-            return EstadoDeAlquiler.Vigente;
-
-        return EstadoDeAlquiler.Terminado;
-
-
+        CorreoCliente = correoCLiente;
+        InmuebleId = idInmueble;
+        FechaDeInicio = fechaDeInicio;
+        FechaDeFin = fechaDeFin;
+        Precio = precio;//Lo creo en null y despues lo agrego
+        Cancelado = false;  // Por defecto, un alquiler recién creado no está cancelado.
+        Pagado = false;
     }
 
+    public Alquiler(string correoCLiente, DateTime fechaInicio, DateTime fechaFin, decimal precio, int idInmueble, string nombreDePersonal, string apellidoDePersonal)
+    {
+        CorreoCliente = correoCLiente;
+        InmuebleId = idInmueble;
+        FechaDeInicio = fechaInicio;
+        FechaDeFin = fechaFin;
+        Precio = precio;
+        NombreDePersonal = nombreDePersonal;
+        ApellidoDePersonal = apellidoDePersonal;
+        Cancelado = false;  // Por defecto, un alquiler recién creado no está cancelado.
+        Pagado = false;
+    }
+    public EstadoDeAlquiler GetEstadoDeAlquiler()
+    {
+        if (TieneDevolucion())
+            return EstadoDeAlquiler.Terminado;
+        if (Cancelado)
+            return EstadoDeAlquiler.Cancelado;
+        DateTime horaLimite = FechaDeInicio.AddHours(14);
+        if (horaLimite < DateTime.Now && FechaDeFin.AddHours(10) > DateTime.Now) //se puede cancelar el mismo día antes de las 3?
+            return EstadoDeAlquiler.EnProceso;
 
+        if (horaLimite > DateTime.Now)
+            return EstadoDeAlquiler.Vigente;//Vigente se refiere a que el alquiler está activo y aún no ha comenzado.
 
+        return EstadoDeAlquiler.Terminado;
+    }
 
+    public bool TieneDevolucion()
+    {
+        return RegistrosDeLlave?.Count == 2;
+    }
+    public bool PuedeEntregarLlave() => GetEstadoDeAlquiler() == EstadoDeAlquiler.EnProceso || ((DateTime.Today.AddDays(1) == FechaDeInicio) || (DateTime.Today == FechaDeInicio));
 
+    public bool TerminoSinEntregaDeLlave()
+    {
+        return (GetEstadoDeAlquiler() == EstadoDeAlquiler.Terminado) && ((RegistrosDeLlave?.Count == null) || (RegistrosDeLlave?.Count == 0));
+    }
 }

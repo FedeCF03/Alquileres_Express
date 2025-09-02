@@ -1,0 +1,133 @@
+@page "/verUsuario/"
+@using BlazorDateRangePicker
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject CasoDeUsoBuscarClientePorId casoDeUsoBuscarClientePorId
+@inject CasoDeUsoBuscarPersonalPorId casoDeUsoBuscarPersonalPorId
+@attribute [Authorize(Roles = "Gerente, Empleado")]
+@inject CasoDeUsoPersonalDescenderGerente casoDeUsoBuscarPersonalDescenderGerente
+
+@inject CasoDeUsoAscenderAGerente casoDeUsoBuscarPersonalAscenderAGerente
+@inject CasoDeUsoEliminarPersonal casoDeUsoEliminarPersonal
+
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+
+@if (usuario != null && rol != null)
+{
+<div class="perfil-contenedor">
+    <h2 class="titulo">@usuario.Nombre</h2>
+
+        <div class="perfil-card">
+            <div><strong>@(usuario.Rol.Equals(RolUsuario.Cliente) ? "Número de cliente" : "Número de personal"):</strong>
+                @usuario.Id</div>
+            <div><strong>Apellido:</strong> @usuario.Apellido</div>
+            <div><strong>DNI:</strong> @usuario.Dni</div>
+            <div><strong>Correo:</strong> @usuario.Correo</div>
+            <div><strong>Dirección:</strong> @usuario.Direccion</div>
+            <div><strong>Fecha de Nacimiento:</strong> @usuario.FechaNacimiento.ToString("dd/MM/yyyy")</div>
+            <div><strong>Rol:</strong> @usuario.Rol</div>
+            @if (usuario.Rol == RolUsuario.Cliente)
+            {
+                <div class="botones">
+                    <button class="btn-editar" @onclick="() => CambiarContraseña(usuario.Id)">Cambiar contraseña</button>
+                    <button @onclick="@(() => NavigationManager.NavigateTo($"/alquileres/{ClienteId}"))" class="btn-navlink">
+                        <span class="bi bi-person-plus-fill" aria-hidden="true"></span> Ver alquileres
+                        <AuthorizeView Roles="Gerente">
+                            <Authorized>
+                                @if (usuario.Rol == RolUsuario.Gerente)
+                                {
+                                    <button class="btn btn-sm btn-outline-primary" @onclick="() => DescenderGerente(usuario.Id)">
+                                        <i class="fas fa-eye"></i> Descender a Empleado
+                                    </button>
+                                }
+                                @if (usuario.Rol == RolUsuario.Gerente || usuario.Rol == RolUsuario.Empleado)
+                                {
+                                    <button class="btn btn-sm btn-outline-primary" @onclick="() => DarDeBaja(usuario.Id)">
+                                        <i class="fas fa-eye"></i> Dar de baja
+                                    </button>
+                                }
+                                @if (usuario.Rol == RolUsuario.Empleado)
+                                {
+                                    <button class="btn btn-sm btn-outline-primary" @onclick="() => AscenderAGerente(usuario.Id)">
+                                        <i class="fas fa-eye"></i> Ascender a Gerente
+                                    </button>
+                                }
+                            </Authorized>
+                        </AuthorizeView>
+                    </button>
+                </div>
+            }
+            else if (usuario.Rol == RolUsuario.Gerente && rol.Equals("Gerente"))
+            {
+                //descender gerente
+            }
+            else if (usuario.Rol == RolUsuario.Empleado && rol.Equals("Gerente"))
+            {
+                // ascender empleado
+                //eliminar empleado
+            }
+
+        </div>
+    </div>
+
+}
+
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? PersonalId { get; set; }
+    [SupplyParameterFromQuery]
+    public int? ClienteId { get; set; }
+    String? correo { get; set; }
+    String? rol { get; set; }
+    Usuario? usuario { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (PersonalId != null && ClienteId != null)
+        {
+            NavigationManager.NavigateTo($"/?mensaje=Parámetros no válidos&EsMensajeDeError=true");
+            return;
+        }
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user!.Identity!.IsAuthenticated)
+        {
+            correo = user.Identity.Name;
+            rol = user.FindFirst(ClaimTypes.Role)?.Value;
+            usuario ??= PersonalId != null ? casoDeUsoBuscarPersonalPorId.Ejecutar(PersonalId.Value) : null;
+            usuario ??= ClienteId != null ? casoDeUsoBuscarClientePorId.Ejecutar(ClienteId.Value) : null;
+            if (usuario == null)
+            {
+                NavigationManager.NavigateTo($"/?mensaje=Usuario no encontrado&EsMensajeDeError=true", true);
+                return;
+            }
+            if (rol!.Equals("Empleado") && usuario.Rol.Equals(RolUsuario.Gerente))
+            {
+                NavigationManager.NavigateTo($"/?mensaje=No tienes permiso para ver este usuario&EsMensajeDeError=true");
+            }
+        }
+
+    }
+    void DescenderGerente(int id)
+    {
+        casoDeUsoBuscarPersonalDescenderGerente.Ejecutar(id);
+        NavigationManager.NavigateTo("/listadoUsuario", true);
+    }
+    void DarDeBaja(int id)
+    {
+        casoDeUsoEliminarPersonal.Ejecutar(id);
+        NavigationManager.NavigateTo("/listadoUsuario", true);
+    }
+    void AscenderAGerente(int id)
+    {
+        casoDeUsoBuscarPersonalAscenderAGerente.Ejecutar(id);
+        NavigationManager.NavigateTo("/listadoUsuario", true);
+    }
+    void CambiarContraseña(int id)
+    {
+        NavigationManager.NavigateTo($"/cambiarContrasena/{id}");
+    }
+}
